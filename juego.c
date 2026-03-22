@@ -16,7 +16,7 @@ void buclePartida(){
                 Examinar(); // Llama a la función para examinar objetos y salidas en la sala actual
                 break;
             case 3:
-                void accionMover(); // Llama a la función para mover al jugador a otra sala (dirección se determinará según la conexión elegida)
+                accionMover(); // Llama a la función para mover al jugador a otra sala (dirección se determinará según la conexión elegida)
                 break;
             case 4:
                 //Coger Objeto
