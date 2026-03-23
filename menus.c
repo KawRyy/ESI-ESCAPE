@@ -4,7 +4,7 @@
 #include "usuarios.h"
 #include "juego.h"
 
-void mostrarMenuInicial() {
+void menu_inicial() {
     int opcion;
     
     printf("---------------------------------\n");
