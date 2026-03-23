@@ -24,7 +24,7 @@ void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puz
                 CogerObjeto(*obj, *jug, *par); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 break;
             case 5:
-                //Soltar Objeto
+                SoltarObjeto(*obj, *jug, *par); // Llama a la función para soltar un objeto del inventario del jugador y colocarlo en la sala actual
                 break;
             case 6:
                 Inventario(); // Llama a la función para mostrar el inventario del jugador
@@ -151,3 +151,4 @@ void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
             }
         }
     }
+
