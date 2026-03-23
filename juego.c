@@ -21,10 +21,10 @@ void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puz
                 accionMover(); // Llama a la función para mover al jugador a otra sala (dirección se determinará según la conexión elegida)
                 break;
             case 4:
-                CogerObjeto(*obj); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
+                CogerObjeto(*obj, *jug, *par); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 break;
             case 5:
-                //Soltar Objeto
+                SoltarObjeto(*obj, *jug, *par); // Llama a la función para soltar un objeto del inventario del jugador y colocarlo en la sala actual
                 break;
             case 6:
                 Inventario(); // Llama a la función para mostrar el inventario del jugador
@@ -107,10 +107,11 @@ void Inventario(){
     }
 }
 
-void CogerObjeto(Objetos *obj){
+void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
     // Función para coger un objeto de la sala actual y añadirlo al inventario del jugador
-    int i = 0;
-     for(i = 0; i < *par->num_objetos; i++){
+    int i = 0; // Variable para recorrer la lista de objetos
+    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual
+     for(i = 0; i < *par->num_objetos && j == 0; i++){
         if(*par->lista_objetos[i].localizacion_objeto == 0 && *par->lista_objetos[i].id_sala == *par->id_sala_actual){ // Detecta los objetos que están en la sala actual
              printf("%s   ->    ¿Deseas coger este objeto? (1: Sí, 0: No)\n", *par->lista_objetos[i].nombre_objeto);
              int respuesta;
@@ -118,9 +119,36 @@ void CogerObjeto(Objetos *obj){
 
                 if(respuesta == 1){
                     *par->lista_objetos[i].localizacion_objeto = 1; // Cambia la localización del objeto a inventario
-                    realloc()
+                    *jug->num_items += 1; // Incrementa el número de objetos en el inventario del jugador
+                    *par->lista_objetos = realloc(par->lista_objetos, (*jug->num_items) * sizeof(Objetos)); // Redimensiona la lista de objetos del jugador para incluir el nuevo objeto
+                    *par->lista_objetos[*jug->num_items - 1] = *par->lista_objetos[i]; // Copia el objeto al final de la lista
                     printf("Has cogido el objeto %s\n", *par->lista_objetos[i].nombre_objeto);
+                    j = 1; // Indica que se ha cogido un objeto y se sale del bucle
                 }
         }
     }
 }
+
+void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
+    int i = 0; // Variable para recorrer la lista de objetos
+    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual
+     for(i = 0; i < *par->num_objetos && j == 0; i++){
+        if(*par->lista_objetos[i].localizacion_objeto == 1 ){ // Detecta los objetos que están en el inventario
+             printf("%s   ->    ¿Deseas soltar este objeto? (1: Sí, 0: No)\n", *par->lista_objetos[i].nombre_objeto);
+             int respuesta;
+             scanf("%d", &respuesta);
+            
+                if(respuesta == 1){
+                    *par->lista_objetos[i].localizacion_objeto = 0; // Indica que se ha soltado el objeto
+                    *jug->num_items -= 1; // Disminuye el número de objetos en el inventario del jugador
+                    *par->lista_objetos = realloc(par->lista_objetos, (*jug->num_items) * sizeof(Objetos)); // Redimensiona la lista de objetos del jugador para incluir el nuevo objeto
+                    *par->lista_objetos[i].localizacion_objeto = *par->id_sala_actual; // Cambia la localización del objeto a la sala actual
+                    
+                    printf("Has soltado el objeto %s\n", *par->lista_objetos[i].nombre_objeto);
+                    j = 1; // Indica que se ha soltado un objeto y se sale del bucle
+                }
+            
+            }
+        }
+    }
+
