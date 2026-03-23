@@ -2,12 +2,8 @@
 #include <stdlib.h>
 #include "estructuras.h"
 
-void buclePartida(){
-    Partida *par;
-    Salas *sal;
-    Conexiones *con;
-    Objetos *obj;
-    Puzles *puz;
+void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz){
+    
 
     int x = 0; //Variable para controlar el bucle del menú
     int opcion; //Variable para almacenar la opción elegida por el usuario
@@ -25,7 +21,7 @@ void buclePartida(){
                 accionMover(); // Llama a la función para mover al jugador a otra sala (dirección se determinará según la conexión elegida)
                 break;
             case 4:
-                //Coger Objeto
+                CogerObjeto(*obj); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 break;
             case 5:
                 //Soltar Objeto
@@ -107,6 +103,24 @@ void Inventario(){
     for(i = 0; i < *par->num_objetos; i++){
         if(*par->lista_objetos[i].localizacion_objeto == 1){ //  Si el objeto está en el inventario
             printf("%s   ->     %s\n", *par->lista_objetos[i].nombre_objeto, *par->lista_objetos[i].descripcion_objeto);
+        }
+    }
+}
+
+void CogerObjeto(Objetos *obj){
+    // Función para coger un objeto de la sala actual y añadirlo al inventario del jugador
+    int i = 0;
+     for(i = 0; i < *par->num_objetos; i++){
+        if(*par->lista_objetos[i].localizacion_objeto == 0 && *par->lista_objetos[i].id_sala == *par->id_sala_actual){ // Detecta los objetos que están en la sala actual
+             printf("%s   ->    ¿Deseas coger este objeto? (1: Sí, 0: No)\n", *par->lista_objetos[i].nombre_objeto);
+             int respuesta;
+             scanf("%d", &respuesta);
+
+                if(respuesta == 1){
+                    *par->lista_objetos[i].localizacion_objeto = 1; // Cambia la localización del objeto a inventario
+                    realloc()
+                    printf("Has cogido el objeto %s\n", *par->lista_objetos[i].nombre_objeto);
+                }
         }
     }
 }
