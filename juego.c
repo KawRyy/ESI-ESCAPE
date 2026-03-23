@@ -81,7 +81,7 @@ void Examinar(Partida *par){
 void accionMover(){ // Función para mover al jugador a otra sala siempre que esté abierta
  
    int j = 0; // Indica si se ha encontrado una conexión abierta desde la sala actual
-    for(int i = 0; i < *par->num_conexiones; i++){
+    for(int i = 0; i < *par->num_conexiones; i++){ // Recorre todas las conexiones para encontrar las que parten de la sala actual
         if(*par->lista_conexiones[i].id_sala_orig == *par->id_sala_actual && *par->lista_conexiones[i].estado_conexion == 1){ // Si la conexión es desde la sala actual y está abierta
             printf("%s\n ¿Quieres entrar a la sala %d? (1: Sí, 0: No)\n", *par->salas[*par->lista_conexiones[i].id_sala_dest].descripcion_sala, *par->lista_conexiones[i].id_sala_dest);
             j = 1;
