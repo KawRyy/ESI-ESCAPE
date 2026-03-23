@@ -1,0 +1,36 @@
+#ifndef FICHEROS_H
+#define FICHEROS_H
+
+#include "estructuras.h"
+
+/*
+ * volcado: carga todos los ficheros de datos del mundo del juego.
+ *
+ *   s / ns  -> array dinámico de Salas      y su tamaño
+ *   c / nc  -> array dinámico de Conexiones y su tamaño
+ *   p / np  -> array dinámico de Puzles     y su tamaño
+ *   o / no  -> array dinámico de Objetos    y su tamaño
+ *
+ * Retorna 1 si todos los ficheros se cargaron correctamente, 0 si alguno falló.
+ * El caller es responsable de liberar cada array con free().
+ */
+/* Capacidades: 10 salas, 9 conexiones, 5 objetos, 5 puzles */
+void volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o);
+
+/*
+ * cargarPartida: busca 'nickname' en jugadores.txt y carga su estado
+ * guardado desde partida.txt en la estructura *par.
+ * Retorna 1 si el jugador existe, 0 si no se encontró o hubo error.
+ * Los arrays internos de *par (lista_objetos, lista_conexiones,
+ * lista_puzles) se reservan con malloc; el caller debe liberarlos.
+ */
+int cargarPartida(Partida *par, char *nickname);
+
+/*
+ * guardarPartida: escribe el estado actual de *par (y el inventario
+ * de *jug si no es NULL) en partida.txt, sobreescribiendo la entrada
+ * anterior del mismo jugador.
+ */
+void guardarPartida(Partida *par, Jugadores *jug);
+
+#endif /* FICHEROS_H */
