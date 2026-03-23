@@ -5,17 +5,10 @@
 
 /*
  * volcado: carga todos los ficheros de datos del mundo del juego.
- *
- *   s / ns  -> array dinámico de Salas      y su tamaño
- *   c / nc  -> array dinámico de Conexiones y su tamaño
- *   p / np  -> array dinámico de Puzles     y su tamaño
- *   o / no  -> array dinámico de Objetos    y su tamaño
- *
  * Retorna 1 si todos los ficheros se cargaron correctamente, 0 si alguno falló.
- * El caller es responsable de liberar cada array con free().
  */
-/* Capacidades: 10 salas, 9 conexiones, 5 objetos, 5 puzles */
-void volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o);
+/* Capacidades: 10 salas, 9 conexiones, 5 objetos, 5 puzles. TEMPORAL */
+int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o);
 
 /*
  * cargarPartida: busca 'nickname' en jugadores.txt y carga su estado

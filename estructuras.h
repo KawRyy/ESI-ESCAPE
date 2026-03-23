@@ -31,7 +31,7 @@ typedef struct {
     char id_objeto[5];
     char nombre_objeto[16];
     char descripcion_objeto[51];
-    int localizacion_objeto; // 0: SALA ; 1: INVENTARIO
+    int localizacion_objeto;
 } Objetos;
 
 typedef struct {
