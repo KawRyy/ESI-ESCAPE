@@ -1,0 +1,11 @@
+//IDpuzzle-Name-IDsala-Desc-Sol
+//IDpuzzle: 3 digits
+//Name: 15 digits max
+//IDsala: 2 digits
+//Desc: 150 digits max
+//Sol: 50 digits max
+P01-DirectorESI-00-Escribe el nombre del director de la ESI-Luis Lafuente
+P02-Binario-00-Codifica 193 (decimal) a binario (8 bits)-11000001
+P03-Suma-01-¿Cuanto es 60 + 7?-67
+P04-Multiplica-04-¿Cuanto es 10 x 10?-100
+P05-Final-08-¿Cuantas salas hay en total?-10

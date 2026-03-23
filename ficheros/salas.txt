@@ -1,0 +1,15 @@
+//ID-Name-Type-Desc
+//ID: 2 digits
+//Name: 30 digits max
+//Type: INICIAL, NORMAL, SALIDA
+//Desc: 150 digits max
+00-Biblioteca-INICIAL-Lugar donde inicia el jugador, bastante grande con 2 salidas: al laboratorio y al aula de teoria
+01-Aula_de_Teoria-NORMAL-Sala grande situada al lado de la biblioteca, conecta con la sala de seminario
+02-Aula_de_Seminario-NORMAL-Pequeña sala que conecta con el aula de teoria
+03-Laboratorio-NORMAL-Pequeña sala que se encuentra cerca de la bibliotecay conecta con el pasillo principal
+04-Pasillo_Principal-NORMAL-Gran sala la cual tiene conexiones con laboratorio, vestibulo, cafeteria y secretaria
+05-Cafeteria-NORMAL-Sala situada despues del pasillo principal
+06-Secretaria-NORMAL-Sala situada despues del pasillo principal y que conecta con el taller
+07-Taller-NORMAL-Sala de gran tamaño que esconde un gran secreto
+08-Vestibulo-NORMAL-Sala que conecta con la salida
+09-Exterior-SALIDA-Salida al exterior

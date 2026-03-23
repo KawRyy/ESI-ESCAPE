@@ -1,0 +1,13 @@
+//IDplayer-IDsala-IDobject-IDconex-IDpuzzle
+//IDplayer
+//IDsala
+//IDobject (1 line per one)
+//IDconex
+//IDpuzzle
+//Example:
+//JUGADOR: 01
+//SALA: 02
+//OBJETO: OB01-Name
+//OBJETO: OB02-Name
+//CONEXION: 01-Activa
+//PUZZLE: P01-Resuelto
