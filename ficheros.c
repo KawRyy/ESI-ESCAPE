@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Cambiar los maximos para que sean variables que se pasan como parametros. Actualmente son valores temporales.*/
+
 #define MAX_SALAS 10
 #define MAX_CONEXIONES 9
 #define MAX_OBJETOS 5
