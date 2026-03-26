@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Cambiar los maximos para que sean variables que se pasan como parametros. Actualmente son valores temporales.*/
+/* Cambiar los maximos para que sean variables que se pasan como parametros.
+ * Actualmente son valores temporales.*/
 
 #define MAX_SALAS 10
 #define MAX_CONEXIONES 9
@@ -23,21 +24,31 @@ static int leer_salas(Salas **out) {
   FILE *f = fopen("ficheros/salas.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_SALAS * sizeof(Salas));
+  *out = malloc(MAX_SALAS *
+                sizeof(Salas)); /* Reserva memoria para el array de salas */
   if (!*out || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_SALAS * sizeof(Salas));
+  memset(*out, 0,
+         MAX_SALAS * sizeof(Salas)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_SALAS) {
-    line[strcspn(line, "\r\n")] = '\0';
-    if (line[0] == '/' || line[0] == '\0') continue;
-    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *tipo = strtok(NULL, "-"), *desc = strtok(NULL, "-");
-    if (!id || !nom || !tipo || !desc) continue;
-    (*out)[n].id_sala = atoi(id);
+    line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
+    if (line[0] == '/' || line[0] == '\0')
+      continue; /* Ignora lineas vacias o comentarios */
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"),
+         *tipo = strtok(NULL, "-"),
+         *desc = strtok(NULL, "-"); /* Separa campos por '-' */
+    if (!id || !nom || !tipo || !desc)
+      continue;
+    (*out)[n].id_sala = atoi(id); /* Convierte el ID a numero entero */
     CPY((*out)[n].nombre_sala, nom);
-    (*out)[n].tipo_sala = !strcmp(tipo, "INICIAL") ? 1 : !strcmp(tipo, "NORMAL") ? 2 : !strcmp(tipo, "SALIDA") ? 3 : 0;
+    (*out)[n].tipo_sala = !strcmp(tipo, "INICIAL")  ? 1
+                          : !strcmp(tipo, "NORMAL") ? 2
+                          : !strcmp(tipo, "SALIDA")
+                              ? 3
+                              : 0; /* Asigna el valor numerico segun el tipo */
     CPY((*out)[n].descripcion_sala, desc);
     n++;
   }
@@ -50,23 +61,29 @@ static int leer_puzles(Puzles **out) {
   FILE *f = fopen("ficheros/puzles.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_PUZLES * sizeof(Puzles));
+  *out = malloc(MAX_PUZLES *
+                sizeof(Puzles)); /* Reserva memoria para array de puzles */
   if (!*out || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_PUZLES * sizeof(Puzles));
+  memset(*out, 0,
+         MAX_PUZLES * sizeof(Puzles)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_PUZLES) {
-    line[strcspn(line, "\r\n")] = '\0';
-    if (line[0] == '/' || line[0] == '\0') continue;
+    line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
+    if (line[0] == '/' || line[0] == '\0')
+      continue; /* Ignora lineas vacias o comentarios */
     char *id = strtok(line, "-");
     strtok(NULL, "-"); /* skip nombre */
-    char *sala = strtok(NULL, "-"), *desc = strtok(NULL, "-"), *sol = strtok(NULL, "-");
-    if (!id || !sala || !desc || !sol) continue;
+    char *sala = strtok(NULL, "-"), *desc = strtok(NULL, "-"),
+         *sol = strtok(NULL, "-"); /* Separa campos por '-' */
+    if (!id || !sala || !desc || !sol)
+      continue;
     CPY((*out)[n].id_puzle, id);
-    (*out)[n].id_sala_puzle = atoi(sala);
-    (*out)[n].tipo_elemento = !strncmp(sol, "OB", 2) ? 1 : 2;
+    (*out)[n].id_sala_puzle = atoi(sala); /* Convierte el ID de sala a entero */
+    (*out)[n].tipo_elemento =
+        !strncmp(sol, "OB", 2) ? 1 : 2; /* Determina el tipo de elemento */
     CPY((*out)[n].descripcion_puzle, desc);
     CPY((*out)[n].solucion_puzle, sol);
     n++;
@@ -80,24 +97,37 @@ static int leer_conexiones(Conexiones **out) {
   FILE *f = fopen("ficheros/conexiones.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_CONEXIONES * sizeof(Conexiones));
+  *out =
+      malloc(MAX_CONEXIONES *
+             sizeof(Conexiones)); /* Reserva memoria para array de conexiones */
   if (!*out || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_CONEXIONES * sizeof(Conexiones));
+  memset(*out, 0,
+         MAX_CONEXIONES *
+             sizeof(Conexiones)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_CONEXIONES) {
-    line[strcspn(line, "\r\n")] = '\0';
-    if (line[0] == '/' || line[0] == '\0') continue;
-    char *id = strtok(line, "-"), *orig = strtok(NULL, "-"), *dest = strtok(NULL, "-"), *state = strtok(NULL, "-"), *cond = strtok(NULL, "-");
+    line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
+    if (line[0] == '/' || line[0] == '\0')
+      continue; /* Ignora lineas vacias o comentarios */
+    char *id = strtok(line, "-"), *orig = strtok(NULL, "-"),
+         *dest = strtok(NULL, "-"), *state = strtok(NULL, "-"),
+         *cond = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id || !orig || !dest || !state || !cond)
       continue;
     CPY((*out)[n].id_conexion, id);
-    (*out)[n].id_sala_orig = atoi(orig);
-    (*out)[n].id_sala_dest = atoi(dest);
-    (*out)[n].estado_conexion = !strcmp(state, "Activa") ? 1 : 0;
-    (*out)[n].condicion_conexion = !strcmp(cond, "0") ? 0 : !strncmp(cond, "OB", 2) ? 1 : !strncmp(cond, "P", 1)  ? 2 : 0;
+    (*out)[n].id_sala_orig = atoi(orig); /* Convierte el ID origen a entero */
+    (*out)[n].id_sala_dest = atoi(dest); /* Convierte el ID destino a entero */
+    (*out)[n].estado_conexion =
+        !strcmp(state, "Activa") ? 1
+                                 : 0; /* Determina si la conexion esta activa */
+    (*out)[n].condicion_conexion =
+        !strcmp(cond, "0")        ? 0
+        : !strncmp(cond, "OB", 2) ? 1
+        : !strncmp(cond, "P", 1)  ? 2
+                                  : 0; /* Asigna numericamente la condicion */
     n++;
   }
   fclose(f);
@@ -109,22 +139,28 @@ static int leer_objetos(Objetos **out) {
   FILE *f = fopen("ficheros/objetos.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_OBJETOS * sizeof(Objetos));
+  *out = malloc(MAX_OBJETOS *
+                sizeof(Objetos)); /* Reserva memoria para array de objetos */
   if (!*out || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_OBJETOS * sizeof(Objetos));
+  memset(*out, 0,
+         MAX_OBJETOS * sizeof(Objetos)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_OBJETOS) {
-    line[strcspn(line, "\r\n")] = '\0';
-    if (line[0] == '/' || line[0] == '\0') continue;
-    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *desc = strtok(NULL, "-"), *loc = strtok(NULL, "-");
-    if (!id || !nom || !desc || !loc) continue;
+    line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
+    if (line[0] == '/' || line[0] == '\0')
+      continue; /* Ignora lineas vacias o comentarios */
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"),
+         *desc = strtok(NULL, "-"),
+         *loc = strtok(NULL, "-"); /* Separa campos por '-' */
+    if (!id || !nom || !desc || !loc)
+      continue;
     CPY((*out)[n].id_objeto, id);
     CPY((*out)[n].nombre_objeto, nom);
     CPY((*out)[n].descripcion_objeto, desc);
-    (*out)[n].localizacion_objeto = atoi(loc);
+    (*out)[n].localizacion_objeto = atoi(loc); /* ID de sala o ubicacion */
     n++;
   }
   fclose(f);
@@ -139,7 +175,9 @@ int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o) {
   int nc = leer_conexiones(c);
   int no = leer_objetos(o);
 
-  return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0) ? 1 : 0;
+  return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0)
+             ? 1
+             : 0; /* Verifica si todas las lecturas fueron exitosas */
 }
 
 /* ── cargarPartida ──────────────────────────────────────────────── */
@@ -157,8 +195,12 @@ int cargarPartida(Partida *par, char *nickname) {
     line[strcspn(line, "\r\n")] = '\0';
     if (line[0] == '/' || line[0] == '\0')
       continue;
-    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-");
-    if (!id || !nom || !nick || strcmp(nick, nickname) != 0)
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"),
+         *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"),
+         *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
+    if (!id || !nom || !nick ||
+        strcmp(nick, nickname) !=
+            0) /* Ignora si faltan datos o no coinciden con el usuario */
       continue;
     jug.id_jugador = atoi(id);
     CPY(jug.nombre_jugador, nom);
@@ -168,8 +210,10 @@ int cargarPartida(Partida *par, char *nickname) {
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
-        char **tmp = realloc(jug.id_objeto, (jug.num_items + 1) * sizeof(char *));
-        if (!tmp) break;
+        char **tmp =
+            realloc(jug.id_objeto, (jug.num_items + 1) * sizeof(char *));
+        if (!tmp)
+          break;
         jug.id_objeto = tmp;
         jug.id_objeto[jug.num_items] = malloc(strlen(obj) + 1);
         if (jug.id_objeto[jug.num_items])
@@ -185,10 +229,13 @@ int cargarPartida(Partida *par, char *nickname) {
     return 0;
 
   /* 2. Inicializar partida con inventario del jugador */
-  memset(par, 0, sizeof(Partida));
-  par->id_jugador = jug.id_jugador;
+  memset(par, 0, sizeof(Partida));  /* Limpia la estructura de partida */
+  par->id_jugador = jug.id_jugador; /* Asigna el id del jugador cargado */
+  par->id_sala_actual =
+      1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
   if (jug.num_items > 0) {
-    par->lista_objetos = malloc(jug.num_items * sizeof(Objetos));
+    par->lista_objetos = malloc(
+        jug.num_items * sizeof(Objetos)); /* Reserva memoria para inventario */
     if (par->lista_objetos) {
       memset(par->lista_objetos, 0, jug.num_items * sizeof(Objetos));
       for (int i = 0; i < jug.num_items; i++) {
@@ -212,7 +259,9 @@ int cargarPartida(Partida *par, char *nickname) {
       continue;
 
     if (!strncmp(line, "JUGADOR:", 8)) {
-      en_bloque = atoi(line + 9) == jug.id_jugador;
+      en_bloque = atoi(line + 9) ==
+                  jug.id_jugador; /* Activa la lectura solo si es el bloque de
+                                     la partida del jugador */
       continue;
     }
     if (!en_bloque)
@@ -224,7 +273,8 @@ int cargarPartida(Partida *par, char *nickname) {
 
     if (!strncmp(line, "OBJETO:", 7)) {
       char *id_o = strtok(line + 8, "-\n");
-      Objetos *tmp = realloc(par->lista_objetos, (par->num_objetos + 1) * sizeof(Objetos));
+      Objetos *tmp =
+          realloc(par->lista_objetos, (par->num_objetos + 1) * sizeof(Objetos));
       if (!tmp) {
         fclose(f);
         return 0;
@@ -233,28 +283,33 @@ int cargarPartida(Partida *par, char *nickname) {
       memset(&par->lista_objetos[par->num_objetos], 0, sizeof(Objetos));
       if (id_o)
         CPY(par->lista_objetos[par->num_objetos].id_objeto, id_o);
-      par->lista_objetos[par->num_objetos].localizacion_objeto = 0; /* 0 = en inventario */
+      par->lista_objetos[par->num_objetos].localizacion_objeto =
+          0; /* 0 = en inventario */
       par->num_objetos++;
       continue;
     }
     if (!strncmp(line, "CONEXION:", 9)) {
       char *id = strtok(line + 10, "-"), *est = strtok(NULL, "-");
-      Conexiones *tmp = realloc(par->lista_conexiones, (par->num_conexiones + 1) * sizeof(Conexiones));
+      Conexiones *tmp = realloc(par->lista_conexiones,
+                                (par->num_conexiones + 1) * sizeof(Conexiones));
       if (!tmp) {
         fclose(f);
         return 0;
       }
       par->lista_conexiones = tmp;
-      memset(&par->lista_conexiones[par->num_conexiones], 0, sizeof(Conexiones));
+      memset(&par->lista_conexiones[par->num_conexiones], 0,
+             sizeof(Conexiones));
       if (id)
         CPY(par->lista_conexiones[par->num_conexiones].id_conexion, id);
-      par->lista_conexiones[par->num_conexiones].estado_conexion = (est && !strcmp(est, "Activa")) ? 1 : 0;
+      par->lista_conexiones[par->num_conexiones].estado_conexion =
+          (est && !strcmp(est, "Activa")) ? 1 : 0;
       par->num_conexiones++;
       continue;
     }
     if (!strncmp(line, "PUZZLE:", 7)) {
       char *id = strtok(line + 8, "-");
-      Puzles *tmp = realloc(par->lista_puzles, (par->num_puzles + 1) * sizeof(Puzles));
+      Puzles *tmp =
+          realloc(par->lista_puzles, (par->num_puzles + 1) * sizeof(Puzles));
       if (!tmp) {
         fclose(f);
         return 0;
@@ -285,13 +340,17 @@ void guardarPartida(Partida *par, Jugadores *jug) {
         strncpy(t, line, sizeof(t));
         t[strcspn(t, "\r\n")] = '\0';
         if (!strncmp(t, "JUGADOR:", 8))
-          skip = atoi(t + 9) == par->id_jugador;
+          skip = atoi(t + 9) ==
+                 par->id_jugador; /* Omite las lineas del jugador actual en el
+                                     guardado original (se van a reescribir) */
         if (!skip)
-          fputs(line, fout);
+          fputs(line,
+                fout); /* Mantiene intacta la partida de los demas jugadores */
       }
       fclose(fin);
     }
-    fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
+    fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador,
+            par->id_sala_actual);
     if (jug) {
       for (int i = 0; i < jug->num_items; i++)
         if (jug->id_objeto && jug->id_objeto[i])
@@ -301,7 +360,9 @@ void guardarPartida(Partida *par, Jugadores *jug) {
         fprintf(fout, "OBJETO: %s\n", par->lista_objetos[i].id_objeto);
     }
     for (int i = 0; i < par->num_conexiones; i++)
-      fprintf(fout, "CONEXION: %s-%s\n", par->lista_conexiones[i].id_conexion, par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada");
+      fprintf(fout, "CONEXION: %s-%s\n", par->lista_conexiones[i].id_conexion,
+              par->lista_conexiones[i].estado_conexion ? "Activa"
+                                                       : "Bloqueada");
     for (int i = 0; i < par->num_puzles; i++)
       fprintf(fout, "PUZZLE: %s-Resuelto\n", par->lista_puzles[i].id_puzle);
     fclose(fout);
@@ -320,7 +381,9 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       char t[512];
       strncpy(t, line, sizeof(t));
       t[strcspn(t, "\r\n")] = '\0';
-      char *id = strtok(t, "-"), *orig = strtok(NULL, "-"), *dest = strtok(NULL, "-"), *state = strtok(NULL, "-"), *cond = strtok(NULL, "-");
+      char *id = strtok(t, "-"), *orig = strtok(NULL, "-"),
+           *dest = strtok(NULL, "-"), *state = strtok(NULL, "-"),
+           *cond = strtok(NULL, "-");
       if (!id || !orig || !dest || !state || !cond) {
         fputs(line, fout);
         continue;
@@ -328,7 +391,8 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       const char *nuevo = state;
       for (int i = 0; i < par->num_conexiones; i++)
         if (!strcmp(par->lista_conexiones[i].id_conexion, id)) {
-          nuevo = par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada";
+          nuevo =
+              par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada";
           break;
         }
       fprintf(fout, "%s-%s-%s-%s-%s\n", id, orig, dest, nuevo, cond);
@@ -355,7 +419,8 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       char t[512];
       strncpy(t, line, sizeof(t));
       t[strcspn(t, "\r\n")] = '\0';
-      char *id = strtok(t, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
+      char *id = strtok(t, "-"), *nom = strtok(NULL, "-"),
+           *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
       if (!id || !nom || !nick || !pw || atoi(id) != par->id_jugador) {
         fputs(line, fout);
         continue;
@@ -368,7 +433,8 @@ void guardarPartida(Partida *par, Jugadores *jug) {
             fprintf(fout, "%s%s", cnt++ ? "," : "-", jug->id_objeto[i]);
       } else {
         for (int i = 0; i < par->num_objetos; i++)
-          fprintf(fout, "%s%s", cnt++ ? "," : "-", par->lista_objetos[i].id_objeto);
+          fprintf(fout, "%s%s", cnt++ ? "," : "-",
+                  par->lista_objetos[i].id_objeto);
       }
       fprintf(fout, "\n");
     }

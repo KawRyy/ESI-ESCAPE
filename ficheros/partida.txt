@@ -11,3 +11,5 @@
 //OBJETO: OB02-Name
 //CONEXION: 01-Activa
 //PUZZLE: P01-Resuelto
+JUGADOR: 01
+SALA: 01
