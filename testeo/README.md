@@ -1,0 +1,1 @@
+Estos tests se han creado con el uso de la IA para comprobar el correcto funcionamiento de las distintas funciones del programa.
