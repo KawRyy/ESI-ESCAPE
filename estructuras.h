@@ -1,6 +1,7 @@
 #ifndef ESTRUCTURAS_H
 #define ESTRUCTURAS_H
 
+/*CAMBIA*/
 typedef struct {
     int id_jugador; // 2 digitos EJ: 99
     char nombre_jugador[21];
@@ -19,6 +20,7 @@ typedef struct {
     int tipo_sala; // 1:INICIAL ; 2: NORMAL ; 3: SALIDA
 } Salas;
 
+/*CAMBIA*/
 typedef struct {
     char id_conexion[4];
     int id_sala_orig;
@@ -27,6 +29,7 @@ typedef struct {
     int condicion_conexion; // 0: no aplica ; 1: requiere objeto ; 2: requiere puzle
 } Conexiones;
 
+/*CAMBIA*/
 typedef struct {
     char id_objeto[5];
     char nombre_objeto[16];
@@ -42,6 +45,7 @@ typedef struct {
     char solucion_puzle[51];
 } Puzles;
 
+/*CAMBIA*/
 typedef struct {
     int id_jugador;        // ID del usuario que juega
     int id_sala_actual;    // Dónde se quedó el jugador
