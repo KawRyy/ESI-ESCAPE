@@ -138,15 +138,62 @@ static int leer_objetos(Objetos **out) {
   return n;
 }
 
+/* ── leer_jugadores ─────────────────────────────────────────────── */
+static int leer_jugadores(Jugadores **out) {
+  FILE *f = fopen("ficheros/jugadores.txt", "r");
+  char line[512];
+  int n = 0;
+  *out = NULL;
+  if (!f) return -1;
+
+  while (fgets(line, sizeof(line), f)) {
+    line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
+    if (line[0] == '/' || line[0] == '\0')
+      continue; /* Ignora lineas vacias o comentarios */
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-");
+    if (!id || !nom || !nick || !pw)
+      continue;
+
+    Jugadores *tmp = realloc(*out, (n + 1) * sizeof(Jugadores));
+    if (!tmp) {
+        fclose(f);
+        return -1;
+    }
+    *out = tmp;
+    memset(&((*out)[n]), 0, sizeof(Jugadores));
+
+    (*out)[n].id_jugador = atoi(id);
+    CPY((*out)[n].nombre_jugador, nom);
+    CPY((*out)[n].jugador, nick);
+    CPY((*out)[n].contraseña, pw);
+    if (inv) {
+      char *obj = strtok(inv, ",");
+      while (obj) {
+        char **tmp_obj = realloc((*out)[n].id_objeto, ((*out)[n].num_items + 1) * sizeof(char *));
+        if (!tmp_obj) break;
+        (*out)[n].id_objeto = tmp_obj;
+        (*out)[n].id_objeto[(*out)[n].num_items] = malloc(strlen(obj) + 1);
+        if ((*out)[n].id_objeto[(*out)[n].num_items])
+          strcpy((*out)[n].id_objeto[(*out)[n].num_items++], obj);
+        obj = strtok(NULL, ",");
+      }
+    }
+    n++;
+  }
+  fclose(f);
+  return n;
+}
+
 /* ── volcado ────────────────────────────────────────────────────── */
-int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o) {
+int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j) {
 
   int ns = leer_salas(s);
   int np = leer_puzles(p);
   int nc = leer_conexiones(c);
   int no = leer_objetos(o);
+  int nj = leer_jugadores(j);
 
-  return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0) ? 1 : 0; /* Verifica si todas las lecturas fueron exitosas */
+  return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0 && nj >= 0) ? 1 : 0; /* Verifica si todas las lecturas fueron exitosas */
 }
 
 /* ── cargarPartida ──────────────────────────────────────────────── */

@@ -7,8 +7,9 @@
  * volcado: carga todos los ficheros de datos del mundo del juego.
  * Retorna 1 si todos los ficheros se cargaron correctamente, 0 si alguno falló.
  */
-/* Capacidades: 10 salas, 9 conexiones, 5 objetos, 5 puzles. TEMPORAL */
-int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o);
+/* Capacidades: 10 salas, 9 conexiones, 5 objetos, 5 puzles. Tamaño de jugadores
+ * dinamico, aumentará al registrarse un nuevo jugador. TEMPORAL */
+int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j);
 
 /*
  * cargarPartida: busca 'nickname' en jugadores.txt y carga su estado

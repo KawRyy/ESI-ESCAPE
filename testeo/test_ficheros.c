@@ -7,8 +7,8 @@
  *   .\test_ficheros.exe
  */
 
-#include "estructuras.h"
-#include "ficheros.h"
+#include "../estructuras.h"
+#include "../ficheros.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,8 +62,9 @@ static void test_volcado(void) {
   Conexiones *conexiones = NULL;
   Puzles *puzles = NULL;
   Objetos *objetos = NULL;
+  Jugadores *jugadores = NULL;
 
-  int ret = volcado(&salas, &conexiones, &puzles, &objetos);
+  int ret = volcado(&salas, &conexiones, &puzles, &objetos, &jugadores);
 
   printf("\n--- Resultados del volcado ---\n");
   ASSERT(ret == 1,
@@ -91,6 +92,7 @@ static void test_volcado(void) {
   free(conexiones);
   free(puzles);
   free(objetos);
+  free(jugadores);
 
   printf("\nFIN DEL TEST DE VOLCADO.\n");
   PAUSA();
