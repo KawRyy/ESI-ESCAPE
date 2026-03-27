@@ -1,7 +1,7 @@
 #ifndef JUEGO_H
 #define JUEGO_H
 #include "estructuras.h"
-void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz);
+void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz, Partida *par);
 void ExaminarObjeto(Partida *par);  
 void ExaminarSalidas(Partida *par);
 void accionMover(Partida *par);
