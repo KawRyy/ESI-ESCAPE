@@ -140,7 +140,7 @@ void ResolverPuzle(Puzles *puz, Partida *par){
             if(respuesta == 1){
                 char solucion[51];
                 printf("%s:\n", par->lista_puzles[i].descripcion_puzle);
-                // Add space in scanf or consume newline
+                // Limpiar el buffer de entrada antes de leer la solución, para evitar problemas con scanf y fgets
                 while(getchar() != '\n'); // Limpiar buffer
                 fgets(solucion, 51, stdin); // Lee la solución introducida por el jugador
                 solucion[strcspn(solucion, "\n")] = '\0'; // Elimina el carácter de nueva línea
