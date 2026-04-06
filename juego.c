@@ -134,7 +134,7 @@ void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
 
                 printf("Has soltado el objeto %s\n", par->lista_objetos[i].nombre_objeto);
                 j = 1; // Este "j = 1" ya estaba actuando como un break para el bucle principal
-            }
+            } 
         }
     }
 }
