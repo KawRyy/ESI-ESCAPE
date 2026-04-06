@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "estructuras.h"
-#include"ficheros.h"
+#include "ficheros.h"
 #include "juego.h"
-#include "menu.h"
+#include "menus.h"
 
-void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz){
+void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz, Partida *par){
     
 
     int x = 0; //Variable para controlar el bucle del menú
@@ -15,7 +15,7 @@ void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puz
         scanf("%d", &opcion); // Lee la opción elegida por el usuario
         switch(opcion){
             case 1:
-                printf("%s\n", *sal->descripcion_sala[par->id_sala_actual]); //Escribe por pantalla la sala actual y su descripción
+                printf("%s\n", *sal->descripcion_sala[(*par)->id_sala_actual]); //Escribe por pantalla la sala actual y su descripción
                 break;
             case 2:
                 printf("Objetos en la sala:\n-------------------------------\n");

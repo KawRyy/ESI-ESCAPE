@@ -6,6 +6,7 @@
 #include "menus.h"
 
 int main() {
+<<<<<<< HEAD
     /* Se vuelcan al inicio del juego y son invariantes */
     Objetos *obj = NULL; // Puntero para almacenar la lista de objetos del juego
     Salas *sal = NULL; // Puntero para almacenar la lista de salas del juego
@@ -30,4 +31,17 @@ int main() {
 
     // menu_principal(&par); // Llama a la función para mostrar el menú principal del juego
     
+=======
+  volcado(NULL, NULL, NULL, NULL, NULL); // Llama a la función para cargar los datos del juego desde los archivos (falta implementar correctamente con punteros)
+
+  menu_inicial(); // Llama a la función para mostrar el menú inicial y gestionar
+                  // el acceso de los jugadores
+  menu_principal(); // Llama a la función para mostrar el menú principal del
+                    // juego y gestionar las acciones del jugador durante la
+                    // partida
+  menu_partida();   // Llama a la función para mostrar el menú de la partida y
+                    // gestionar las acciones específicas dentro de la partida
+
+  return 0;
+>>>>>>> 9625f60b9552772341f157a948a035bc9e7c7c45
 }

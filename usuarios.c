@@ -8,7 +8,7 @@
 
 #define MAX_INTENTOS 3
 
-// Máxima longitud de una línea (en principio, BUFSIZ, el tamaño dl buffer de E/S).
+// Máxima longitud de una línea (en principio, BUFSIZ, el tamaño del buffer de E/S).
 
 #define MAX_LONGITUD_LINEA BUFSIZ
 
@@ -42,13 +42,15 @@ static void muestra_usuarios(Jugador *jugador, int número_jugadores)
 /*
     El enunciado dice que se emplee memoria dinámica, se entiende que cuando sea necesario, es
     decir, cuando no se conozca de antemano el número de objetos necesarios. Si el tamaño es fijo y
-    conocido, no tiene sentido (no vamoa a poner las variales locales en memoria dinámica).
+    conocido, no tiene sentido (no vamos a poner las variables locales en memoria dinámica).
 
     Para poder añadir un nuevo jugador, necesitamos modificar el vector de jugadores y el número de
     jugadores, pasándolos por referencia, es decir, con punteros.
 
-    - jugadores         Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
-    - número_jugadores  Puntero al número de jugadores.
+    Parámetros:
+
+    jugadores           (E/S)   Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
+    número_jugadores    (E)     Puntero al número de jugadores.
 */
 
 void login(Jugador **jugadores, int *número_jugadores)
@@ -113,22 +115,45 @@ void login(Jugador **jugadores, int *número_jugadores)
     }
 }
 
-// Puntero al jugador con el nombre de usuario indicado en el vector de jugadores o NULL si no existe.
+// Búsqueda de un usuario en el vector de jugadores.
+//
+// Realiza una búsqueda lineal por nombre de usuario y, si encuentra un jugador con ese nombre de usuario, 
+// devuelve un puntero a él. En caso contrario, devuelve NULL para indicar que no existe.
+//
+// Parámetros:
+//
+// usuario          (E)      Nombre de usuario 
+// jugador          (E)      Vector de jugadores (puntero a su primer elemento)
+// numero_jugadores (E)      Número de juhadores del vector
+//
+// Valor devuelto:
+//
+// Puntero al (primer) jugador con ese nombre de usuario o NULL si no existe ninguno con ese nombre.
 
 Jugador *busca_usuario(const char *usuario, Jugador jugador[], int numero_jugadores)
 {
     int encontrado = 0;
     int k;
-    for (k = 0; k < numero_jugadores && !encontrado; ++k)
-        if (!strcmp(usuario, jugador[k].jugador))
-            encontrado = 1;
-    if (encontrado)
+    for (k = 0; k < numero_jugadores && !encontrado; ++k) {
+        if (!strcmp(usuario, jugador[k].jugador)) {  // ¿Las cadenas son iguales?
+            encontrado = 1;                          // Sí, terminamos el bucle.
+        }
+    }
+    // Cuidado, pues aunque o encuentre, el bucle incrementa la k...
+    if (encontrado) {
         return &jugador[k - 1];  // O, equivalentemente, jugador + k - 1.
-    else
+    } else {
         return NULL;
+    }
 }
 
 // Muestra un mensaje, lee una línea completa y guarda en la cadena n caracteres como mucho, incluyendo el '\0'.
+//
+// Parámetros:
+//
+// mensaje (E)      Mensaje a mostrar 
+// cadena  (S)      Cadena leída
+// n       (E)      Número máximo de caracteres, incluyendo el terminador
 
 void lee_cadena(const char *mensaje, char *cadena, int n)
 {
@@ -178,7 +203,7 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
     nuevo_jugador.id_jugador = *número_jugadores + 1;
-    // Obtenemos el nombre el usuario y la contraseña del nuevo jugador.
+    // Obtenemos el nombre, el usuario y la contraseña del nuevo jugador.
     lee_cadena("Nombre: ", nuevo_jugador.nombre_jugador, sizeof nuevo_jugador.nombre_jugador);
     lee_cadena("Usuario: ", nuevo_jugador.jugador, sizeof nuevo_jugador.jugador);
     // Buscamos si ese jugador ya está registrado (solo se comprueba el usuario, puede haber personas con el mismo nombre).

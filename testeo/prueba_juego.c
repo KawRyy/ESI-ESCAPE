@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "estructuras.h"
-#include "juego.h"
+#include "../estructuras.h"
+#include "../juego.h"
 
 // ============================================================================
 // FUNCIONES DE INICIALIZACIÓN DE DATOS DE PRUEBA
