@@ -5,54 +5,6 @@
 #include "ficheros.h"
 #include "juego.h"
 
-void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz, Partida *par){
-    
-
-    int x = 0; //Variable para controlar el bucle del menú
-    int opcion; //Variable para almacenar la opción elegida por el usuario
-    while(x == 0){
-        printf("Menu:\n Sala: %s \n--------------------------------\n 1.Describir Sala\n 2.Examinar (objetos y salidas)\n 3.Entrar en otra sala\n 4.Coger Objeto\n 5.Soltar Objeto\n 6.Inventario\n 7.Usar Objeto\n 8.Resolver puzle / introducir código\n 9.Guardar Partida\n 10.Volver\n--------------------------------\n", sal[par->id_sala_actual].nombre_sala);
-        scanf("%d", &opcion); // Lee la opción elegida por el usuario
-        switch(opcion){
-            case 1:
-                printf("%s\n", sal[par->id_sala_actual].descripcion_sala); //Escribe por pantalla la sala actual y su descripción
-                break;
-            case 2:
-                printf("Objetos en la sala:\n-------------------------------\n");
-                ExaminarObjeto(par); // Llama a la función para examinar objetos de la sala actual
-                printf("\nSalidas disponibles:\n-------------------------------\n");
-                ExaminarSalidas(par); // Llama a la función para examinar las salidas disponibles desde la sala actual
-                break;
-            case 3:
-                accionMover(par, sal); // Llama a la función para mover al jugador a otra sala (dirección se determinará según la conexión elegida)
-                break;
-            case 4:
-                CogerObjeto(obj, jug, par); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
-                break;
-            case 5:
-                SoltarObjeto(obj, jug, par); // Llama a la función para soltar un objeto del inventario del jugador y colocarlo en la sala actual
-                break;
-            case 6:
-                printf("Inventario:\n-------------------------------\n");
-                Inventario(par); // Llama a la función para mostrar el inventario del jugador
-                break;
-            case 7:
-                UsarObjeto(obj, con, par); // Llama a la función para usar un objeto del inventario del jugador, lo que podría afectar a las conexiones o puzles de la sala actual
-                break;
-            case 8:
-                ResolverPuzle(puz, par); // Llama a la función para resolver un puzle de la sala actual, lo que podría afectar a las conexiones o objetos disponibles  
-                break;
-            case 9:
-                guardarPartida(par, jug);
-                break;
-            case 10:
-                x = 1; // Salir del bucle
-                break;
-            default:
-                printf("Opción no válida. Por favor, elige una opción del menú.\n");
-        }
-    }
-}
 
 
 
@@ -119,7 +71,7 @@ void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
             scanf("%d", &respuesta);
 
             if (respuesta == 1) {
-                par->lista_objetos[i].localizacion_objeto = 00; // Cambia la localización del objeto a inventario
+                par->lista_objetos[i].localizacion_objeto = 0; // Cambia la localización del objeto a inventario
                 jug->num_items += 1; // Incrementa el número de objetos en el inventario del jugador
                 par->lista_objetos = realloc(par->lista_objetos, (jug->num_items) * sizeof(Objetos)); // Redimensiona la lista de objetos del jugador para incluir el nuevo objeto
                 par->lista_objetos[jug->num_items - 1] = par->lista_objetos[i]; // Copia el objeto al final de la lista
@@ -188,7 +140,7 @@ void ResolverPuzle(Puzles *puz, Partida *par){
             if(respuesta == 1){
                 char solucion[51];
                 printf("%s:\n", par->lista_puzles[i].descripcion_puzle);
-                // Add space in scanf or consume newline
+                // Limpiar el buffer de entrada antes de leer la solución, para evitar problemas con scanf y fgets
                 while(getchar() != '\n'); // Limpiar buffer
                 fgets(solucion, 51, stdin); // Lee la solución introducida por el jugador
                 solucion[strcspn(solucion, "\n")] = '\0'; // Elimina el carácter de nueva línea
