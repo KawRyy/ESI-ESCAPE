@@ -1,24 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "estructuras.h"
 #include "usuarios.h"
 #include "juego.h"
 
-void menu_inicial() {
-    int opcion;
-    
-    printf("=================================\n");
-    printf("    Bienvenido a ESI-ESCAPE\n");
-    printf("=================================\n");
-    printf("1. Iniciar sesión\n");
-    printf("2. Salir\n");
-    printf("Seleccione una opción: ");
+void menu_inicial(Jugadores **jug){
+    int control = 0;
+    do{
+        printf("=================================\n");
+        printf("    Bienvenido a ESI-ESCAPE\n");
+        printf("=================================\n");
+        printf("1. Iniciar sesión\n");
+        printf("2. Salir\n");
+        printf("Seleccione una opción: ");
 
-    scanf("%d", &opcion);
+        scanf("%d", &control);
 
-    switch(opcion) {
+        switch(control){
         case 1:
-            /* login(); */ // FALTA CREAR LAS ESTRUCTURAS PARÁMETROS
+/* JUGADORES NO ESTÁ INICIALIZADO || login() RECIBE PARÁMETROS ERRÓNEOS */
+
+        /*  if (login(&jug) == 1){
+                printf("Inicio de sesión exitoso... \n");
+                break;
+            else{
+                printf("Inicio de sesión fallido... \n");
+                control = 0; // Volver a mostrar el menú
+                break;
+            };
+        */
             break;
         case 2:
             printf("Gracias por jugar. ¡Hasta luego!\n");
@@ -26,8 +37,46 @@ void menu_inicial() {
         default:
             printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
     }
-
+    }while(control != 1 && control != 2);
 }
+
+
+void menu_principal(){
+    int control = 0;
+    
+    do{
+        printf("=================================\n");
+        printf("        Menú Principal\n");
+        printf("=================================\n");
+        printf("1. Nueva Partida\n");
+        printf("2. Cargar Partida\n");
+        printf("3. Salir\n");
+        printf("Seleccione una opción: ");
+        scanf("%d", &control);
+
+        switch(control){
+            case 1:
+                printf("Iniciando nueva partida...\n");
+
+/* NO EXISTE NINGUNA FUNCIÓN PARA INICIAR NUEVA PARTIDA AÚN */
+
+                // iniciarNuevaPartida(); // Llama a la función para iniciar una nueva partida
+                break;
+            case 2:
+                printf("Cargando partida...\n");
+                break;
+            case 3:
+                printf("Gracias por jugar. ¡Hasta luego!\n");
+                exit(0);
+            default:
+                printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
+        }
+    }while(control != 1 && control != 2);
+    
+}
+
+
+
 
 /* void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz){
     

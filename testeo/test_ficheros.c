@@ -87,6 +87,61 @@ static void test_volcado(void) {
            "Primera sala tiene nombre no vacio");
   }
 
+  if (jugadores) {
+    int max_jugadores = 0;
+    FILE *f_jug = fopen("ficheros/jugadores.txt", "r");
+    if (f_jug) {
+      char line[512];
+      while (fgets(line, sizeof(line), f_jug)) {
+        if (line[0] != '/' && line[0] != '\0' && line[0] != '\n') {
+          max_jugadores++;
+        }
+      }
+      fclose(f_jug);
+    }
+
+    printf("\n  [INFO] Inspeccionando los jugadores volcados en memoria...\n");
+    char buf[64];
+    while (1) {
+      printf("\nIntroduce el ID de un jugador para ver su informacion (0 para terminar la visualizacion): ");
+      if (!fgets(buf, sizeof(buf), stdin)) break;
+      buf[strcspn(buf, "\n")] = 0;
+      int search_id = atoi(buf);
+      if (search_id <= 0) break;
+
+      int encontrado = 0;
+      for (int i = 0; i < max_jugadores; i++) {
+        if (jugadores[i].id_jugador == search_id) {
+          printf("  -> DATOS DEL JUGADOR ENCONTRADO:\n");
+          printf("       ID: %d\n", jugadores[i].id_jugador);
+          printf("       Nombre real: %s\n", jugadores[i].nombre_jugador);
+          printf("       Nickname: %s\n", jugadores[i].jugador);
+          printf("       Num. objetos: %d\n", jugadores[i].num_items);
+          for (int j = 0; j < jugadores[i].num_items; j++) {
+            printf("         - ID Objeto %d: %s\n", j + 1, jugadores[i].id_objeto[j]);
+          }
+          encontrado = 1;
+          break;
+        }
+      }
+      if (!encontrado) {
+        printf("  [!] Jugador con ID %d no encontrado.\n", search_id);
+      }
+    }
+
+    /* Liberación profunda de jugadores para evitar memory leaks */
+    for (int i = 0; i < max_jugadores; i++) {
+      if (jugadores[i].id_objeto) {
+        for (int j = 0; j < jugadores[i].num_items; j++) {
+          if (jugadores[i].id_objeto[j]) {
+            free(jugadores[i].id_objeto[j]);
+          }
+        }
+        free(jugadores[i].id_objeto);
+      }
+    }
+  }
+
   INFO("Liberando memoria usada en este test...");
   free(salas);
   free(conexiones);
