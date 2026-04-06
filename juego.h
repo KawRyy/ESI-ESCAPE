@@ -4,7 +4,7 @@
 void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz, Partida *par);
 void ExaminarObjeto(Partida *par);  
 void ExaminarSalidas(Partida *par);
-void accionMover(Partida *par);
+void accionMover(Partida *par, Salas *sal);
 void Inventario(Partida *par);
 void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par);
 void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par);
