@@ -279,18 +279,7 @@ int cargarPartida(Partida *par, char *nickname) {
     }
 
     if (!strncmp(line, "OBJETO:", 7)) {
-      char *id_o = strtok(line + 8, "-\n");
-      Objetos *tmp = realloc(par->lista_objetos, (par->num_objetos + 1) * sizeof(Objetos));
-      if (!tmp) {
-        fclose(f);
-        return 0;
-      }
-      par->lista_objetos = tmp;
-      memset(&par->lista_objetos[par->num_objetos], 0, sizeof(Objetos));
-      if (id_o)
-        CPY(par->lista_objetos[par->num_objetos].id_objeto, id_o);
-      par->lista_objetos[par->num_objetos].localizacion_objeto = 0; /* 0 = en inventario */
-      par->num_objetos++;
+      /* Ignoramos OBJETO de partida.txt para evitar inventario duplicado (ahora usa solo jugadores.txt) */
       continue;
     }
     if (!strncmp(line, "CONEXION:", 9)) {
@@ -348,14 +337,7 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       fclose(fin);
     }
     fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
-    if (jug) {
-      for (int i = 0; i < jug->num_items; i++)
-        if (jug->id_objeto && jug->id_objeto[i])
-          fprintf(fout, "OBJETO: %s\n", jug->id_objeto[i]);
-    } else {
-      for (int i = 0; i < par->num_objetos; i++)
-        fprintf(fout, "OBJETO: %s\n", par->lista_objetos[i].id_objeto);
-    }
+    /* Se omite guardar OBJETO: aquí para no duplicar datos (el inventario se aloja en jugadores.txt) */
     for (int i = 0; i < par->num_conexiones; i++)
       fprintf(fout, "CONEXION: %s-%s\n", par->lista_conexiones[i].id_conexion,par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada");
     for (int i = 0; i < par->num_puzles; i++)
@@ -418,12 +400,11 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       }
       fprintf(fout, "%s-%s-%s-%s", id, nom, nick, pw);
       int cnt = 0;
-      if (jug && jug->id_objeto) {
-        for (int i = 0; i < jug->num_items; i++)
-          if (jug->id_objeto[i]) fprintf(fout, "%s%s", cnt++ ? "," : "-", jug->id_objeto[i]);
-      } else {
-        for (int i = 0; i < par->num_objetos; i++)
+      /* Utilizamos siempre la lista de objetos de la Partida filtrando el inventario activo */
+      for (int i = 0; i < par->num_objetos; i++) {
+        if (par->lista_objetos[i].localizacion_objeto == 0) {
           fprintf(fout, "%s%s", cnt++ ? "," : "-", par->lista_objetos[i].id_objeto);
+        }
       }
       fprintf(fout, "\n");
     }
