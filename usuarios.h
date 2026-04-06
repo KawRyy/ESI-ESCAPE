@@ -12,7 +12,7 @@
 #define USUARIOS_H
 
 // Comprobar...
-// 
+
 // #include "estructuras.h"
 // #include "ficheros.h"
 

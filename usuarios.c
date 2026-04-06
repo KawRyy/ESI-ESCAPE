@@ -8,7 +8,7 @@
 
 #define MAX_INTENTOS 3
 
-// Máxima longitud de una línea (en principio, BUFSIZ, el tamaño dl buffer de E/S).
+// Máxima longitud de una línea (en principio, BUFSIZ, el tamaño del buffer de E/S).
 
 #define MAX_LONGITUD_LINEA BUFSIZ
 
@@ -42,7 +42,7 @@ static void muestra_usuarios(Jugador *jugador, int número_jugadores)
 /*
     El enunciado dice que se emplee memoria dinámica, se entiende que cuando sea necesario, es
     decir, cuando no se conozca de antemano el número de objetos necesarios. Si el tamaño es fijo y
-    conocido, no tiene sentido (no vamoa a poner las variales locales en memoria dinámica).
+    conocido, no tiene sentido (no vamos a poner las variables locales en memoria dinámica).
 
     Para poder añadir un nuevo jugador, necesitamos modificar el vector de jugadores y el número de
     jugadores, pasándolos por referencia, es decir, con punteros.
@@ -178,7 +178,7 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
     nuevo_jugador.id_jugador = *número_jugadores + 1;
-    // Obtenemos el nombre el usuario y la contraseña del nuevo jugador.
+    // Obtenemos el nombre, el usuario y la contraseña del nuevo jugador.
     lee_cadena("Nombre: ", nuevo_jugador.nombre_jugador, sizeof nuevo_jugador.nombre_jugador);
     lee_cadena("Usuario: ", nuevo_jugador.jugador, sizeof nuevo_jugador.jugador);
     // Buscamos si ese jugador ya está registrado (solo se comprueba el usuario, puede haber personas con el mismo nombre).
