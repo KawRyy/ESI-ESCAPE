@@ -225,3 +225,11 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
         return 1;
     }
 }
+
+static int num_jugadores(Jugador *jugadores){
+    int num = 1;
+    while(jugadores[num].id_jugador != NULL){
+        num++;
+    }
+    return num;
+}
