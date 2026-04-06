@@ -60,43 +60,80 @@ void Inventario(Partida *par){
     }
 }
 
+
 void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
-    // Función para coger un objeto de la sala actual y añadirlo al inventario del jugador
-    int i = 0; // Variable para recorrer la lista de objetos
-    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual
-     for(i = 0; i < par->num_objetos && j == 0; i++){
-        if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){ // Detecta los objetos que están en la sala actual
+    int i = 0;
+    int j = 0;
+    for(i = 0; i < par->num_objetos && j == 0; i++){
+        if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){
             printf("%s   ->    ¿Deseas coger este objeto? (1: Sí, 0: No)\n", par->lista_objetos[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
 
             if (respuesta == 1) {
-                par->lista_objetos[i].localizacion_objeto = 0; // Cambia la localización del objeto a inventario
-                jug->num_items += 1; // Incrementa el número de objetos en el inventario del jugador
-                par->lista_objetos = realloc(par->lista_objetos, (jug->num_items) * sizeof(Objetos)); // Redimensiona la lista de objetos del jugador para incluir el nuevo objeto
-                par->lista_objetos[jug->num_items - 1] = par->lista_objetos[i]; // Copia el objeto al final de la lista
+                // 1. Cambiamos la localización a 0 (Inventario)
+                par->lista_objetos[i].localizacion_objeto = 0; 
+                
+                // 2. Incrementamos el contador del jugador
+                jug->num_items += 1; 
+
+                // 3. Añadimos el ID al array de strings del jugador
+                jug->id_objeto = realloc(jug->id_objeto, jug->num_items * sizeof(char*));
+                jug->id_objeto[jug->num_items - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
+                strcpy(jug->id_objeto[jug->num_items - 1], par->lista_objetos[i].id_objeto);
+
                 printf("Has cogido el objeto %s\n", par->lista_objetos[i].nombre_objeto);
-                j = 1; // Indica que se ha cogido un objeto y se sale del bucle
+                j = 1; 
             }
         }
     }
 }
 
 void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
-    int i = 0; // Variable para recorrer la lista de objetos
-    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual
-     for(i = 0; i < par->num_objetos && j == 0; i++){
-        if(par->lista_objetos[i].localizacion_objeto == 0 ){ // Detecta los objetos que están en el inventario
+    int i = 0;
+    int j = 0;
+    for(i = 0; i < par->num_objetos && j == 0; i++){
+        if(par->lista_objetos[i].localizacion_objeto == 0 ){ 
             printf("%s   ->    ¿Deseas soltar este objeto? (1: Sí, 0: No)\n", par->lista_objetos[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
             
             if (respuesta == 1) {
-                par->lista_objetos[i].localizacion_objeto = par->id_sala_actual; // Indica que se ha soltado el objeto en la sala actual
-                jug->num_items -= 1; // Disminuye el número de objetos en el inventario del jugador
-                par->lista_objetos = realloc(par->lista_objetos, (jug->num_items) * sizeof(Objetos)); // Redimensiona la lista de objetos del jugador para incluir el nuevo objeto
+                // 1. Cambiamos la localización a la sala actual
+                par->lista_objetos[i].localizacion_objeto = par->id_sala_actual; 
+                
+                // 2. Disminuimos los items del jugador
+                jug->num_items -= 1; 
+                
+                // 3. Buscamos y eliminamos el ID del array del jugador usando un "booleano"
+                int encontrado_id = 0; // Variable que actuará como booleano
+                
+                // Añadimos "&& encontrado_id == 0" a la condición para que actúe como un break
+                for(int k = 0; k <= jug->num_items && encontrado_id == 0; k++) {
+                    
+                    if (jug->id_objeto[k] != NULL && strcmp(jug->id_objeto[k], par->lista_objetos[i].id_objeto) == 0) {
+                        free(jug->id_objeto[k]);
+                        
+                        // Mover el último elemento al hueco que queda (si no es el último)
+                        if (k < jug->num_items) {
+                            jug->id_objeto[k] = jug->id_objeto[jug->num_items];
+                        }
+                        
+                        // Reducir el array
+                        if (jug->num_items > 0) {
+                            jug->id_objeto = realloc(jug->id_objeto, jug->num_items * sizeof(char*));
+                        } else {
+                            free(jug->id_objeto);
+                            jug->id_objeto = NULL;
+                        }
+                        
+                        // Cambiamos el valor a 1 para que en la próxima iteración la condición del for falle y salga del bucle
+                        encontrado_id = 1; 
+                    }
+                }
+
                 printf("Has soltado el objeto %s\n", par->lista_objetos[i].nombre_objeto);
-                j = 1; // Indica que se ha soltado un objeto y se sale del bucle
+                j = 1; // Este "j = 1" ya estaba actuando como un break para el bucle principal
             }
         }
     }
@@ -146,6 +183,7 @@ void ResolverPuzle(Puzles *puz, Partida *par){
                 solucion[strcspn(solucion, "\n")] = '\0'; // Elimina el carácter de nueva línea
                 if(strcmp(solucion, par->lista_puzles[i].solucion_puzle) == 0){ // Si la solución introducida coincide con la solución del puzle
                     printf("Has resuelto el puzle %s\n", par->lista_puzles[i].descripcion_puzle);
+                
                     j = 1; // Indica que se ha resuelto un puzle y se sale del bucle
                 } else {
                     printf("La solución introducida no es correcta para el puzle %s\n", par->lista_puzles[i].descripcion_puzle);
