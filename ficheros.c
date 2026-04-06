@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//Añadir mas comentarios en cargarPartida y guardarPartida.
-
 #define MAX_SALAS 10
 #define MAX_CONEXIONES 9
 #define MAX_OBJETOS 5
@@ -201,7 +199,9 @@ int cargarPartida(Partida *par, char *nickname) {
   FILE *f;
   char line[512];
 
-  /* 1. Buscar jugador en jugadores.txt */
+  /* 1. Buscar jugador en jugadores.txt:
+   *    Se abre el fichero y se busca linea a linea un usuario que coincida
+   *    con el 'nickname' proporcionado como parametro. */
   Jugadores jug;
   memset(&jug, 0, sizeof(Jugadores));
   int hallado = 0;
@@ -220,8 +220,10 @@ int cargarPartida(Partida *par, char *nickname) {
     if (pw)
       CPY(jug.contraseña, pw);
     if (inv) {
+      /* Procesa los items en el inventario que vienen separados por comas */
       char *obj = strtok(inv, ",");
       while (obj) {
+        /* Se usa realloc para extender dinamicamente la lista de punteros id_objeto */
         char **tmp = realloc(jug.id_objeto, (jug.num_items + 1) * sizeof(char *));
         if (!tmp)
           break;
@@ -239,7 +241,9 @@ int cargarPartida(Partida *par, char *nickname) {
   if (!hallado)
     return 0;
 
-  /* 2. Inicializar partida con inventario del jugador */
+  /* 2. Inicializar partida con inventario del jugador:
+   *    Se vacia la estructura Partida y se configuran los valores iniciales.
+   *    Asimismo, se copian los objetos extraidos del fichero jugador a la lista_objetos. */
   memset(par, 0, sizeof(Partida));  /* Limpia la estructura de partida */
   par->id_jugador = jug.id_jugador; /* Asigna el id del jugador cargado */
   par->id_sala_actual = 1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
@@ -258,7 +262,9 @@ int cargarPartida(Partida *par, char *nickname) {
     free(jug.id_objeto[i]);
   free(jug.id_objeto);
 
-  /* 3. Cargar progreso desde partida.txt */
+  /* 3. Cargar progreso desde partida.txt:
+   *    Se recorre secuencialmente el estado guardado para extraer la sala en la
+   *    que se encuentra el jugador, los puzles resueltos y las conexiones alteradas. */
   if ((f = fopen("ficheros/partida.txt", "r")) == NULL)
     return 1;
   int en_bloque = 0;
@@ -283,6 +289,7 @@ int cargarPartida(Partida *par, char *nickname) {
       continue;
     }
     if (!strncmp(line, "CONEXION:", 9)) {
+      /* Extrae los datos de la conexion y los vuelca en el array de conexiones modificadas */
       char *id = strtok(line + 10, "-"), *est = strtok(NULL, "-");
       Conexiones *tmp = realloc(par->lista_conexiones, (par->num_conexiones + 1) * sizeof(Conexiones));
       if (!tmp) {
@@ -321,7 +328,9 @@ void guardarPartida(Partida *par, Jugadores *jug) {
   FILE *fin, *fout;
   char line[512];
 
-  /* 1. partida.txt */
+  /* 1. Actualizacion de partida.txt:
+   *    En lugar de modificar en linea, se copia todo el contenido original excepto
+   *    las entradas del jugador en cuestion, que se reescriben al final del nuevo fichero tmp. */
   if ((fout = fopen("ficheros/partida_tmp.txt", "w")) != NULL) {
     int skip = 0;
     if ((fin = fopen("ficheros/partida.txt", "r")) != NULL) {
@@ -336,6 +345,7 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       }
       fclose(fin);
     }
+    /* Escribe los datos actualizados del jugador correspondientes a sala actual, conexiones y puzles resueltos */
     fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
     /* Se omite guardar OBJETO: aquí para no duplicar datos (el inventario se aloja en jugadores.txt) */
     for (int i = 0; i < par->num_conexiones; i++)
@@ -346,7 +356,9 @@ void guardarPartida(Partida *par, Jugadores *jug) {
     reemplazar("ficheros/partida.txt", "ficheros/partida_tmp.txt");
   }
 
-  /* 2. conexiones.txt */
+  /* 2. Actualizacion de conexiones.txt:
+   *    Revisa todas las conexiones globales. Si alguna coincide con una conexion modificada
+   *    en memoria (dentro de par->lista_conexiones), sobreescribe su estado, por defecto copia original. */
   fin = fopen("ficheros/conexiones.txt", "r");
   fout = fopen("ficheros/conexiones_tmp.txt", "w");
   if (fin && fout) {
@@ -381,7 +393,9 @@ void guardarPartida(Partida *par, Jugadores *jug) {
   else
     remove("ficheros/conexiones_tmp.txt");
 
-  /* 3. jugadores.txt */
+  /* 3. Actualizacion de jugadores.txt:
+   *    Mantiene la informacion intacta del resto de usuarios y actualiza de manera exclusiva
+   *    la seccion del inventario del jugador actual. */
   fin = fopen("ficheros/jugadores.txt", "r");
   fout = fopen("ficheros/jugadores_tmp.txt", "w");
   if (fin && fout) {
