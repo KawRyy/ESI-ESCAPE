@@ -119,7 +119,7 @@ void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
             scanf("%d", &respuesta);
 
             if (respuesta == 1) {
-                par->lista_objetos[i].localizacion_objeto = 00; // Cambia la localización del objeto a inventario
+                par->lista_objetos[i].localizacion_objeto = 0; // Cambia la localización del objeto a inventario
                 jug->num_items += 1; // Incrementa el número de objetos en el inventario del jugador
                 par->lista_objetos = realloc(par->lista_objetos, (jug->num_items) * sizeof(Objetos)); // Redimensiona la lista de objetos del jugador para incluir el nuevo objeto
                 par->lista_objetos[jug->num_items - 1] = par->lista_objetos[i]; // Copia el objeto al final de la lista
