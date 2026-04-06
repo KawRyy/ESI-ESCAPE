@@ -62,8 +62,8 @@ void Inventario(Partida *par){
 
 
 void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
-    int i = 0;
-    int j = 0;
+    int i = 0; // Variable para recorrer la lista de objetos
+    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual y se ha cogido, para salir del bucle después de coger un objeto
     for(i = 0; i < par->num_objetos && j == 0; i++){
         if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){
             printf("%s   ->    ¿Deseas coger este objeto? (1: Sí, 0: No)\n", par->lista_objetos[i].nombre_objeto);
@@ -78,20 +78,20 @@ void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
                 jug->num_items += 1; 
 
                 // 3. Añadimos el ID al array de strings del jugador
-                jug->id_objeto = realloc(jug->id_objeto, jug->num_items * sizeof(char*));
+                jug->id_objeto = realloc(jug->id_objeto, jug->num_items * sizeof(char*)); // Redimensionamos el array para añadir un nuevo elemento
                 jug->id_objeto[jug->num_items - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
                 strcpy(jug->id_objeto[jug->num_items - 1], par->lista_objetos[i].id_objeto);
 
                 printf("Has cogido el objeto %s\n", par->lista_objetos[i].nombre_objeto);
-                j = 1; 
+                j = 1; ////Variable para recorrer la lista de objetos
             }
         }
     }
 }
 
 void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
-    int i = 0;
-    int j = 0;
+    int i = 0; //Variable para recorrer la lista de objetos
+    int j = 0; // Indica si se ha encontrado algún objeto en el inventario
     for(i = 0; i < par->num_objetos && j == 0; i++){
         if(par->lista_objetos[i].localizacion_objeto == 0 ){ 
             printf("%s   ->    ¿Deseas soltar este objeto? (1: Sí, 0: No)\n", par->lista_objetos[i].nombre_objeto);
@@ -133,7 +133,7 @@ void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
                 }
 
                 printf("Has soltado el objeto %s\n", par->lista_objetos[i].nombre_objeto);
-                j = 1; // Este "j = 1" ya estaba actuando como un break para el bucle principal
+                j = 1; //  Indica que se ha soltado un objeto y se sale del bucle
             } 
         }
     }
