@@ -16,18 +16,14 @@ int main() {
     Jugadores *jug = NULL; // Puntero para almacenar la lista de jugadores del juego
     Partida *par = NULL; // Puntero para almacenar la partida del jugador
 
-    int succes = volcado(&sal, &con, &puz, &obj); // Variable para controlar si se han cargado correctamente los datos del juego
+    int succes = volcado(&sal, &con, &puz, &obj, &jug); // Variable para controlar si se han cargado correctamente los datos del juego
     if (succes == 0) { // Si hubo un error al cargar los datos, se muestra un mensaje de error y se termina el programa
         printf("Error al cargar los datos del juego desde los archivos\n");
         return 1;
     }
 
-/* JUGADORES NO ESTÁ INICIALIZADO*/
+    menu_inicial(&jug); // Llama a la función para mostrar el menú inicial y gestionar el acceso de los jugadores
 
-    // menu_inicial(&jug); // Llama a la función para mostrar el menú inicial y gestionar el acceso de los jugadores
-
-/* PARTIDA NO ESTÁ INICIALIZADA */
-
-    // menu_principal(&par); // Llama a la función para mostrar el menú principal del juego
+    menu_principal(&par, &jug, &obj, &sal, &con, &puz); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
     
 }
