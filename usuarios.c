@@ -47,8 +47,10 @@ static void muestra_usuarios(Jugador *jugador, int número_jugadores)
     Para poder añadir un nuevo jugador, necesitamos modificar el vector de jugadores y el número de
     jugadores, pasándolos por referencia, es decir, con punteros.
 
-    - jugadores         Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
-    - número_jugadores  Puntero al número de jugadores.
+    Parámetros:
+
+    jugadores           (E/S)   Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
+    número_jugadores    (E)     Puntero al número de jugadores.
 */
 
 void login(Jugador **jugadores, int *número_jugadores)
@@ -113,22 +115,45 @@ void login(Jugador **jugadores, int *número_jugadores)
     }
 }
 
-// Puntero al jugador con el nombre de usuario indicado en el vector de jugadores o NULL si no existe.
+// Búsqueda de un usuario en el vector de jugadores.
+//
+// Realiza una búsqueda lineal por nombre de usuario y, si encuentra un jugador con ese nombre de usuario, 
+// devuelve un puntero a él. En caso contrario, devuelve NULL para indicar que no existe.
+//
+// Parámetros:
+//
+// usuario          (E)      Nombre de usuario 
+// jugador          (E)      Vector de jugadores (puntero a su primer elemento)
+// numero_jugadores (E)      Número de juhadores del vector
+//
+// Valor devuelto:
+//
+// Puntero al (primer) jugador con ese nombre de usuario o NULL si no existe ninguno con ese nombre.
 
 Jugador *busca_usuario(const char *usuario, Jugador jugador[], int numero_jugadores)
 {
     int encontrado = 0;
     int k;
-    for (k = 0; k < numero_jugadores && !encontrado; ++k)
-        if (!strcmp(usuario, jugador[k].jugador))
-            encontrado = 1;
-    if (encontrado)
+    for (k = 0; k < numero_jugadores && !encontrado; ++k) {
+        if (!strcmp(usuario, jugador[k].jugador)) {  // ¿Las cadenas son iguales?
+            encontrado = 1;                          // Sí, terminamos el bucle.
+        }
+    }
+    // Cuidado, pues aunque o encuentre, el bucle incrementa la k...
+    if (encontrado) {
         return &jugador[k - 1];  // O, equivalentemente, jugador + k - 1.
-    else
+    } else {
         return NULL;
+    }
 }
 
 // Muestra un mensaje, lee una línea completa y guarda en la cadena n caracteres como mucho, incluyendo el '\0'.
+//
+// Parámetros:
+//
+// mensaje (E)      Mensaje a mostrar 
+// cadena  (S)      Cadena leída
+// n       (E)      Número máximo de caracteres, incluyendo el terminador
 
 void lee_cadena(const char *mensaje, char *cadena, int n)
 {
