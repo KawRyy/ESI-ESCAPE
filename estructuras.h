@@ -20,7 +20,6 @@ typedef struct {
     int tipo_sala; // 1:INICIAL ; 2: NORMAL ; 3: SALIDA
 } Salas;
 
-/*CAMBIA*/
 typedef struct {
     char id_conexion[4];
     int id_sala_orig;
@@ -29,7 +28,6 @@ typedef struct {
     int condicion_conexion; // 0: no aplica ; 1: requiere objeto ; 2: requiere puzle
 } Conexiones;
 
-/*CAMBIA*/
 typedef struct {
     char id_objeto[5];
     char nombre_objeto[16];
@@ -43,6 +41,7 @@ typedef struct {
     int tipo_elemento; // Elemento que genera resolver el puzle, 1: CÓDIGO ; 2: PALABRA
     char descripcion_puzle[151];
     char solucion_puzle[51];
+    int resuelto; // 0: PENDIENTE ; 1: RESUELTO
 } Puzles;
 
 /*CAMBIA*/

@@ -22,8 +22,7 @@ int main() {
         return 1;
     }
 
-    menu_inicial(&jug); // Llama a la función para mostrar el menú inicial y gestionar el acceso de los jugadores
+    menu_inicial(&par, &jug, &obj, &sal, &con, &puz); // Llama a la función para mostrar el menú inicial e iniciar la ejecución del juego
 
-    menu_principal(&par, &jug, &obj, &sal, &con, &puz); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
-    
+    return 0; // Termina el programa con éxito
 }

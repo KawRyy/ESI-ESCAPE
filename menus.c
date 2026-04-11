@@ -5,8 +5,14 @@
 #include "usuarios.h"
 #include "juego.h"
 
-void menu_inicial(Jugadores **jug){
-    int control = 0;
+
+/* CABECEEEEEEEEEEEEEEEEEEERASSSSSSSSSSSSSSS*/
+
+
+
+void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz){
+    int control = 0;  // Variable para controlar la opción seleccionada en el menú inicial
+    int salir = 0;  // Variable para controlar cuándo salir del menú inicial
     do{
         printf("=================================\n");
         printf("    Bienvenido a ESI-ESCAPE\n");
@@ -14,112 +20,139 @@ void menu_inicial(Jugadores **jug){
         printf("1. Iniciar sesión\n");
         printf("2. Salir\n");
         printf("Seleccione una opción: ");
-
-        scanf("%d", &control);
+        if(scanf("%d", &control) != 1) {
+            printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
+            while (getchar() != '\n'); // Limpia el buffer de entrada
+        }
 
         switch(control){
         case 1:
-/* JUGADORES NO ESTÁ INICIALIZADO || login() RECIBE PARÁMETROS ERRÓNEOS */
-
-        /*  if (login(&jug) == 1){
+            if (login(jug) == 1){ // FALTA QUE LOGIN DEVUELVA 1
                 printf("Inicio de sesión exitoso... \n");
-                break;
+                menu_principal(par, jug, obj, sal, con, puz); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
+            }
             else{
                 printf("Inicio de sesión fallido... \n");
-                control = 0; // Volver a mostrar el menú
-                break;
-            };
-        */
+                }
             break;
         case 2:
             printf("Gracias por jugar. ¡Hasta luego!\n");
-            exit(0);
+            salir = 1; // Establece la variable salir a 1 para salir del menú inicial
+            break;
         default:
             printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
     }
-    }while(control != 1 && control != 2);
+    }while(salir == 0);
 }
 
 
-void menu_principal(){
-    int control = 0;
-    
+static void menu_principal(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz){
+    int control = 0; // Variable para controlar la opción seleccionada en el menú principal
+    int salir = 0; // Variable para controlar cuándo salir del menú principal
     do{
         printf("=================================\n");
         printf("        Menú Principal\n");
         printf("=================================\n");
         printf("1. Nueva Partida\n");
         printf("2. Cargar Partida\n");
-        printf("3. Salir\n");
+        printf("3. Salir del juego\n");
         printf("Seleccione una opción: ");
-        scanf("%d", &control);
-
+        if(scanf("%d", &control) != 1){
+            printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
+            while(getchar() != '\n'); // Limpia el buffer de entrada
+        }
+        
         switch(control){
             case 1:
                 printf("Iniciando nueva partida...\n");
 
 /* NO EXISTE NINGUNA FUNCIÓN PARA INICIAR NUEVA PARTIDA AÚN */
 
-                // iniciarNuevaPartida(); // Llama a la función para iniciar una nueva partida
+                // iniciarNuevaPartida(par); // Llama a la función para iniciar una nueva partida
+                menu_juego(par, jug, obj, sal, con, puz); // Llama al menú de juego para gestionar las acciones dentro de la partida
                 break;
             case 2:
                 printf("Cargando partida...\n");
+                // cargarPartida(*par, id_jugador); // Llama a la función para cargar una partida existente (se le pasará el ID del jugador 
+                // que ha iniciado sesión) AUN NO TENGO EL ID TENGO QUE REQUERIRLO EN EL LOGIN
                 break;
             case 3:
                 printf("Gracias por jugar. ¡Hasta luego!\n");
-                exit(0);
+                salir = 1; // Establece la variable salir a 1 para salir del menú principal
+                break;
             default:
                 printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
         }
-    }while(control != 1 && control != 2);
+    }while(salir == 0);
     
 }
 
 
+static void menu_juego(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz){
+    int control = 0; // Variable para controlar la opción seleccionada en el menú de juego
+    int salir = 0; // Variable para controlar cuándo salir del menú de juego
+    do{
+        printf("=================================\n");
+        printf("          Menú de Juego\n");
+        printf("=================================\n");
+        printf("1. Describir sala\n");
+        printf("2. Examinar objetos\n");
+        printf("3. Entrar en otra sala\n");
+        printf("4. Coger objeto\n");
+        printf("5. Soltar objeto\n");
+        printf("6. Inventario\n");
+        printf("7. Usar objeto\n");
+        printf("8. Resolver puzle\n");
+        printf("9. Guardar partida\n");
+        printf("10. Salir al menú principal\n");
+        printf("Seleccione una opción: ");
+        if(scanf("%d", &control) != 1){
+            printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
+            while(getchar() != '\n'); // Limpia el buffer de entrada
+        }
 
-
-/* void buclePartida(Jugadores *jug, Salas *sal, Conexiones *con, Objetos *obj, Puzles *puz){
-    
-
-    int x = 0; //Variable para controlar el bucle del menú
-    int opcion; //Variable para almacenar la opción elegida por el usuario
-    while(x == 0){
-        printf("Menu:\n Sala: %s \n--------------------------------\n 1.Describir Sala\n 2.Examinar (objetos y salidas)\n 3.Entrar en otra sala\n 4.Coger Objeto\n 5.Soltar Objeto\n 6.Inventario\n 7.Usar Objeto\n 8.Resolver puzle / introducir código\n 9.Guardar Partida\n 10.Volver\n--------------------------------\n", Salas.nombre_sala[Partida.id_sala_actual]);
-        scanf("%d", &opcion); // Lee la opción elegida por el usuario
-        switch(opcion){
+        switch(control){
             case 1:
-                Describir_Sala(*par->id_sala_actual); // Llama a la función para describir la sala actual
+                // describirSala(); // Llama a la función para describir la sala actual del jugador
                 break;
             case 2:
-                Examinar(*par); // Llama a la función para examinar objetos y salidas en la sala actual
+                printf("===== OBJETOS EN LA SALA ===== \n");
+                ExaminarObjeto(*par); // Llama a la función para examinar los objetos presentes en la sala actual
                 break;
             case 3:
-                accionMover(); // Llama a la función para mover al jugador a otra sala (dirección se determinará según la conexión elegida)
+                printf("===== SALIDAS ===== \n");
+                ExaminarSalidas(*par); // Llama a la función para examinar las salidas disponibles desde la sala actual
                 break;
             case 4:
-                CogerObjeto(*obj); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
+                printf("===== COGER OBJETO ===== \n");
+                // CogerObjeto(*obj NO HACE FALTA, *jug, *par); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 break;
             case 5:
-                //Soltar Objeto
+                printf("===== SOLTAR OBJETO ===== \n");
+                // SoltarObjeto(*obj NO HACE FALTA, *jug, *par); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
                 break;
             case 6:
-                Inventario(); // Llama a la función para mostrar el inventario del jugador
+                printf("===== INVENTARIO ===== \n");
+                Inventario(*par); // Llama a la función para mostrar el inventario del jugador
                 break;
             case 7:
-                //Usar Objeto
+                printf("===== USAR OBJETO ===== \n");
+                // UsarObjeto(*obj NO HACE FALTA, *con NO HACE FALTA, *par); // Llama a la función para usar un objeto del inventario del jugador en una conexión o en la sala actual
                 break;
             case 8:
-                //Resolver puzle / introducir código  
+                printf("===== RESOLVER PUZLE ===== \n");
+                // ResolverPuzle(*puz NO HACE FALTA, *par); // Llama a la función para resolver un puzle presente en la sala actual
                 break;
             case 9:
-                //Guardar Partida
+                printf("Guardando partida...\n");
+                // guardarPartida(*par); // Llama a la función para guardar el estado actual de la partida
                 break;
             case 10:
-                x = 1; // Salir del bucle
+                printf("Saliendo al menú principal...\n");
+                salir = 1; // Establece la variable salir a 1 para salir del menú de juego
                 break;
             default:
-                printf("Opción no válida. Por favor, elige una opción del menú.\n");
+                printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
         }
-    }
+    }while(salir == 0);
 }
-    */
