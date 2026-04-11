@@ -5,9 +5,9 @@ void ExaminarObjeto(Partida *par);
 void ExaminarSalidas(Partida *par);
 void accionMover(Partida *par, Salas *sal);
 void Inventario(Partida *par);
-void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par);
-void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par);
-void UsarObjeto(Objetos *obj, Conexiones *con, Partida *par);
-void ResolverPuzle(Puzles *puz, Partida *par);
+void CogerObjeto(Jugadores *jug, Partida *par);
+void SoltarObjeto(Jugadores *jug, Partida *par);
+void UsarObjeto(Partida *par);
+void ResolverPuzle(Partida *par);
 
 #endif

@@ -61,7 +61,7 @@ void Inventario(Partida *par){
 }
 
 
-void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
+void CogerObjeto(Jugadores *jug, Partida *par){
     int i = 0; // Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en la sala actual y se ha cogido, para salir del bucle después de coger un objeto
     for(i = 0; i < par->num_objetos && j == 0; i++){
@@ -89,7 +89,7 @@ void CogerObjeto(Objetos *obj, Jugadores *jug, Partida *par){
     }
 }
 
-void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
+void SoltarObjeto(Jugadores *jug, Partida *par){
     int i = 0; //Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en el inventario
     for(i = 0; i < par->num_objetos && j == 0; i++){
@@ -139,7 +139,7 @@ void SoltarObjeto(Objetos *obj, Jugadores *jug, Partida *par){
     }
 }
 
-void UsarObjeto(Objetos *obj, Conexiones *con, Partida *par){
+void UsarObjeto(Partida *par){
     // Función para usar un objeto del inventario del jugador
     int i = 0; // Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en el inventario
@@ -150,9 +150,9 @@ void UsarObjeto(Objetos *obj, Conexiones *con, Partida *par){
             scanf("%d", &respuesta);
 
             if(respuesta == 1){
-                   if(con->id_sala_orig == par->id_sala_actual && con->condicion_conexion == 1 /* && strcmp(con->id_objeto, par->lista_objetos[i].id_objeto) == 0 */){ 
-                        con->estado_conexion = 1; // Abre la conexión
-                        printf("Has usado el objeto %s para abrir la conexión hacia la sala %d\n", par->lista_objetos[i].nombre_objeto, con->id_sala_dest);
+                   if(par->lista_conexiones[i].id_sala_orig == par->id_sala_actual && par->lista_conexiones[i].condicion_conexion == 1 /* && strcmp(con->id_objeto, par->lista_objetos[i].id_objeto) == 0 */){ 
+                        par->lista_conexiones[i].estado_conexion = 1; // Abre la conexión
+                        printf("Has usado el objeto %s para abrir la conexión hacia la sala %d\n", par->lista_objetos[i].nombre_objeto, par->lista_conexiones[i].id_sala_dest);
                     } else {
                         printf("No se puede usar el objeto %s en esta situación\n", par->lista_objetos[i].nombre_objeto);
                         j = 1; // Indica que se ha usado un objeto y se sale del bucle
@@ -164,7 +164,7 @@ void UsarObjeto(Objetos *obj, Conexiones *con, Partida *par){
 
 }
 
-void ResolverPuzle(Puzles *puz, Partida *par){
+void ResolverPuzle(Partida *par){
     // Función para resolver un puzle de la sala actual
     int i = 0; // Variable para recorrer la lista de puzles
     int j = 0; // Indica si se ha encontrado algún puzle en la sala actual
