@@ -241,21 +241,28 @@ int cargarPartida(Partida *par, char *nickname) {
   if (!hallado)
     return 0;
 
-  /* 2. Inicializar partida con inventario del jugador:
+  /* 2. Inicializar partida con el estado global de objetos y el inventario del jugador:
    *    Se vacia la estructura Partida y se configuran los valores iniciales.
-   *    Asimismo, se copian los objetos extraidos del fichero jugador a la lista_objetos. */
+   *    Cargamos TODO el ecosistema de objetos y marcamos los del inventario del jugador a 0. */
   memset(par, 0, sizeof(Partida));  /* Limpia la estructura de partida */
   par->id_jugador = jug.id_jugador; /* Asigna el id del jugador cargado */
   par->id_sala_actual = 1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
+  
+  Objetos *base_objs = NULL;
+  int num_base = leer_objetos(&base_objs);
+  if (num_base > 0) {
+    par->lista_objetos = base_objs;
+    par->num_objetos = num_base;
+  }
+  
   if (jug.num_items > 0) {
-    par->lista_objetos = malloc(jug.num_items * sizeof(Objetos)); /* Reserva memoria para inventario */
-    if (par->lista_objetos) {
-      memset(par->lista_objetos, 0, jug.num_items * sizeof(Objetos));
-      for (int i = 0; i < jug.num_items; i++) {
-        CPY(par->lista_objetos[i].id_objeto, jug.id_objeto[i]);
-        par->lista_objetos[i].localizacion_objeto = 0; /* 0 = en inventario */
+    for (int i = 0; i < jug.num_items; i++) {
+      for (int j = 0; j < par->num_objetos; j++) {
+        if (!strcmp(par->lista_objetos[j].id_objeto, jug.id_objeto[i])) {
+          par->lista_objetos[j].localizacion_objeto = 0; /* Lo marcamos como inventario */
+          break;
+        }
       }
-      par->num_objetos = jug.num_items;
     }
   }
   for (int i = 0; i < jug.num_items; i++)
@@ -285,7 +292,20 @@ int cargarPartida(Partida *par, char *nickname) {
     }
 
     if (!strncmp(line, "OBJETO:", 7)) {
-      /* Ignoramos OBJETO de partida.txt para evitar inventario duplicado (ahora usa solo jugadores.txt) */
+      /* Leemos cambios de posicion ajenos al inventario formados como OBJETO: ID-Sala */
+      char *id = strtok(line + 8, "-"), *loc_str = strtok(NULL, "-");
+      if (id && loc_str) {
+        int loc = atoi(loc_str);
+        for (int i = 0; i < par->num_objetos; i++) {
+          if (!strcmp(par->lista_objetos[i].id_objeto, id)) {
+            /* Solo actualizamos si el objeto no fue rescatado del maletin (inventario prima) */
+            if (par->lista_objetos[i].localizacion_objeto != 0) {
+              par->lista_objetos[i].localizacion_objeto = loc;
+            }
+            break;
+          }
+        }
+      }
       continue;
     }
     if (!strncmp(line, "CONEXION:", 9)) {
@@ -347,7 +367,23 @@ void guardarPartida(Partida *par, Jugadores *jug) {
     }
     /* Escribe los datos actualizados del jugador correspondientes a sala actual, conexiones y puzles resueltos */
     fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
-    /* Se omite guardar OBJETO: aquí para no duplicar datos (el inventario se aloja en jugadores.txt) */
+    Objetos *base_objs_save = NULL;
+    int num_base_save = leer_objetos(&base_objs_save);
+    for (int i = 0; i < par->num_objetos; i++) {
+      if (par->lista_objetos[i].localizacion_objeto != 0) {
+        int base_loc = -1;
+        for (int j = 0; j < num_base_save; j++) {
+          if (!strcmp(base_objs_save[j].id_objeto, par->lista_objetos[i].id_objeto)) {
+            base_loc = base_objs_save[j].localizacion_objeto;
+            break;
+          }
+        }
+        if (base_loc != -1 && par->lista_objetos[i].localizacion_objeto != base_loc) {
+          fprintf(fout, "OBJETO: %s-%02d\n", par->lista_objetos[i].id_objeto, par->lista_objetos[i].localizacion_objeto);
+        }
+      }
+    }
+    if (base_objs_save) free(base_objs_save);
     for (int i = 0; i < par->num_conexiones; i++)
       fprintf(fout, "CONEXION: %s-%s\n", par->lista_conexiones[i].id_conexion,par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada");
     for (int i = 0; i < par->num_puzles; i++)
