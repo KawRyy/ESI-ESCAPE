@@ -39,12 +39,12 @@ void CogerObjeto(Jugadores *jug, Partida *par){
                 par->lista_objetos[i].localizacion_objeto = 0; 
                 
                 // 2. Incrementamos el contador del jugador
-                jug->num_items += 1; 
+                jug->num_objetos += 1; 
 
                 // 3. Añadimos el ID al array de strings del jugador
-                jug->id_objeto = realloc(jug->id_objeto, jug->num_items * sizeof(char*)); // Redimensionamos el array para añadir un nuevo elemento
-                jug->id_objeto[jug->num_items - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
-                strcpy(jug->id_objeto[jug->num_items - 1], par->lista_objetos[i].id_objeto);
+                jug->id_objetos = realloc(jug->id_objetos, jug->num_objetos * sizeof(char*)); // Redimensionamos el array para añadir un nuevo elemento
+                jug->id_objetos[jug->num_objetos - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
+                strcpy(jug->id_objetos[jug->num_objetos - 1], par->lista_objetos[i].id_objeto);
 
                 printf("Has cogido el objeto %s\n", par->lista_objetos[i].nombre_objeto);
                 j = 1; ////Variable para recorrer la lista de objetos
@@ -67,28 +67,28 @@ void SoltarObjeto(Jugadores *jug, Partida *par){
                 par->lista_objetos[i].localizacion_objeto = par->id_sala_actual; 
                 
                 // 2. Disminuimos los items del jugador
-                jug->num_items -= 1; 
+                jug->num_objetos -= 1; 
                 
                 // 3. Buscamos y eliminamos el ID del array del jugador usando un "booleano"
                 int encontrado_id = 0; // Variable que actuará como booleano
                 
                 // Añadimos "&& encontrado_id == 0" a la condición para que actúe como un break
-                for(int k = 0; k <= jug->num_items && encontrado_id == 0; k++) {
+                for(int k = 0; k <= jug->num_objetos && encontrado_id == 0; k++) {
                     
-                    if (jug->id_objeto[k] != NULL && strcmp(jug->id_objeto[k], par->lista_objetos[i].id_objeto) == 0) {
-                        free(jug->id_objeto[k]);
+                    if (jug->id_objetos[k] != NULL && strcmp(jug->id_objetos[k], par->lista_objetos[i].id_objeto) == 0) {
+                        free(jug->id_objetos[k]);
                         
                         // Mover el último elemento al hueco que queda (si no es el último)
-                        if (k < jug->num_items) {
-                            jug->id_objeto[k] = jug->id_objeto[jug->num_items];
+                        if (k < jug->num_objetos) {
+                            jug->id_objetos[k] = jug->id_objetos[jug->num_objetos];
                         }
                         
                         // Reducir el array
-                        if (jug->num_items > 0) {
-                            jug->id_objeto = realloc(jug->id_objeto, jug->num_items * sizeof(char*));
+                        if (jug->num_objetos > 0) {
+                            jug->id_objetos = realloc(jug->id_objetos, jug->num_objetos * sizeof(char*));
                         } else {
-                            free(jug->id_objeto);
-                            jug->id_objeto = NULL;
+                            free(jug->id_objetos);
+                            jug->id_objetos = NULL;
                         }
                         
                         // Cambiamos el valor a 1 para que en la próxima iteración la condición del for falle y salga del bucle
