@@ -1,6 +1,6 @@
 #ifndef SALAS_Y_CONEXIONES_H
 #define SALAS_Y_CONEXIONES_H
-#include "estructuras.h"
+
 
 typedef struct {
     int id_sala; // 2 digitos EJ: 99

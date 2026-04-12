@@ -1,6 +1,6 @@
 #ifndef OBJETOS_Y_PUZZLES_H
 #define OBJETOS_Y_PUZZLES_H
-#include "estructuras.h"
+
 
 typedef struct {
     char id_objeto[5];
