@@ -9,12 +9,12 @@
 #include "partida.h" 
 #include <stdio.h>
 
-void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
+void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz, int* num_jugadores);
 static void menu_principal(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
 static void menu_juego(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
 
 
-void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz){
+void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz, int* num_jugadores){
     int control = 0;  // Variable para controlar la opción seleccionada en el menú inicial
     int salir = 0;  // Variable para controlar cuándo salir del menú inicial
     do{
@@ -34,7 +34,7 @@ void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Co
         /* EL 3 ESTA HARDCODEADO NECESITAMOS EL NUMERO DE JUGADORES */
 
 
-            if (login(jug, 3) != -1) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
+            if (login(jug, *num_jugadores) != -1) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
                 printf("Inicio de sesión exitoso... \n");
                 menu_principal(par, jug, obj, sal, con, puz); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
             }
