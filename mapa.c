@@ -26,7 +26,7 @@ void ExaminarSalidas(Partida *par){
 }
 
 void accionMover(Partida *par, Salas *sal){ // Función para mover al jugador a otra sala siempre que esté abierta
- //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de moverse en el menú de acciones del jugador
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de moverse en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de las conexiones que parten de la sala actual y se pregunta al jugador si desea moverse a alguna de las salas conectadas.
 
    int j = 0; // Indica si se ha encontrado una conexión abierta desde la sala actual
@@ -46,5 +46,18 @@ void accionMover(Partida *par, Salas *sal){ // Función para mover al jugador a 
         }
         if(j == 0){ // Si no se ha encontrado ninguna conexión abierta desde la sala actual
             printf("No hay conexiones abiertas desde esta sala.\n");
-        }
     }
+}
+
+
+void describirSala(Partida *par, Salas *sal){ // Función para describir la sala actual del jugador
+//Precondición: Deben haber sido cargados los datos de la partida
+//Postcondición: Se muestra la descripción de la sala actual del jugador
+
+    for(int i = 0; i < par->num_conexiones; i++){
+        if(par->lista_conexiones[i].id_sala_orig == par->id_sala_actual){ // Si la conexión es desde la sala actual 
+            printf("%s\n", sal[par->lista_conexiones[i].id_sala_orig].descripcion_sala); // Muestra la descripción de la sala actual
+            break;
+        }
+    }  
+}

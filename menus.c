@@ -143,15 +143,15 @@ static void menu_juego(Partida **par, Jugadores **jug, Objetos **obj, Salas **sa
                 break;
             case 7:
                 printf("===== USAR OBJETO ===== \n");
-                // UsarObjeto(*obj NO HACE FALTA, *con NO HACE FALTA, *par); // Llama a la función para usar un objeto del inventario del jugador en una conexión o en la sala actual
+                UsarObjeto(*par); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
                 break;
             case 8:
                 printf("===== RESOLVER PUZLE ===== \n");
-                // ResolverPuzle(*puz NO HACE FALTA, *par); // Llama a la función para resolver un puzle presente en la sala actual
+                ResolverPuzle(*par); // Llama a la función para resolver un puzle presente en la sala actual del jugador
                 break;
             case 9:
                 printf("Guardando partida...\n");
-                // guardarPartida(*par); // Llama a la función para guardar el estado actual de la partida
+                guardarPartida(*par, *jug); // Llama a la función para guardar el estado actual de la partida (se le pasará la estructura de la partida y del jugador para guardar su progreso)
                 break;
             case 10:
                 printf("Saliendo al menú principal...\n");
