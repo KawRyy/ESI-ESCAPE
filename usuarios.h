@@ -11,15 +11,11 @@
 #ifndef USUARIOS_H
 #define USUARIOS_H
 
-// Comprobar...
-
-// #include "estructuras.h"
-// #include "ficheros.h"
-
-// ESTA DEFINICIÓN DE ESTRUCTURA DEBE ESTAR EN OTRO MÓDULO.
-// COMPROBAR QUE CUADRA.
-
-// Al leer el fichero de jugadores hay que crear el vector dinámico de jugadores y el de objetos.
+// Al leer el fichero de jugadores hay que crear, con memoria dinámica, el vector dinámico de jugadores
+// y el de objetos de cada jugador, aparte de actualizar la variable que lleva la cuenta del número
+// real de jugadores y el campo num_objetos de cada jugador.
+//
+// Luego, no se puede olvodar liberar toda la memoria asignada (al final de main).
 
 typedef struct {
     int id_jugador;             // Identificador del jugador.
@@ -38,10 +34,10 @@ typedef struct {
     modificar el vector de jugadores y el número de jugadores, pasándolos por referencia, es
     decir, con punteros.
 
-    - jugadores         Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
+    - jugadores         Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugadores).
     - número_jugadores  Puntero al número de jugadores.
 */
 
-int login(Jugadores **jugadores, int *numero_jugadores);
+void login(Jugadores **jugadores, int *número_jugadores);
 
 #endif /* USUARIOS_H */
