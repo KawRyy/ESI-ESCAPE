@@ -53,7 +53,7 @@ static void muestra_usuarios(Jugador *jugador, int número_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-void login(Jugador **jugadores, int *número_jugadores)
+int login(Jugador **jugadores, int *número_jugadores)
 {
     Jugador *jugador;
     char usuario[sizeof (*jugadores)->jugador];
@@ -66,7 +66,7 @@ void login(Jugador **jugadores, int *número_jugadores)
         lee_cadena("Usuario: ", usuario, sizeof usuario);
         // Buscamos un jugador que se corresponda con ese usuario.
         jugador = busca_usuario(usuario, *jugadores, *número_jugadores);
-        // Comprobamos si el uauario existe.     
+        // Comprobamos si el usuario existe.     
         if (jugador) {    // O, equivalentemente, p_jugador != NULL.
             // El usuario existe, comprobamos si la contraseña es correcta.
             int intentos = 0;
@@ -80,6 +80,7 @@ void login(Jugador **jugadores, int *número_jugadores)
                 } else {
                     // Es correcta, terminamos.
                     sesión_iniciada = 1;
+                    return jugador->id_jugador; // Devuelve el ID y sale de la función
                 }
             }
             if (intentos == MAX_INTENTOS) {
@@ -113,6 +114,7 @@ void login(Jugador **jugadores, int *número_jugadores)
             }
         }
     }
+    return -1; // Por seguridad, aunque el flujo actual obliga a loguear para salir en menu_inicial, devolvemos un valor que indique que no se ha podido iniciar sesión.
 }
 
 // Búsqueda de un usuario en el vector de jugadores.
@@ -224,12 +226,4 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
 
         return 1;
     }
-}
-
-static int num_jugadores(Jugador *jugadores){
-    int num = 1;
-    while(jugadores[num].id_jugador != NULL){
-        num++;
-    }
-    return num;
 }

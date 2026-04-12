@@ -42,6 +42,6 @@ typedef struct {
     - número_jugadores  Puntero al número de jugadores.
 */
 
-void login(Jugador **jugadores, int *número_jugadores);
+int login(Jugador **jugadores, int *numero_jugadores);
 
 #endif /* USUARIOS_H */
