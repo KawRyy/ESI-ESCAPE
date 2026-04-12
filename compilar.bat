@@ -1,12 +1,21 @@
 @echo off
+echo ==========================================
 echo Compilando el proyecto ESI ESCAPE...
-gcc main.c ficheros.c objetos_y_puzzles.c usuarios.c salas_y_conexiones.c menus.c -o esi_escape.exe
+echo ==========================================
+
+:: Compilación de todos los módulos del repositorio
+gcc main.c condiciones.c ficheros.c mapa.c menus.c usuarios.c -o esi_escape.exe
+
+:: Verificación de si la compilación fue exitosa
 if %ERRORLEVEL% EQU 0 (
-    echo Compilacion exitosa. Ejecutando el juego...
+    echo [OK] Compilacion exitosa.
     echo ------------------------------------------
+    echo Iniciando el juego...
     esi_escape.exe
 ) else (
     echo ------------------------------------------
-    echo Hubo errores durante la compilacion.
+    echo [ERROR] Hubo errores durante la compilacion.
+    echo Revisa que GCC este instalado y en el PATH.
 )
+
 pause
