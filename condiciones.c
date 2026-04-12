@@ -127,18 +127,22 @@ void UsarObjeto(Partida *par){
             scanf("%d", &respuesta);
 
             if(respuesta == 1){
-                   if(par->lista_conexiones[i].id_sala_orig == par->id_sala_actual && par->lista_conexiones[i].condicion_conexion == 1 /* && strcmp(con->id_objeto, par->lista_objetos[i].id_objeto) == 0 */){ 
-                        par->lista_conexiones[i].estado_conexion = 1; // Abre la conexión
-                        printf("Has usado el objeto %s para abrir la conexión hacia la sala %d\n", par->lista_objetos[i].nombre_objeto, par->lista_conexiones[i].id_sala_dest);
-                    } else {
+                for(int k = 0; k < par->num_conexiones; k++){
+                    if(par->lista_conexiones[k].id_sala_orig == par->id_sala_actual && par->lista_conexiones[k].condicion_conexion == 1 && strcmp(par->lista_conexiones[k].id_conexion, par->lista_objetos[i].id_objeto) == 0){ 
+                    // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id de la conexión
+                    par->lista_conexiones[k].estado_conexion = 1; // Cambia el estado de la conexión a abierta
+            printf("Has usado %s para abrir la conexión hacia la sala %d\n",par->lista_objetos[i].nombre_objeto,par->lista_conexiones[k].id_sala_dest);
+    
+
+            } else {
                         printf("No se puede usar el objeto %s en esta situación\n", par->lista_objetos[i].nombre_objeto);
                         j = 1; // Indica que se ha usado un objeto y se sale del bucle
                     }
             
+                }
             }
         }
     }
-
 }
 
 void ResolverPuzle(Partida *par){
@@ -162,6 +166,7 @@ void ResolverPuzle(Partida *par){
                 fgets(solucion, 51, stdin); // Lee la solución introducida por el jugador
                 solucion[strcspn(solucion, "\n")] = '\0'; // Elimina el carácter de nueva línea
                 if(strcmp(solucion, par->lista_puzles[i].solucion_puzle) == 0){ // Si la solución introducida coincide con la solución del puzle
+                    par->lista_puzles[i].resuelto = 1; // Marca el puzle como resuelto
                     printf("Has resuelto el puzle %s\n", par->lista_puzles[i].descripcion_puzle);
                 
                     j = 1; // Indica que se ha resuelto un puzle y se sale del bucle
