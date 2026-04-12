@@ -181,7 +181,7 @@ static int leer_jugadores(Jugadores **jugadores) {
 }
 
 /* ── volcado ────────────────────────────────────────────────────── */
-int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j) {
+int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j, int* num_jugadores) {
 
   int ns = leer_salas(s);
   int np = leer_puzles(p);

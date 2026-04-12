@@ -16,7 +16,7 @@
  */
 /* Capacidades: 10 salas, 9 conexiones, 5 objetos, 5 puzles. Tamaño de jugadores
  * dinamico, aumentará a    l registrarse un nuevo jugador. TEMPORAL */
-int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j);
+int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j, int* jugadores);
 
 /*
  * cargarPartida: busca 'id_jugador' en jugadores.txt y carga su estado
