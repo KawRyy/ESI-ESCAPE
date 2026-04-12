@@ -11,18 +11,18 @@ static void reemplazar(const char *orig, const char *tmp) {
 }
 
 /* ── leer_salas ─────────────────────────────────────────────────── */
-static int leer_salas(Salas **out) {
+static int leer_salas(Salas **salas) {
   const int MAX_SALAS = 10; /* Limite maximo de salas a cargar en memoria */
   FILE *f = fopen("ficheros/salas.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_SALAS * sizeof(Salas)); /* Reserva memoria para el array de salas */
-  if (!*out || !f) {
+  *salas = malloc(MAX_SALAS * sizeof(Salas)); /* Reserva memoria para el array de salas */
+  if (!*salas || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_SALAS * sizeof(Salas)); /* Inicializa la memoria con ceros */
+  memset(*salas, 0, MAX_SALAS * sizeof(Salas)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_SALAS) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -30,10 +30,10 @@ static int leer_salas(Salas **out) {
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *tipo = strtok(NULL, "-"), *desc = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id || !nom || !tipo || !desc)
       continue;
-    (*out)[n].id_sala = atoi(id); /* Convierte el ID a numero entero */
-    CPY((*out)[n].nombre_sala, nom);
-    (*out)[n].tipo_sala = !strcmp(tipo, "INICIAL")  ? 1 : !strcmp(tipo, "NORMAL") ? 2 : !strcmp(tipo, "SALIDA") ? 3 : 0; /* Asigna el valor numerico segun el tipo */
-    CPY((*out)[n].descripcion_sala, desc);
+    (*salas)[n].id_sala = atoi(id); /* Convierte el ID a numero entero */
+    CPY((*salas)[n].nombre_sala, nom);
+    (*salas)[n].tipo_sala = !strcmp(tipo, "INICIAL")  ? 1 : !strcmp(tipo, "NORMAL") ? 2 : !strcmp(tipo, "SALIDA") ? 3 : 0; /* Asigna el valor numerico segun el tipo */
+    CPY((*salas)[n].descripcion_sala, desc);
     n++;
   }
   fclose(f);
@@ -41,18 +41,18 @@ static int leer_salas(Salas **out) {
 }
 
 /* ── leer_puzles ────────────────────────────────────────────────── */
-static int leer_puzles(Puzles **out) {
+static int leer_puzles(Puzles **puzles) {
   const int MAX_PUZLES = 5; /* Limite maximo de puzles a cargar en memoria */
   FILE *f = fopen("ficheros/puzles.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_PUZLES * sizeof(Puzles)); /* Reserva memoria para array de puzles */
-  if (!*out || !f) {
+  *puzles = malloc(MAX_PUZLES * sizeof(Puzles)); /* Reserva memoria para array de puzles */
+  if (!*puzles || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_PUZLES * sizeof(Puzles)); /* Inicializa la memoria con ceros */
+  memset(*puzles, 0, MAX_PUZLES * sizeof(Puzles)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_PUZLES) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -62,11 +62,11 @@ static int leer_puzles(Puzles **out) {
     char *sala = strtok(NULL, "-"), *desc = strtok(NULL, "-"), *sol = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id || !sala || !desc || !sol)
       continue;
-    CPY((*out)[n].id_puzle, id);
-    (*out)[n].id_sala_puzle = atoi(sala); /* Convierte el ID de sala a entero */
-    (*out)[n].tipo_elemento = !strncmp(sol, "OB", 2) ? 1 : 2; /* Determina el tipo de elemento */
-    CPY((*out)[n].descripcion_puzle, desc);
-    CPY((*out)[n].solucion_puzle, sol);
+    CPY((*puzles)[n].id_puzle, id);
+    (*puzles)[n].id_sala_puzle = atoi(sala); /* Convierte el ID de sala a entero */
+    (*puzles)[n].tipo_elemento = !strncmp(sol, "OB", 2) ? 1 : 2; /* Determina el tipo de elemento */
+    CPY((*puzles)[n].descripcion_puzle, desc);
+    CPY((*puzles)[n].solucion_puzle, sol);
     n++;
   }
   fclose(f);
@@ -74,30 +74,30 @@ static int leer_puzles(Puzles **out) {
 }
 
 /* ── leer_conexiones ────────────────────────────────────────────── */
-static int leer_conexiones(Conexiones **out) {
+static int leer_conexiones(Conexiones **conexiones) {
   const int MAX_CONEXIONES = 9; /* Limite maximo de conexiones a cargar en memoria */
   FILE *f = fopen("ficheros/conexiones.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_CONEXIONES * sizeof(Conexiones)); /* Reserva memoria para array de conexiones */
-  if (!*out || !f) {
+  *conexiones = malloc(MAX_CONEXIONES * sizeof(Conexiones)); /* Reserva memoria para array de conexiones */
+  if (!*conexiones || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_CONEXIONES * sizeof(Conexiones)); /* Inicializa la memoria con ceros */
+  memset(*conexiones, 0, MAX_CONEXIONES * sizeof(Conexiones)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_CONEXIONES) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
       continue; /* Ignora lineas vacias o comentarios */
-    char *id = strtok(line, "-"), *orig = strtok(NULL, "-"), *dest = strtok(NULL, "-"), *state = strtok(NULL, "-"), *cond = strtok(NULL, "-"); /* Separa campos por '-' */
-    if (!id || !orig || !dest || !state || !cond)
+    char *id = strtok(line, "-"), *orig = strtok(NULL, "-"), *dest = strtok(NULL, "-"), *estado = strtok(NULL, "-"), *cond = strtok(NULL, "-"); /* Separa campos por '-' */
+    if (!id || !orig || !dest || !estado || !cond)
       continue;
-    CPY((*out)[n].id_conexion, id);
-    (*out)[n].id_sala_orig = atoi(orig); /* Convierte el ID origen a entero */
-    (*out)[n].id_sala_dest = atoi(dest); /* Convierte el ID destino a entero */
-    (*out)[n].estado_conexion = !strcmp(state, "Activa") ? 1 : 0; /* Determina si la conexion esta activa */
-    (*out)[n].condicion_conexion = !strcmp(cond, "0") ? 0 : !strncmp(cond, "OB", 2) ? 1 : !strncmp(cond, "P", 1)  ? 2 : 0; /* Asigna numericamente la condicion */
+    CPY((*conexiones)[n].id_conexion, id);
+    (*conexiones)[n].id_sala_orig = atoi(orig); /* Convierte el ID origen a entero */
+    (*conexiones)[n].id_sala_dest = atoi(dest); /* Convierte el ID destino a entero */
+    (*conexiones)[n].estado_conexion = !strcmp(estado, "Activa") ? 1 : 0; /* Determina si la conexion esta activa */
+    (*conexiones)[n].condicion_conexion = !strcmp(cond, "0") ? 0 : !strncmp(cond, "OB", 2) ? 1 : !strncmp(cond, "P", 1)  ? 2 : 0; /* Asigna numericamente la condicion */
     n++;
   }
   fclose(f);
@@ -105,18 +105,18 @@ static int leer_conexiones(Conexiones **out) {
 }
 
 /* ── leer_objetos ───────────────────────────────────────────────── */
-static int leer_objetos(Objetos **out) {
+static int leer_objetos(Objetos **objetos) {
   const int MAX_OBJETOS = 5; /* Limite maximo de objetos a cargar en memoria */
   FILE *f = fopen("ficheros/objetos.txt", "r");
   char line[512];
   int n = 0;
-  *out = malloc(MAX_OBJETOS * sizeof(Objetos)); /* Reserva memoria para array de objetos */
-  if (!*out || !f) {
+  *objetos = malloc(MAX_OBJETOS * sizeof(Objetos)); /* Reserva memoria para array de objetos */
+  if (!*objetos || !f) {
     if (f)
       fclose(f);
     return -1;
   }
-  memset(*out, 0, MAX_OBJETOS * sizeof(Objetos)); /* Inicializa la memoria con ceros */
+  memset(*objetos, 0, MAX_OBJETOS * sizeof(Objetos)); /* Inicializa la memoria con ceros */
   while (fgets(line, sizeof(line), f) && n < MAX_OBJETOS) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -124,10 +124,10 @@ static int leer_objetos(Objetos **out) {
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *desc = strtok(NULL, "-"), *loc = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id || !nom || !desc || !loc)
       continue;
-    CPY((*out)[n].id_objeto, id);
-    CPY((*out)[n].nombre_objeto, nom);
-    CPY((*out)[n].descripcion_objeto, desc);
-    (*out)[n].localizacion_objeto = atoi(loc); /* ID de sala o ubicacion */
+    CPY((*objetos)[n].id_objeto, id);
+    CPY((*objetos)[n].nombre_objeto, nom);
+    CPY((*objetos)[n].descripcion_objeto, desc);
+    (*objetos)[n].localizacion_objeto = atoi(loc); /* ID de sala o ubicacion */
     n++;
   }
   fclose(f);
@@ -135,11 +135,11 @@ static int leer_objetos(Objetos **out) {
 }
 
 /* ── leer_jugadores ─────────────────────────────────────────────── */
-static int leer_jugadores(Jugadores **out) {
+static int leer_jugadores(Jugadores **jugadores) {
   FILE *f = fopen("ficheros/jugadores.txt", "r");
   char line[512];
   int n = 0;
-  *out = NULL;
+  *jugadores = NULL;
   if (!f) return -1;
 
   while (fgets(line, sizeof(line), f)) {
@@ -150,27 +150,27 @@ static int leer_jugadores(Jugadores **out) {
     if (!id || !nom || !nick || !pw)
       continue;
 
-    Jugadores *tmp = realloc(*out, (n + 1) * sizeof(Jugadores));
+    Jugadores *tmp = realloc(*jugadores, (n + 1) * sizeof(Jugadores));
     if (!tmp) {
         fclose(f);
         return -1;
     }
-    *out = tmp;
-    memset(&((*out)[n]), 0, sizeof(Jugadores));
+    *jugadores = tmp;
+    memset(&((*jugadores)[n]), 0, sizeof(Jugadores));
 
-    (*out)[n].id_jugador = atoi(id);
-    CPY((*out)[n].nombre_jugador, nom);
-    CPY((*out)[n].jugador, nick);
-    CPY((*out)[n].contraseña, pw);
+    (*jugadores)[n].id_jugador = atoi(id);
+    CPY((*jugadores)[n].nombre_jugador, nom);
+    CPY((*jugadores)[n].jugador, nick);
+    CPY((*jugadores)[n].contraseña, pw);
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
-        char **tmp_obj = realloc((*out)[n].id_objeto, ((*out)[n].num_items + 1) * sizeof(char *));
+        char **tmp_obj = realloc((*jugadores)[n].id_objeto, ((*jugadores)[n].num_items + 1) * sizeof(char *));
         if (!tmp_obj) break;
-        (*out)[n].id_objeto = tmp_obj;
-        (*out)[n].id_objeto[(*out)[n].num_items] = malloc(strlen(obj) + 1);
-        if ((*out)[n].id_objeto[(*out)[n].num_items])
-          strcpy((*out)[n].id_objeto[(*out)[n].num_items++], obj);
+        (*jugadores)[n].id_objeto = tmp_obj;
+        (*jugadores)[n].id_objeto[(*jugadores)[n].num_items] = malloc(strlen(obj) + 1);
+        if ((*jugadores)[n].id_objeto[(*jugadores)[n].num_items])
+          strcpy((*jugadores)[n].id_objeto[(*jugadores)[n].num_items++], obj);
         obj = strtok(NULL, ",");
       }
     }
