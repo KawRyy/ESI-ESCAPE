@@ -29,7 +29,7 @@ typedef struct {
     // INVENTARIO DINÁMICO (IDs de objetos). Otra ocpión es una estructura dentro con los dos campos que siguen...
     char **id_objetos;          // Vector de dinámico de cadenas (puntero a puntero).
     int num_objetos;            // Número de objetos.
-} Jugador;
+} Jugadores;
 
 /*
     Login. Incluye la posibilidad de registrar un nuevo usuario.
@@ -42,6 +42,6 @@ typedef struct {
     - número_jugadores  Puntero al número de jugadores.
 */
 
-int login(Jugador **jugadores, int *numero_jugadores);
+int login(Jugadores **jugadores, int *numero_jugadores);
 
 #endif /* USUARIOS_H */

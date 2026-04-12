@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "estructuras.h"
+#include "salas_y_conexiones.h"
+#include "objetos_y_puzzles.h"
 #include "usuarios.h"
 #include "juego.h"
 

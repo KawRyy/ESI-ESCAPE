@@ -14,13 +14,13 @@
 
 // Declaraciones de funciones auxiliares privadas al módulo.
 
-static Jugador *busca_usuario(const char *usuario, Jugador jugador[], int numero_jugadores);
+static Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores);
 static void lee_cadena(const char *mensaje, char *cadena, int n);
-static int registra_nuevo_usuario(Jugador **jugador, int *número_jugadores);
+static int registra_nuevo_usuario(Jugadores **jugador, int *número_jugadores);
 
 // Para depuración...
 
-static void muestra_usuarios(Jugador *jugador, int número_jugadores)
+static void muestra_usuarios(Jugadores *jugador, int número_jugadores)
 {
     putchar('\n');
     puts(">>> DEPURACIÓN");
@@ -53,9 +53,9 @@ static void muestra_usuarios(Jugador *jugador, int número_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-int login(Jugador **jugadores, int *número_jugadores)
+int login(Jugadores **jugadores, int *número_jugadores)
 {
-    Jugador *jugador;
+    Jugadores *jugador;
     char usuario[sizeof (*jugadores)->jugador];
     char contraseña[sizeof (*jugadores)->contraseña];
     int sesión_iniciada = 0;
@@ -132,7 +132,7 @@ int login(Jugador **jugadores, int *número_jugadores)
 //
 // Puntero al (primer) jugador con ese nombre de usuario o NULL si no existe ninguno con ese nombre.
 
-Jugador *busca_usuario(const char *usuario, Jugador jugador[], int numero_jugadores)
+Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores)
 {
     int encontrado = 0;
     int k;
@@ -199,9 +199,9 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
 // - 0  Indica que el usuario ya existe y no se ha podido registrar.
 // - 1  Indica que el usuario se ha registrado con éxito. 
 
-int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
+int registra_nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
 {
-    Jugador nuevo_jugador;
+    Jugadores nuevo_jugador;
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
     nuevo_jugador.id_jugador = *número_jugadores + 1;
@@ -218,7 +218,7 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
         nuevo_jugador.num_objetos = 0;
         // Añadimos el nuevo jugador.
         ++*número_jugadores;
-        *jugadores = realloc(*jugadores, sizeof(Jugador) * *número_jugadores);  // Reservamos espacio para una estructura extra.
+        *jugadores = realloc(*jugadores, sizeof(Jugadores) * *número_jugadores);  // Reservamos espacio para una estructura extra.
         (*jugadores)[*número_jugadores - 1] = nuevo_jugador;                    // Copiamos la estructura a la última posición.
 
         // PARA DEPURACIÓN. ELIMINAR ANTES DE ENTREGAR.
