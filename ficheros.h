@@ -5,7 +5,7 @@
 #include "mapa.h"        
 #include "condiciones.h" 
 #include "usuarios.h"    
-#include "menus.h"        
+#include "partida.h"        
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

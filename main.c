@@ -7,7 +7,8 @@
 #include "menus.h"       
 #include "mapa.h"        
 #include "condiciones.h" 
-#include "usuarios.h"    
+#include "usuarios.h"
+#include "partida.h"  
 
 int main() {
     /* Se vuelcan al inicio del juego y son invariantes */

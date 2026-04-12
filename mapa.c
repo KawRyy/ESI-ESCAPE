@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "ficheros.h"
 #include "mapa.h"    
-#include "menus.h"   
+#include "partida.h" 
 
 void ExaminarSalidas(Partida *par);
 void accionMover(Partida *par, Salas *sal);

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "condiciones.h" 
-#include "menus.h"       
+#include "partida.h"     
 #include "usuarios.h"  
 #include "mapa.h" 
 

@@ -5,7 +5,8 @@
 #include "usuarios.h"    
 #include "mapa.h"        
 #include "condiciones.h" 
-#include "ficheros.h"    
+#include "ficheros.h"
+#include "partida.h" 
 #include <stdio.h>
 
 void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
