@@ -1,5 +1,5 @@
 /*
-    Alejandro Palomo Medina
+    Alejandro Palomo Medina 
 
     Módulo: Usuarios (usuarios.h/usuarios.c)
 
