@@ -1,4 +1,9 @@
-
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "ficheros.h"
+#include "salas_y_conexiones.h"
+#include "menus.h"
 
 void ExaminarSalidas(Partida *par){
     for(int i = 0; i < par->num_conexiones; i++){

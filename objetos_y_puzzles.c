@@ -1,3 +1,9 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "ficheros.h"
+#include "objetos_y_puzzles.h"
+#include "menus.h"
 
 void ExaminarObjeto(Partida *par){
     for(int i = 0; i < par->num_objetos; i++){
