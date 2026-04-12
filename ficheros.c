@@ -193,13 +193,13 @@ int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j) {
 }
 
 /* ── cargarPartida ──────────────────────────────────────────────── */
-int cargarPartida(Partida *par, char *nickname) {
+int cargarPartida(Partida *par, int id_jugador) {
   FILE *f;
   char line[512];
 
   /* 1. Buscar jugador en jugadores.txt:
-   *    Se abre el fichero y se busca linea a linea un usuario que coincida
-   *    con el 'nickname' proporcionado como parametro. */
+   *    Se abre el fichero y se busca linea a linea un usuario cuyo id_jugador
+   *    coincida con el 'id_jugador' proporcionado como parametro. */
   Jugadores jug;
   memset(&jug, 0, sizeof(Jugadores));
   int hallado = 0;
@@ -210,7 +210,7 @@ int cargarPartida(Partida *par, char *nickname) {
     if (line[0] == '/' || line[0] == '\0')
       continue;
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
-    if (!id || !nom || !nick || strcmp(nick, nickname) != 0) /* Ignora si faltan datos o no coinciden con el usuario */
+    if (!id || !nom || !nick || atoi(id) != id_jugador) /* Ignora si faltan datos o el ID no coincide */
       continue;
     jug.id_jugador = atoi(id);
     CPY(jug.nombre_jugador, nom);
