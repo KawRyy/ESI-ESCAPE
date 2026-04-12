@@ -3,8 +3,8 @@
 
 #include "salas_y_conexiones.h"
 #include "objetos_y_puzzles.h"
+#include "menus.h"
 #include "usuarios.h"
-#include "juego.h"
 
 void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
 static void menu_principal(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
