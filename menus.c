@@ -27,6 +27,9 @@ void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Co
 
         switch(control){
         case 1:
+        /* EL 3 ESTA HARDCODEADO NECESITAMOS EL NUMERO DE JUGADORES */
+
+
             if (login(jug, 3) != -1) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
                 printf("Inicio de sesión exitoso... \n");
                 menu_principal(par, jug, obj, sal, con, puz); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
@@ -124,11 +127,11 @@ static void menu_juego(Partida **par, Jugadores **jug, Objetos **obj, Salas **sa
                 break;
             case 4:
                 printf("===== COGER OBJETO ===== \n");
-                // CogerObjeto(*obj NO HACE FALTA, *jug, *par); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
+                CogerObjeto(*jug,*par); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 break;
             case 5:
                 printf("===== SOLTAR OBJETO ===== \n");
-                // SoltarObjeto(*obj NO HACE FALTA, *jug, *par); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
+                SoltarObjeto(*jug, *par); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
                 break;
             case 6:
                 printf("===== INVENTARIO ===== \n");
