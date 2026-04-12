@@ -161,7 +161,7 @@ static int leer_jugadores(Jugadores **jugadores) {
     (*jugadores)[n].id_jugador = atoi(id);
     CPY((*jugadores)[n].nombre_jugador, nom);
     CPY((*jugadores)[n].jugador, nick);
-    CPY((*jugadores)[n].contraseña, pw);
+    CPY((*jugadores)[n].contrasena, pw);
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
