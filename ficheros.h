@@ -1,7 +1,7 @@
 #ifndef FICHEROS_H
 #define FICHEROS_H
 
-#include "objetos_y_puzles.h"
+#include "objetos_y_puzzles.h"
 #include "usuarios.h"
 #include "salas_y_conexiones.h"
 #include "menus.h"
