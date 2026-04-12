@@ -4,6 +4,7 @@
 #include "objetos_y_puzles.h"
 #include "usuarios.h"
 #include "salas_y_conexiones.h"
+#include "menus.h"
 
 /*
  * volcado: carga todos los ficheros de datos del mundo del juego.
