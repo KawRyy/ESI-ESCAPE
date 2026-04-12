@@ -14,15 +14,15 @@
 
 // Declaraciones de funciones auxiliares privadas al módulo.
 
-static Jugador *busca_usuario(const char *usuario, Jugador jugador[], int numero_jugadores);
+static Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores);
 static void lee_cadena(const char *mensaje, char *cadena, int n);
-static int registra_nuevo_usuario(Jugador **jugador, int *número_jugadores);
-static int registra_usuario(Jugador **jugadores, int *número_jugadores);
-static void nuevaPartida(Partida *partida);
+static void registra_usuario(Jugadores **jugadores, int *número_jugadores);
+static int nuevo_usuario(Jugadores **jugador, int *número_jugadores);
+static void nuevaPartida(Jugadores *jugador, Partida *partida);
 
 // Para depuración...
 
-static void muestra_usuarios(Jugador *jugador, int número_jugadores)
+static void muestra_usuarios(Jugadores *jugador, int número_jugadores)
 {
     putchar('\n');
     puts(">>> DEPURACIÓN");
@@ -55,9 +55,9 @@ static void muestra_usuarios(Jugador *jugador, int número_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-void login(Jugador **jugadores, int *número_jugadores)
+void login(Jugadores **jugadores, int *número_jugadores)
 {
-    Jugador *jugador;
+    Jugadores *jugador;
     char usuario[sizeof (*jugadores)->jugador];
     char contraseña[sizeof (*jugadores)->contraseña];
     int sesión_iniciada = 0;
@@ -90,29 +90,7 @@ void login(Jugador **jugadores, int *número_jugadores)
             }
         } else {
             // El usuario no existe, informamos y damos la opción de registrarse como nuevo usuario.
-            char respuesta[2];
-            int respuesta_correcta = 0;
-
-            puts("No existe un jugador con ese nombre\n");
-            while (!respuesta_correcta) {
-                lee_cadena("¿Desea registrar un nuevo usuario? [S/N] ", respuesta, sizeof(respuesta));
-                switch (respuesta[0]) {
-                    case 'n': case 'N':
-                        respuesta_correcta = 1;
-                        break;
-                    case 's': case 'S':
-                        respuesta_correcta = registra_nuevo_usuario(jugadores, número_jugadores);
-                        if (respuesta_correcta) {
-                            puts("Se ha registrado correctamente el usuario\n");
-                        } else {
-                            puts("El usuario ya existe.\n");
-                        }
-                        break;
-                    default:
-                        puts("Conteste 'S' o 'N'.");
-                }
-                putchar('\n');
-            }
+            registra_usuario(jugadores, número_jugadores);
         }
     }
 }
@@ -132,7 +110,7 @@ void login(Jugador **jugadores, int *número_jugadores)
 //
 // Puntero al (primer) jugador con ese nombre de usuario o NULL si no existe ninguno con ese nombre.
 
-Jugador *busca_usuario(const char *usuario, Jugador jugador[], int numero_jugadores)
+Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores)
 {
     int encontrado = 0;
     int k;
@@ -192,16 +170,44 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
     strcpy(cadena, linea);
 }
 
-// Registra a un jugador como nuevo usuario.
+// Solicita si desea registrar a un jugador como nuevo usuario.
+
+void registra_usuario(Jugadores **jugadores, int *número_jugadores)
+{
+    char respuesta[2];
+    int respuesta_correcta = 0;
+
+    while (!respuesta_correcta) {
+        lee_cadena("¿Desea registrar un nuevo usuario? [S/N] ", respuesta, sizeof(respuesta));
+        switch (respuesta[0]) {
+            case 'n': case 'N':
+                respuesta_correcta = 1;
+                break;
+            case 's': case 'S':
+                respuesta_correcta = nuevo_usuario(jugadores, número_jugadores);
+                if (respuesta_correcta) {
+                    puts("Se ha registrado correctamente el usuario\n");
+                } else {
+                    puts("El usuario ya existe.\n");
+                }
+                break;
+            default:
+                puts("Conteste 'S' o 'N'.");
+        }
+        putchar('\n');
+    }
+}
+
+// Registra a un jugador como nuevo usuario si no existe.
 //
 // Valor devuelto:
 //
 // - 0  Indica que el usuario ya existe y no se ha podido registrar.
 // - 1  Indica que el usuario se ha registrado con éxito. 
 
-int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
+int nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
 {
-    Jugador nuevo_jugador;
+    Jugadores nuevo_jugador;
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
     nuevo_jugador.id_jugador = *número_jugadores + 1;
@@ -214,11 +220,11 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
     } else {
         lee_cadena("Contraseña: ", nuevo_jugador.contraseña, sizeof nuevo_jugador.contraseña);
         // Inicialmente, el nuevo jugador no posee objetos.
-        nuevo_jugador.id_objetos = NULL;
+        nuevo_jugador.objetos = NULL;
         nuevo_jugador.num_objetos = 0;
         // Añadimos el nuevo jugador.
         ++*número_jugadores;
-        *jugadores = realloc(*jugadores, sizeof(Jugador) * *número_jugadores);  // Reservamos espacio para una estructura extra.
+        *jugadores = realloc(*jugadores, sizeof(Jugadores) * *número_jugadores);  // Reservamos espacio para una estructura extra.
         (*jugadores)[*número_jugadores - 1] = nuevo_jugador;                    // Copiamos la estructura a la última posición.
 
         // PARA DEPURACIÓN. ELIMINAR ANTES DE ENTREGAR.
@@ -228,103 +234,27 @@ int registra_nuevo_usuario(Jugador **jugadores, int *número_jugadores)
     }
 }
 
-int registra_usuario(Jugador **jugadores, int *número_jugadores)
-{
-while (!respuesta_correcta) {
-                lee_cadena("¿Desea registrar un nuevo usuario? [S/N] ", respuesta, sizeof(respuesta));
-                switch (respuesta[0]) {
-                    case 'n': case 'N':
-                        respuesta_correcta = 1;
-                        break;
-                    case 's': case 'S':
-                        respuesta_correcta = registra_nuevo_usuario(jugadores, número_jugadores);
-                        if (respuesta_correcta) {
-                            puts("Se ha registrado correctamente el usuario\n");
-                        } else {
-                            puts("El usuario ya existe.\n");
-                        }
-                        break;
-                    default:
-                        puts("Conteste 'S' o 'N'.");
-                }
-                putchar('\n');
-            }
-}
-    
+/*
 partida->num_objetos = 0;
 partida->num_conexiones = 0;
 partida->num_puzles = 0;
+*/
 
-void nuevaPartida(Partida *partida)
+// Crea una nueva partida.
+//
+// Inicializa la estructura partida para el jugador indicado.
+//
+// jugador (E)  Jugador que ha inciado sesión 
+// partida (S)  Partida nueva sin inicializar. 
+
+void nuevaPartida(Jugadores *jugador, Partida *partida)
 {
-
-    FILE *f;
-    char linea[100];
-
-    f = fopen("Partida.txt", "r");
-
-    if(f == NULL){
-        printf("Error al abrir el fichero\n");
-        return;
-    }
-
-    while(fgets(linea, sizeof(linea), f) != NULL){
-
-        /* JUGADOR */
-        if(strncmp(linea, "JUGADOR:", 8) == 0){
-
-            sscanf(linea, "JUGADOR: %d", &partida->id_jugador);
-        }
-
-        /* SALA */
-        else if(strncmp(linea, "SALA:", 5) == 0){
-
-            sscanf(linea, "SALA: %d", &partida->id_sala_actual);
-        }
-
-        /* OBJETO */
-        else if(strncmp(linea, "OBJETO:", 7) == 0){
-
-            char id[10], loc[10];
-
-            sscanf(linea, "OBJETO: %[^-]-%s", id, loc);
-
-            strcpy(partida->lista_objetos[partida->num_objetos].id, id);
-            strcpy(partida->lista_objetos[partida->num_objetos].localizacion, loc);
-
-            partida->num_objetos++;
-        }
-
-        /* CONEXION */
-        else if(strncmp(linea, "CONEXION:", 10) == 0){
-
-            int id;
-            char estado[10];
-
-            sscanf(linea, "CONEXION: %d-%s", &id, estado);
-
-            partida->lista_conexiones[partida->num_conexiones].id = id;
-            strcpy(partida->lista_conexiones[partida->num_conexiones].estado, estado);
-
-            partida->num_conexiones++;
-        }
-
-        /* PUZLE */
-        else if(strncmp(linea, "PUZLE:", 6) == 0){
-
-            char id[10], estado[15];
-
-            sscanf(linea, "PUZLE: %[^-]-%s", id, estado);
-
-            strcpy(partida->lista_puzles[partida->num_puzles].id, id);
-            strcpy(partida->lista_puzles[partida->num_puzles].estado, estado);
-
-            partida->num_puzles++;
-        }
-
-    }
-
-    fclose(f);
-
-    printf("Partida cargada correctamente\n");
+    partida->id_jugador = jugador->id_jugador;
+    partida->id_sala_actual = 0;
+    partida->lista_objetos = NULL;
+    partida->num_objetos = 0;
+    partida->lista_conexiones = NULL;
+    partida->num_conexiones = 0;
+    partida->lista_puzles = NULL;
+    partida->num_puzles = 0;
 }
