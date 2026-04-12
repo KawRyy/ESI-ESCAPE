@@ -4,10 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_SALAS 10
-#define MAX_CONEXIONES 9
-#define MAX_OBJETOS 5
-#define MAX_PUZLES 5
+
 
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
@@ -18,6 +15,7 @@ static void reemplazar(const char *orig, const char *tmp) {
 
 /* ── leer_salas ─────────────────────────────────────────────────── */
 static int leer_salas(Salas **out) {
+  const int MAX_SALAS = 10; /* Limite maximo de salas a cargar en memoria */
   FILE *f = fopen("ficheros/salas.txt", "r");
   char line[512];
   int n = 0;
@@ -47,6 +45,7 @@ static int leer_salas(Salas **out) {
 
 /* ── leer_puzles ────────────────────────────────────────────────── */
 static int leer_puzles(Puzles **out) {
+  const int MAX_PUZLES = 5; /* Limite maximo de puzles a cargar en memoria */
   FILE *f = fopen("ficheros/puzles.txt", "r");
   char line[512];
   int n = 0;
@@ -79,6 +78,7 @@ static int leer_puzles(Puzles **out) {
 
 /* ── leer_conexiones ────────────────────────────────────────────── */
 static int leer_conexiones(Conexiones **out) {
+  const int MAX_CONEXIONES = 9; /* Limite maximo de conexiones a cargar en memoria */
   FILE *f = fopen("ficheros/conexiones.txt", "r");
   char line[512];
   int n = 0;
@@ -109,6 +109,7 @@ static int leer_conexiones(Conexiones **out) {
 
 /* ── leer_objetos ───────────────────────────────────────────────── */
 static int leer_objetos(Objetos **out) {
+  const int MAX_OBJETOS = 5; /* Limite maximo de objetos a cargar en memoria */
   FILE *f = fopen("ficheros/objetos.txt", "r");
   char line[512];
   int n = 0;
@@ -392,44 +393,7 @@ void guardarPartida(Partida *par, Jugadores *jug) {
     reemplazar("ficheros/partida.txt", "ficheros/partida_tmp.txt");
   }
 
-  /* 2. Actualizacion de conexiones.txt:
-   *    Revisa todas las conexiones globales. Si alguna coincide con una conexion modificada
-   *    en memoria (dentro de par->lista_conexiones), sobreescribe su estado, por defecto copia original. */
-  fin = fopen("ficheros/conexiones.txt", "r");
-  fout = fopen("ficheros/conexiones_tmp.txt", "w");
-  if (fin && fout) {
-    while (fgets(line, sizeof(line), fin)) {
-      if (line[0] == '/' && line[1] == '/') {
-        fputs(line, fout);
-        continue;
-      }
-      char t[512];
-      strncpy(t, line, sizeof(t));
-      t[strcspn(t, "\r\n")] = '\0';
-      char *id = strtok(t, "-"), *orig = strtok(NULL, "-"),*dest = strtok(NULL, "-"), *state = strtok(NULL, "-"),*cond = strtok(NULL, "-");
-      if (!id || !orig || !dest || !state || !cond) {
-        fputs(line, fout);
-        continue;
-      }
-      const char *nuevo = state;
-      for (int i = 0; i < par->num_conexiones; i++)
-        if (!strcmp(par->lista_conexiones[i].id_conexion, id)) {
-          nuevo = par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada";
-          break;
-        }
-      fprintf(fout, "%s-%s-%s-%s-%s\n", id, orig, dest, nuevo, cond);
-    }
-  }
-  if (fin)
-    fclose(fin);
-  if (fout)
-    fclose(fout);
-  if (fin && fout)
-    reemplazar("ficheros/conexiones.txt", "ficheros/conexiones_tmp.txt");
-  else
-    remove("ficheros/conexiones_tmp.txt");
-
-  /* 3. Actualizacion de jugadores.txt:
+  /* 2. Actualizacion de jugadores.txt:
    *    Mantiene la informacion intacta del resto de usuarios y actualiza de manera exclusiva
    *    la seccion del inventario del jugador actual. */
   fin = fopen("ficheros/jugadores.txt", "r");
