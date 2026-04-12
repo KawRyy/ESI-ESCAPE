@@ -1,3 +1,14 @@
+/*
+    Módulo: Usuarios (usuarios.c) - Alejandro Palomo Medina
+
+    Gestión de usuarios del juego.
+
+    Dependencias:
+
+    - "usuarios.h"
+    - Varias cabeceras de la biblioteca estándar
+*/
+
 #include "usuarios.h"
 #include <stdio.h>
 #include <stddef.h>
@@ -16,18 +27,19 @@
 
 static Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores);
 static void lee_cadena(const char *mensaje, char *cadena, int n);
+static int solicita_contrasena(Jugadores* jugador);
 static void registra_usuario(Jugadores **jugadores, int *número_jugadores);
-static int nuevo_usuario(Jugadores **jugador, int *número_jugadores);
-static void nuevaPartida(Jugadores *jugador, Partida *partida);
+static int nuevo_usuario(Jugadores **jugadores, int *número_jugadores);
+static void nueva_partida(Jugadores *jugador, Partida *partida);
 
 // Para depuración...
 
-static void muestra_usuarios(Jugadores *jugador, int número_jugadores)
+static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
 {
     putchar('\n');
     puts(">>> DEPURACIÓN");
-    for (int k = 0; k < número_jugadores; ++k)
-        printf("%02d-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador, jugador[k].jugador, jugador[k].contraseña);
+    for (int k = 0; k < numero_jugadores; ++k)
+        printf("%02d-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador, jugador[k].jugador, jugador[k].contrasena);
     puts("<<< DEPURACIÓN\n");
 }
 
@@ -55,11 +67,10 @@ static void muestra_usuarios(Jugadores *jugador, int número_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-void login(Jugadores **jugadores, int *número_jugadores)
+void login(Jugadores **jugadores, int *numero_jugadores)
 {
     Jugadores *jugador;
     char usuario[sizeof (*jugadores)->jugador];
-    char contraseña[sizeof (*jugadores)->contraseña];
     int sesión_iniciada = 0;
 
     // El proceso de login finaliza cuando se consigue iniciar sesión.
@@ -67,30 +78,14 @@ void login(Jugadores **jugadores, int *número_jugadores)
         // Solicitamos las credenciales.
         lee_cadena("Usuario: ", usuario, sizeof usuario);
         // Buscamos un jugador que se corresponda con ese usuario.
-        jugador = busca_usuario(usuario, *jugadores, *número_jugadores);
+        jugador = busca_usuario(usuario, *jugadores, *numero_jugadores);
         // Comprobamos si el uauario existe.     
-        if (jugador) {    // O, equivalentemente, p_jugador != NULL.
-            // El usuario existe, comprobamos si la contraseña es correcta.
-            int intentos = 0;
-
-            while (intentos < MAX_INTENTOS && !sesión_iniciada) {
-                lee_cadena("Contraseña: ", contraseña, sizeof contraseña);
-                if (strcmp(contraseña, jugador->contraseña)) {
-                    // Es incorrecta, informamos y seguimos intentándolo.
-                    puts("Contraseña incorrecta\n");
-                    ++intentos;
-                } else {
-                    // Es correcta, terminamos.
-                    sesión_iniciada = 1;
-                }
-            }
-            if (intentos == MAX_INTENTOS) {
-                // Es incorrecta y se ha alcanzado el máximo número de intentos permitidos.
-                puts("Se ha superado el máximo número de intentos permitidos.\n");
-            }
+        if (jugador) {    // O, equivalentemente, jugador != NULL.
+            // El usuario existe, solicitamos ls contraseña.
+            sesión_iniciada = solicita_contrasena(jugador);
         } else {
             // El usuario no existe, informamos y damos la opción de registrarse como nuevo usuario.
-            registra_usuario(jugadores, número_jugadores);
+            registra_usuario(jugadores, numero_jugadores);
         }
     }
 }
@@ -127,13 +122,23 @@ Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_ju
     }
 }
 
-// Muestra un mensaje, lee una línea completa y guarda en la cadena n caracteres como mucho, incluyendo el '\0'.
+// Muestra un mensaje, lee una línea completa y guarda en la cadena n caracteres
+// como mucho, incluyendo el '\0'.
 //
 // Parámetros:
 //
 // mensaje (E)      Mensaje a mostrar 
 // cadena  (S)      Cadena leída
 // n       (E)      Número máximo de caracteres, incluyendo el terminador
+//
+// Precondición:
+//
+//   mensaje apunta a una cadena válida
+//   n > 0
+//
+// Postcondición:
+//
+//   cadena contiene los n - 1 primeros caracteres de la entrada seguidos de '\0'
 
 void lee_cadena(const char *mensaje, char *cadena, int n)
 {
@@ -170,21 +175,55 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
     strcpy(cadena, linea);
 }
 
-// Solicita si desea registrar a un jugador como nuevo usuario.
+// Solicita la contraseña de un jugador.
+//
+// Precondición:
+//
+// - El jugador debe existir (el parámetro jugador no puede ser NULL)
+//
+// Poscondición:
+//
+// - Devuelve 1 si la contraseña es correcta y 0 si no lo es (tras MAX_INTENTOS)
 
-void registra_usuario(Jugadores **jugadores, int *número_jugadores)
+int solicita_contrasena(Jugadores* jugador)
+{
+    char contrasena[sizeof jugador->contrasena];
+    int contrasena_correcta = 0;
+    int intentos = 0;
+
+    while (intentos < MAX_INTENTOS && !contrasena_correcta) {
+        lee_cadena("Contraseña: ", contrasena, sizeof contrasena);
+        if (strcmp(contrasena, jugador->contrasena)) {
+            // Es incorrecta, informamos y seguimos intentándolo.
+            puts("Contraseña incorrecta\n");
+            ++intentos;
+        } else {
+            // Es correcta, terminamos.
+            contrasena_correcta = 1;
+        }
+    }
+    if (intentos == MAX_INTENTOS) {
+        // Es incorrecta y se ha alcanzado el máximo número de intentos permitidos.
+        puts("Se ha superado el máximo número de intentos permitidos.\n");
+    }
+    return contrasena_correcta;
+}
+
+// Solicita si se quiere registrar a un jugador como nuevo usuario.
+
+void registra_usuario(Jugadores **jugadores, int *numero_jugadores)
 {
     char respuesta[2];
     int respuesta_correcta = 0;
 
     while (!respuesta_correcta) {
-        lee_cadena("¿Desea registrar un nuevo usuario? [S/N] ", respuesta, sizeof(respuesta));
+        lee_cadena("El usuario no existe. ¿Desea registrar un nuevo usuario? [S/N] ", respuesta, sizeof(respuesta));
         switch (respuesta[0]) {
             case 'n': case 'N':
                 respuesta_correcta = 1;
                 break;
             case 's': case 'S':
-                respuesta_correcta = nuevo_usuario(jugadores, número_jugadores);
+                respuesta_correcta = nuevo_usuario(jugadores, numero_jugadores);
                 if (respuesta_correcta) {
                     puts("Se ha registrado correctamente el usuario\n");
                 } else {
@@ -218,7 +257,7 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
     if (busca_usuario(nuevo_jugador.jugador, *jugadores, *número_jugadores)) {
        return 0;
     } else {
-        lee_cadena("Contraseña: ", nuevo_jugador.contraseña, sizeof nuevo_jugador.contraseña);
+        lee_cadena("Contraseña: ", nuevo_jugador.contrasena, sizeof nuevo_jugador.contrasena);
         // Inicialmente, el nuevo jugador no posee objetos.
         nuevo_jugador.objetos = NULL;
         nuevo_jugador.num_objetos = 0;
@@ -247,7 +286,7 @@ partida->num_puzles = 0;
 // jugador (E)  Jugador que ha inciado sesión 
 // partida (S)  Partida nueva sin inicializar. 
 
-void nuevaPartida(Jugadores *jugador, Partida *partida)
+void nueva_partida(Jugadores *jugador, Partida *partida)
 {
     partida->id_jugador = jugador->id_jugador;
     partida->id_sala_actual = 0;

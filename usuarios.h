@@ -5,14 +5,18 @@
 
     Dependencias:
 
-    - "ficheros.h"  Lectura/escritura del fichero de usuarios.
+    ...
+    ...
+    ...
 */
 
 #ifndef USUARIOS_H
 #define USUARIOS_H
 
+// PENDIENTE
+//
 // Objetos, Puzles, Salas, Conexiones y Partida está en otro ficheros que todavía no compilan.
-// Cuamdp compile, eliminar y poner los .h
+// Cuamdp compilen, eliminar e incluir los .h correspondientes...
 
 typedef struct {
     char id_objeto[5];
@@ -60,6 +64,7 @@ typedef struct {
     int num_puzles;
 } Partida;
 
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Al leer el fichero de jugadores hay que crear, con memoria dinámica, los vectores dinámicos:
 //
@@ -78,7 +83,7 @@ typedef struct {
     int id_jugador;             // Identificador del jugador.
     char nombre_jugador[21];    // Nombre del jugador.
     char jugador[11];           // Nombre de usuario (nickname).
-    char contraseña[9];         // Contraseña.
+    char contrasena[9];         // Contraseña.
     Objetos *objetos;           // Puntero a vector dinámico de objetos (o NULL si no hay ninguno).
     int num_objetos;            // Número de objetos.
 } Jugadores;
@@ -94,6 +99,6 @@ typedef struct {
     - número_jugadores  Puntero al número de jugadores.
 */
 
-void login(Jugadores **jugadores, int *número_jugadores);
+void login(Jugadores **jugadores, int *numero_jugadores);
 
 #endif /* USUARIOS_H */
