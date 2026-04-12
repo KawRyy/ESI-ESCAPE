@@ -5,6 +5,8 @@
 #include "objetos_y_puzzles.h"
 #include "menus.h"
 
+
+
 void ExaminarObjeto(Partida *par){
     for(int i = 0; i < par->num_objetos; i++){
         if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){ // Si el objeto está en la sala actual
