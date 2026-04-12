@@ -1,12 +1,14 @@
 /*
-    Módulo: Usuarios (usuarios.c) - Alejandro Palomo Medina
+    Alejandro Palomo Medina
+    
+    Módulo: Usuarios (usuarios.c)
 
     Gestión de usuarios del juego.
 
     Dependencias:
 
     - "usuarios.h"
-    - Varias cabeceras de la biblioteca estándar
+    - Varias cabeceras de la biblioteca de C
 */
 
 #include "usuarios.h"

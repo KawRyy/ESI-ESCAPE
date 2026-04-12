@@ -1,5 +1,7 @@
 /*
-    Módulo: Usuarios (usuarios.h) - Alejandro Palomo Medina
+    Alejandro Palomo Medina
+    
+    Módulo: Usuarios (usuarios.h)
 
     Gestión de usuarios del juego.
 
@@ -13,14 +15,13 @@
 #ifndef USUARIOS_H
 #define USUARIOS_H
 
-#include "partida.h"
+// #include "partida.h"
 
 // PENDIENTE
 //
 // Objetos, Puzles, Salas, Conexiones y Partida está en otro ficheros que todavía no compilan.
-// Cuamdp compilen, eliminar e incluir los .h correspondientes...
+// Cuando compilen, eliminar e incluir los .h correspondientes...
 
-/*
 typedef struct {
     char id_objeto[5];
     char nombre_objeto[16];
@@ -66,7 +67,6 @@ typedef struct {
     Puzles *lista_puzles;        // Array con el estado (Resuelto/Pendiente) de cada uno
     int num_puzles;
 } Partida;
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
