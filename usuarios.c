@@ -67,7 +67,7 @@ static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-void login(Jugadores **jugadores, int *numero_jugadores)
+int login(Jugadores **jugadores, int *numero_jugadores)
 {
     Jugadores *jugador;
     char usuario[sizeof (*jugadores)->jugador];
@@ -88,6 +88,7 @@ void login(Jugadores **jugadores, int *numero_jugadores)
             registra_usuario(jugadores, numero_jugadores);
         }
     }
+    return jugador->id_jugador;
 }
 
 // Búsqueda de un usuario en el vector de jugadores.

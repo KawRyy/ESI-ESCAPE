@@ -89,7 +89,7 @@ typedef struct {
 } Jugadores;
 
 /*
-    Login. Incluye la posibilidad de registrar un nuevo usuario.
+    Login. Incluye la posibilidad de registrar nuevos usuarios.
 
     Para poder añadir un nuevo jugador si se opta por registrar un nuevo usuario, necesitamos 
     modificar el vector de jugadores y el número de jugadores, pasándolos por referencia, es
@@ -97,8 +97,18 @@ typedef struct {
 
     - jugadores         Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugadores).
     - número_jugadores  Puntero al número de jugadores.
+
+    Precondición:
+
+      *jugadores apunta a un vector reservado con memoria dinámica o es NULL (si no hay jugadores)
+      *número_jugadores > 0 y contiene el número de jugadores que contiene el vector dinámico
+
+    Postcondición:
+
+      Modifica *jugadores y *numero_jugadores si se registran nuevos usuarios
+      Devuelve el id del jugador que inicia sesión    
 */
 
-void login(Jugadores **jugadores, int *numero_jugadores);
+int login(Jugadores **jugadores, int *numero_jugadores);
 
 #endif /* USUARIOS_H */
