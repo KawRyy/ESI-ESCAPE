@@ -6,9 +6,12 @@
 #include "usuarios.h"  
 #include "mapa.h" 
 
+//Módulo que se encarga de gestionar las condiciones de los objetos, conexiones y puzles, así como el inventario del jugador
 
-
-void ExaminarObjeto(Partida *par){
+void ExaminarObjeto(Partida *par){ 
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de examinar objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual
+   
     for(int i = 0; i < par->num_objetos; i++){
         if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){ // Si el objeto está en la sala actual
             printf("%s   ->     %s\n", par->lista_objetos[i].nombre_objeto, par->lista_objetos[i].descripcion_objeto);
@@ -17,6 +20,9 @@ void ExaminarObjeto(Partida *par){
 }
 
 void Inventario(Partida *par){
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de ver el inventario en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador
+   
     for(int i = 0; i < par->num_objetos; i++){
         if(par->lista_objetos[i].localizacion_objeto == 0){ //  Si el objeto está en el inventario
             printf("%s   ->     %s\n", par->lista_objetos[i].nombre_objeto, par->lista_objetos[i].descripcion_objeto);
@@ -26,6 +32,10 @@ void Inventario(Partida *par){
 
 
 void CogerObjeto(Jugadores *jug, Partida *par){
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de coger objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual y se pregunta al jugador si desea coger alguno de ellos. 
+//Si el jugador decide coger un objeto, este se añade a su inventario y se elimina de la sala.
+   
     int i = 0; // Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en la sala actual y se ha cogido, para salir del bucle después de coger un objeto
     for(i = 0; i < par->num_objetos && j == 0; i++){
@@ -54,6 +64,10 @@ void CogerObjeto(Jugadores *jug, Partida *par){
 }
 
 void SoltarObjeto(Jugadores *jug, Partida *par){
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de soltar objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea soltar alguno de ellos. 
+//Si el jugador decide soltar un objeto, este se elimina de su inventario y se añade a la sala actual.
+ 
     int i = 0; //Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en el inventario
     for(i = 0; i < par->num_objetos && j == 0; i++){
@@ -104,7 +118,11 @@ void SoltarObjeto(Jugadores *jug, Partida *par){
 }
 
 void UsarObjeto(Partida *par){
-    // Función para usar un objeto del inventario del jugador
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea usar alguno de ellos. 
+//Si el jugador decide usar un objeto, se comprueba si este puede ser usado en la situación actual (por ejemplo, 
+//si puede abrir una conexión o resolver un puzle) y se aplica el efecto correspondiente.
+    
     int i = 0; // Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en el inventario
      for(i = 0; i < par->num_objetos && j == 0; i++){
@@ -129,7 +147,10 @@ void UsarObjeto(Partida *par){
 }
 
 void ResolverPuzle(Partida *par){
-    // Función para resolver un puzle de la sala actual
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de resolver puzles en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los puzles que se encuentran en la sala actual y se pregunta al jugador si desea intentar resolver alguno de ellos.
+//Si el jugador decide intentar resolver un puzle, se le pide que introduzca la solución. Si la solución introducida es correcta, se muestra un mensaje de éxito y se marca el puzle como resuelto.
+
     int i = 0; // Variable para recorrer la lista de puzles
     int j = 0; // Indica si se ha encontrado algún puzle en la sala actual
      for(i = 0; i < par->num_puzles && j == 0; i++){
