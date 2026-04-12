@@ -52,9 +52,9 @@ void CogerObjeto(Jugadores *jug, Partida *par){
                 jug->num_objetos += 1; 
 
                 // 3. Añadimos el ID al array de strings del jugador
-                jug->*objetos = realloc(jug->*objetos, jug->num_objetos * sizeof(char*)); // Redimensionamos el array para añadir un nuevo elemento
-                jug->*objetos[jug->num_objetos - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
-                strcpy(jug->*objetos[jug->num_objetos - 1], par->lista_objetos[i].id_objeto);
+                jug->(*objetos) = realloc(jug->(*objetos), jug->num_objetos * sizeof(char*)); // Redimensionamos el array para añadir un nuevo elemento
+                jug->(*objetos)[jug->num_objetos - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
+                strcpy(jug->(*objetos)[jug->num_objetos - 1], par->lista_objetos[i].id_objeto);
 
                 printf("Has cogido el objeto %s\n", par->lista_objetos[i].nombre_objeto);
                 j = 1; ////Variable para recorrer la lista de objetos
@@ -89,20 +89,20 @@ void SoltarObjeto(Jugadores *jug, Partida *par){
                 // Añadimos "&& encontrado_id == 0" a la condición para que actúe como un break
                 for(int k = 0; k <= jug->num_objetos && encontrado_id == 0; k++) {
                     
-                    if (jug->*objetos[k] != NULL && strcmp(jug->*objetos[k], par->lista_objetos[i].id_objeto) == 0) {
-                        free(jug->*objetos[k]);
+                    if (jug->(*objetos[k]) != NULL && strcmp(jug->(*objetos[k]), par->lista_objetos[i].id_objeto) == 0) {
+                        free(jug->(*objetos[k]));
                         
                         // Mover el último elemento al hueco que queda (si no es el último)
                         if (k < jug->num_objetos) {
-                            jug->*objetos[k] = jug->objetos[jug->num_objetos];
+                            jug->(*objetos[k]) = jug->(*objetos[jug->num_objetos]);
                         }
                         
                         // Reducir el array
                         if (jug->num_objetos > 0) {
-                            jug->*objetos = realloc(jug->*objetos, jug->num_objetos * sizeof(char*));
+                            jug->(*objetos) = realloc(jug->(*objetos), jug->num_objetos * sizeof(char*));
                         } else {
-                            free(jug->*objetos);
-                            jug->*objetos = NULL;
+                            free(jug->(*objetos));
+                            jug->(*objetos) = NULL;
                         }
                         
                         // Cambiamos el valor a 1 para que en la próxima iteración la condición del for falle y salga del bucle
