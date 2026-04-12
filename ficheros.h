@@ -19,13 +19,13 @@
 int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j);
 
 /*
- * cargarPartida: busca 'nickname' en jugadores.txt y carga su estado
+ * cargarPartida: busca 'id_jugador' en jugadores.txt y carga su estado
  * guardado desde partida.txt en la estructura *par.
  * Retorna 1 si el jugador existe, 0 si no se encontró o hubo error.
  * Los arrays internos de *par (lista_objetos, lista_conexiones,
  * lista_puzles) se reservan con malloc; el caller debe liberarlos.
  */
-int cargarPartida(Partida *par, char *nickname);
+int cargarPartida(Partida *par, int id_jugador);
 
 /*
  * guardarPartida: escribe el estado actual de *par (y el inventario
