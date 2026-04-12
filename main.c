@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "estructuras.h"
-#include "ficheros.h"
-#include "menus.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "ficheros.h"   
+#include "menus.h"       
+#include "mapa.h"        
+#include "condiciones.h" 
+#include "usuarios.h"    
 
 int main() {
     /* Se vuelcan al inicio del juego y son invariantes */

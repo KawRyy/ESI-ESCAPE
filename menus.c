@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "salas_y_conexiones.h"
-#include "objetos_y_puzzles.h"
-#include "menus.h"
-#include "usuarios.h"
+#include "menus.h"      
+#include "usuarios.h"    
+#include "mapa.h"        
+#include "condiciones.h" 
+#include "ficheros.h"    
+#include <stdio.h>
 
 void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);
 static void menu_principal(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz);

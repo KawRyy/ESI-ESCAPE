@@ -1,10 +1,14 @@
 #ifndef FICHEROS_H
 #define FICHEROS_H
 
-#include "objetos_y_puzzles.h"
-#include "usuarios.h"
-#include "salas_y_conexiones.h"
-#include "menus.h"
+#include "ficheros.h"
+#include "mapa.h"        
+#include "condiciones.h" 
+#include "usuarios.h"    
+#include "menus.h"        
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  * volcado: carga todos los ficheros de datos del mundo del juego.
