@@ -7,8 +7,8 @@
 //Example:
 //JUGADOR: 01
 //SALA: 02
-//OBJETO: OB01-Name
-//OBJETO: OB02-Name
+//OBJETO: OB01-Place
+//OBJETO: OB02-Place
 //CONEXION: 01-Activa
 //PUZZLE: P01-Resuelto
 JUGADOR: 01
