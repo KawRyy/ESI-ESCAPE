@@ -35,84 +35,79 @@ void CogerObjeto(Jugadores *jug, Partida *par){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de coger objetos en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual y se pregunta al jugador si desea coger alguno de ellos. 
 //Si el jugador decide coger un objeto, este se añade a su inventario y se elimina de la sala.
-   
+
     int i = 0; // Variable para recorrer la lista de objetos
-    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual y se ha cogido, para salir del bucle después de coger un objeto
-    for(i = 0; i < par->num_objetos && j == 0; i++){
-        if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){
+    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual para coger, para evitar mostrar el mensaje de "No hay objetos en esta sala" varias veces si hay varios objetos
+    
+    for(i = 0; i < par->num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en la sala actual
+        if(par->lista_objetos[i].localizacion_objeto == par->id_sala_actual){ // Si el objeto está en la sala actual
             printf("%s   ->    ¿Deseas coger este objeto? (1: Sí, 0: No)\n", par->lista_objetos[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
 
-            if (respuesta == 1) {
+            if(respuesta == 1){
                 // 1. Cambiamos la localización a 0 (Inventario)
-                par->lista_objetos[i].localizacion_objeto = 0; 
+                par->lista_objetos[i].localizacion_objeto = 0;
                 
-                // 2. Incrementamos el contador del jugador
-                jug->num_objetos += 1; 
-
-                // 3. Añadimos el ID al array de strings del jugador
-                jug->(*objetos) = realloc(jug->(*objetos), jug->num_objetos * sizeof(char*)); // Redimensionamos el array para añadir un nuevo elemento
-                jug->(*objetos)[jug->num_objetos - 1] = malloc(strlen(par->lista_objetos[i].id_objeto) + 1);
-                strcpy(jug->(*objetos)[jug->num_objetos - 1], par->lista_objetos[i].id_objeto);
+                // 2. Incrementamos el contador y redimensionamos el array
+                jug->num_objetos++;
+                jug->objetos = realloc(jug->objetos, jug->num_objetos * sizeof(Objetos));
+                
+                // 3. Copiamos el struct entero al último hueco
+                jug->objetos[jug->num_objetos - 1] = par->lista_objetos[i];
 
                 printf("Has cogido el objeto %s\n", par->lista_objetos[i].nombre_objeto);
-                j = 1; ////Variable para recorrer la lista de objetos
+                j = 1;
             }
         }
     }
 }
 
-void SoltarObjeto(Jugadores *jug, Partida *par){
+
+ void SoltarObjeto(Jugadores *jug, Partida *par){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de soltar objetos en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea soltar alguno de ellos. 
 //Si el jugador decide soltar un objeto, este se elimina de su inventario y se añade a la sala actual.
- 
-    int i = 0; //Variable para recorrer la lista de objetos
-    int j = 0; // Indica si se ha encontrado algún objeto en el inventario
-    for(i = 0; i < par->num_objetos && j == 0; i++){
-        if(par->lista_objetos[i].localizacion_objeto == 0 ){ 
+
+    int i = 0; // Variable para recorrer la lista de objetos
+    int j = 0; // Indica si se ha encontrado algún objeto en el inventario para soltar, para evitar mostrar el mensaje de "No tienes objetos en el inventario" varias veces si hay varios objetos
+    
+    for(i = 0; i < par->num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en el inventario
+        if(par->lista_objetos[i].localizacion_objeto == 0){  // Si el objeto está en el inventario
             printf("%s   ->    ¿Deseas soltar este objeto? (1: Sí, 0: No)\n", par->lista_objetos[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
             
-            if (respuesta == 1) {
+            if(respuesta == 1){
                 // 1. Cambiamos la localización a la sala actual
-                par->lista_objetos[i].localizacion_objeto = par->id_sala_actual; 
+                par->lista_objetos[i].localizacion_objeto = par->id_sala_actual;
                 
-                // 2. Disminuimos los items del jugador
-                jug->num_objetos -= 1; 
-                
-                // 3. Buscamos y eliminamos el ID del array del jugador usando un "booleano"
-                int encontrado_id = 0; // Variable que actuará como booleano
-                
-                // Añadimos "&& encontrado_id == 0" a la condición para que actúe como un break
-                for(int k = 0; k <= jug->num_objetos && encontrado_id == 0; k++) {
-                    
-                    if (jug->(*objetos[k]) != NULL && strcmp(jug->(*objetos[k]), par->lista_objetos[i].id_objeto) == 0) {
-                        free(jug->(*objetos[k]));
+                // 2. Buscamos el objeto en el inventario del jugador y lo eliminamos
+                int encontrado = 0;
+                for(int k = 0; k < jug->num_objetos && encontrado == 0; k++){
+                    if(strcmp(jug->objetos[k].id_objeto, par->lista_objetos[i].id_objeto) == 0){
                         
-                        // Mover el último elemento al hueco que queda (si no es el último)
-                        if (k < jug->num_objetos) {
-                            jug->(*objetos[k]) = jug->(*objetos[jug->num_objetos]);
+                        // Mover el último elemento al hueco (si no es el último)
+                        if(k < jug->num_objetos - 1){
+                            jug->objetos[k] = jug->objetos[jug->num_objetos - 1];
                         }
                         
                         // Reducir el array
-                        if (jug->num_objetos > 0) {
-                            jug->(*objetos) = realloc(jug->(*objetos), jug->num_objetos * sizeof(char*));
+                        jug->num_objetos--;
+                        if(jug->num_objetos > 0){ // Redimensionar solo si quedan objetos, para evitar realloc a 0
+                            jug->objetos = realloc(jug->objetos, jug->num_objetos * sizeof(Objetos)); // Redimensiona el array al nuevo tamaño
                         } else {
-                            free(jug->(*objetos));
-                            jug->(*objetos) = NULL;
+                            free(jug->objetos);
+                            jug->objetos = NULL;
                         }
                         
-                        // Cambiamos el valor a 1 para que en la próxima iteración la condición del for falle y salga del bucle
-                        encontrado_id = 1; 
+                        encontrado = 1;
                     }
                 }
-
+                
                 printf("Has soltado el objeto %s\n", par->lista_objetos[i].nombre_objeto);
-                j = 1; //  Indica que se ha soltado un objeto y se sale del bucle
-            } 
+                j = 1;
+            }
         }
     }
 }
