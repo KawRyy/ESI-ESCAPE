@@ -165,12 +165,12 @@ static int leer_jugadores(Jugadores **jugadores) {
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
-        char **tmp_obj = realloc((*jugadores)[n].id_objeto, ((*jugadores)[n].num_items + 1) * sizeof(char *));
+        char **tmp_obj = realloc((*jugadores)[n].id_objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(char *));
         if (!tmp_obj) break;
-        (*jugadores)[n].id_objeto = tmp_obj;
-        (*jugadores)[n].id_objeto[(*jugadores)[n].num_items] = malloc(strlen(obj) + 1);
-        if ((*jugadores)[n].id_objeto[(*jugadores)[n].num_items])
-          strcpy((*jugadores)[n].id_objeto[(*jugadores)[n].num_items++], obj);
+        (*jugadores)[n].id_objetos = tmp_obj;
+        (*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos] = malloc(strlen(obj) + 1);
+        if ((*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos])
+          strcpy((*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos++], obj);
         obj = strtok(NULL, ",");
       }
     }
@@ -222,13 +222,13 @@ int cargarPartida(Partida *par, char *nickname) {
       char *obj = strtok(inv, ",");
       while (obj) {
         /* Se usa realloc para extender dinamicamente la lista de punteros id_objeto */
-        char **tmp = realloc(jug.id_objeto, (jug.num_items + 1) * sizeof(char *));
+        char **tmp = realloc(jug.id_objetos, (jug.num_objetos + 1) * sizeof(char *));
         if (!tmp)
           break;
-        jug.id_objeto = tmp;
-        jug.id_objeto[jug.num_items] = malloc(strlen(obj) + 1);
-        if (jug.id_objeto[jug.num_items])
-          strcpy(jug.id_objeto[jug.num_items++], obj);
+        jug.id_objetos = tmp;
+        jug.id_objetos[jug.num_objetos] = malloc(strlen(obj) + 1);
+        if (jug.id_objetos[jug.num_objetos])
+          strcpy(jug.id_objetos[jug.num_objetos++], obj);
         obj = strtok(NULL, ",");
       }
     }
@@ -271,16 +271,16 @@ int cargarPartida(Partida *par, char *nickname) {
 
   /* Aplica el inventario del jugador desde jugadores.txt como estado inicial de los objetos:
    * los objetos en su bolsa se marcan con localizacion 0 antes de que partida.txt los sobreescriba */
-  for (int i = 0; i < jug.num_items; i++) {
+  for (int i = 0; i < jug.num_objetos; i++) {
     for (int j = 0; j < par->num_objetos; j++) {
-      if (!strcmp(par->lista_objetos[j].id_objeto, jug.id_objeto[i])) {
+      if (!strcmp(par->lista_objetos[j].id_objeto, jug.id_objetos[i])) {
         par->lista_objetos[j].localizacion_objeto = 0; /* Lo marcamos como inventario */
         break;
       }
     }
-    free(jug.id_objeto[i]);
+    free(jug.id_objetos[i]);
   }
-  free(jug.id_objeto);
+  free(jug.id_objetos);
 
   /* 3. Sobreescribir con el progreso guardado en partida.txt:
    *    Si existe un bloque para este jugador, sus datos sobreescriben el estado base
