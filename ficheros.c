@@ -1,10 +1,7 @@
 #include "ficheros.h"
-#include "estructuras.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-
 
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
