@@ -212,9 +212,13 @@ int cargarPartida(Partida *par, char *id_jugador) {
     line[strcspn(line, "\r\n")] = '\0';
     if (line[0] == '/' || line[0] == '\0')
       continue;
-    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
+    char line_copy[512];
+    strncpy(line_copy, line, sizeof(line_copy) - 1);
+    line_copy[sizeof(line_copy) - 1] = '\0';
+    char *id = strtok(line_copy, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
     if (!id || !nom || !nick || strcmp(id, id_jugador) != 0) /* Ignora si faltan datos o el ID no coincide */
       continue;
+    CPY(jug.id_jugador, id);
     CPY(jug.nombre_jugador, nom);
     if (pw)
       CPY(jug.contrasena, pw);
@@ -243,7 +247,7 @@ int cargarPartida(Partida *par, char *id_jugador) {
   /* 2. Inicializar la partida con el estado base de objetos, conexiones y puzles:
    *    Se cargan todos los arrays desde sus ficheros de datos originales. */
   memset(par, 0, sizeof(Partida));
-  strcpy(par->id_jugador, jug.id_jugador);
+  CPY(par->id_jugador, jug.id_jugador);
   par->id_sala_actual = 1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
 
   /* Carga el estado base de objetos desde objetos.txt */
@@ -293,7 +297,7 @@ int cargarPartida(Partida *par, char *id_jugador) {
     if (line[0] == '/' || line[0] == '\0')
       continue;
 
-    if (!strncmp(line, "JUGADOR:", 8)) {
+    if (!strncmp(line, "JUGADOR:", 8) && strlen(line) > 9) {
       en_bloque = strcmp(line + 9, jug.id_jugador) == 0; /* Activa la lectura solo si es el bloque del jugador */
       continue;
     }
@@ -306,7 +310,10 @@ int cargarPartida(Partida *par, char *id_jugador) {
     }
     if (!strncmp(line, "OBJETO:", 7)) {
       /* Sobreescribe la ubicacion del objeto en lista_objetos segun el id guardado */
-      char *id = strtok(line + 8, "-"), *loc_str = strtok(NULL, "-");
+      char obj_copy[512];
+      strncpy(obj_copy, line + 8, sizeof(obj_copy) - 1);
+      obj_copy[sizeof(obj_copy) - 1] = '\0';
+      char *id = strtok(obj_copy, "-"), *loc_str = strtok(NULL, "-");
       if (id && loc_str) {
         int loc = atoi(loc_str);
         for (int i = 0; i < par->num_objetos; i++) {
@@ -320,7 +327,10 @@ int cargarPartida(Partida *par, char *id_jugador) {
     }
     if (!strncmp(line, "CONEXION:", 9)) {
       /* Sobreescribe el estado de la conexion en lista_conexiones segun el id guardado */
-      char *id = strtok(line + 10, "-"), *est = strtok(NULL, "-");
+      char conexion_copy[512];
+      strncpy(conexion_copy, line + 10, sizeof(conexion_copy) - 1);
+      conexion_copy[sizeof(conexion_copy) - 1] = '\0';
+      char *id = strtok(conexion_copy, "-"), *est = strtok(NULL, "-");
       if (!id) continue;
       for (int i = 0; i < par->num_conexiones; i++) {
         if (!strcmp(par->lista_conexiones[i].id_conexion, id)) {
@@ -332,7 +342,10 @@ int cargarPartida(Partida *par, char *id_jugador) {
     }
     if (!strncmp(line, "PUZZLE:", 7)) {
       /* Sobreescribe el estado del puzle en lista_puzles segun el id guardado */
-      char *id = strtok(line + 8, "-"), *est = strtok(NULL, "-");
+      char puzzle_copy[512];
+      strncpy(puzzle_copy, line + 8, sizeof(puzzle_copy) - 1);
+      puzzle_copy[sizeof(puzzle_copy) - 1] = '\0';
+      char *id = strtok(puzzle_copy, "-"), *est = strtok(NULL, "-");
       if (!id) continue;
       for (int i = 0; i < par->num_puzles; i++) {
         if (!strcmp(par->lista_puzles[i].id_puzle, id)) {
@@ -349,7 +362,7 @@ int cargarPartida(Partida *par, char *id_jugador) {
 
 
 /* ── guardarPartida ─────────────────────────────────────────────── */
-void guardarPartida(Partida *par, Jugadores *jug) {
+void guardarPartida(Partida *par) {
   FILE *fin, *fout;
   char line[512];
 
@@ -363,7 +376,7 @@ void guardarPartida(Partida *par, Jugadores *jug) {
         char t[512];
         strncpy(t, line, sizeof(t));
         t[strcspn(t, "\r\n")] = '\0';
-        if (!strncmp(t, "JUGADOR:", 8))
+        if (!strncmp(t, "JUGADOR:", 8) && strlen(t) > 9)
           skip = strcmp(t + 9, par->id_jugador) == 0; /* Omite las lineas del jugador actual en el guardado original (se van a reescribir) */
         if (!skip)
           fputs(line,fout); /* Mantiene intacta la partida de los demas jugadores */
@@ -394,9 +407,13 @@ void guardarPartida(Partida *par, Jugadores *jug) {
     while (fgets(line, sizeof(line), fin)) {
       if (line[0] == '/' && line[1] == '/') { fputs(line, fout); continue; }
       char t[512];
-      strncpy(t, line, sizeof(t));
+      strncpy(t, line, sizeof(t) - 1);
+      t[sizeof(t) - 1] = '\0';
       t[strcspn(t, "\r\n")] = '\0';
-      char *id = strtok(t, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
+      char t_copy[512];
+      strncpy(t_copy, t, sizeof(t_copy) - 1);
+      t_copy[sizeof(t_copy) - 1] = '\0';
+      char *id = strtok(t_copy, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
       if (!id || !nom || !nick || !pw || strcmp(id, par->id_jugador) != 0) {
         fputs(line, fout); /* Mantiene intacto el resto de jugadores */
         continue;
@@ -417,3 +434,27 @@ void guardarPartida(Partida *par, Jugadores *jug) {
   else
     remove("ficheros/jugadores_tmp.txt");
 }
+
+/* ── borrarPartida ──────────────────────────────────────────────── */
+void borrarPartida(char *id_jugador) {
+  FILE *fin, *fout;
+  char line[512];
+
+  if ((fout = fopen("ficheros/partida_tmp.txt", "w")) != NULL) {
+    int skip = 0;
+    if ((fin = fopen("ficheros/partida.txt", "r")) != NULL) {
+      while (fgets(line, sizeof(line), fin)) {
+        char t[512];
+        strncpy(t, line, sizeof(t));
+        t[strcspn(t, "\r\n")] = '\0';
+        if (!strncmp(t, "JUGADOR:", 8) && strlen(t) > 9)
+          skip = strcmp(t + 9, id_jugador) == 0; 
+        if (!skip)
+          fputs(line, fout); 
+      }
+      fclose(fin);
+    }
+    fclose(fout);
+    reemplazar("ficheros/partida.txt", "ficheros/partida_tmp.txt");
+  }
+}
