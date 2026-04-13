@@ -36,4 +36,17 @@ void guardarPartida(Partida *par);
  */
 void borrarPartida(char *id_jugador);
 
+/*
+ * guardarJugador: agrega un nuevo jugador al archivo jugadores.txt
+ * con su ID, nombre, nickname y contraseña.
+ */
+void guardarJugador(Jugadores *jugador);
+
+/*
+ * Funciones de lectura auxiliares exportadas para uso en gestion.c
+ */
+int leer_objetos(Objetos **objetos);
+int leer_conexiones(Conexiones **conexiones);
+int leer_puzles(Puzles **puzles);
+
 #endif /* FICHEROS_H */

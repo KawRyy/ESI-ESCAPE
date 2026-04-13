@@ -10,7 +10,7 @@ typedef struct {
 } Objetos;
 
 typedef struct {
-    char id_puzle[4];
+    char id_puzle[5];
     int id_sala_puzle; // Sala donde se encuentra
     int tipo_elemento; // Elemento que genera resolver el puzle, 1: CÓDIGO ; 2: PALABRA
     char descripcion_puzle[151];
@@ -26,11 +26,11 @@ typedef struct {
 } Salas;
 
 typedef struct {
-    char id_conexion[4];
+    char id_conexion[5];
     int id_sala_orig;
     int id_sala_dest;
     int estado_conexion; // 0: CERRADA ; 1: ABIERTA
-    int condicion_conexion; // 0: no aplica ; 1: requiere objeto ; 2: requiere puzle
+    char id_condicionante[5]; // ID del objeto o puzle que condiciona la conexión, si no tiene condición se pone "0"
 } Conexiones;
 
 typedef struct {

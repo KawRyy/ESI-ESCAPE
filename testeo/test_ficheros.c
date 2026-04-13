@@ -313,11 +313,10 @@ static void test_guardarPartida(void) {
        "ficheros/partida_tmp.txt, que sobreescribira al original...");
   par_original.id_sala_actual = sala_nueva;
 
-  // NOTA PARA LA MODIFICACION: la firma de guardarPartida() ahora incluye un
-  // tercer parametro Conexiones *con. Nosotros pasamos NULL ya que en este
-  // script de pruebas en aislamiento no tenemos un struct Conexiones global
-  // completo.
-  guardarPartida(&par_original, NULL);
+  // NOTA PARA LA MODIFICACIÓN: la firma de guardarPartida() se ha
+  // simplificado para no requerir el parámetro Jugadores *jug ya que no
+  // se utiliza en la implementación de la función.
+  guardarPartida(&par_original);
 
   INFO("Paso C: RE-CARGANDO la partida y verificando cambios...");
   Partida par_recargado;
@@ -335,7 +334,7 @@ static void test_guardarPartida(void) {
   INFO("Paso D: RESTAURANDO la sala original para no romper la partida del "
        "jugador...");
   par_recargado.id_sala_actual = sala_antigua;
-  guardarPartida(&par_recargado, NULL);
+  guardarPartida(&par_recargado);
   INFO("Restauracion completa. Todo deberia volver a la normalidad.");
 
   INFO("Liberando memoria del round-trip...");
