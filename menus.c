@@ -31,7 +31,6 @@ void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Co
 
         switch(control){
         case 1:
-
             jug_login = login(jug, num_jugadores);
             if (jug_login != NULL) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
                 printf("Inicio de sesion exitoso... \n");
@@ -151,7 +150,7 @@ static void menu_juego(Partida **par, Jugadores *jug_login, Objetos **obj, Salas
 
         switch(control){
             case 1:
-                // describirSala(); // Llama a la función para describir la sala actual del jugador
+                describirSala(*sal, *par); // Llama a la función para describir la sala actual del jugador
                 break;
             case 2:
                 system("cls");
