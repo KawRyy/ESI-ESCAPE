@@ -5,3 +5,4 @@
 //Password: 8 digits
 //Inventory: Undefined
 01-asdasd-erchope-12345678
+123-123-123-123456

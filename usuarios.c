@@ -12,6 +12,8 @@
 */
 
 #include "usuarios.h"
+#include "estructuras.h"
+#include "gestion.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +37,7 @@ static void lee_cadena(const char *mensaje, char *cadena, int n);
 static int solicita_contrasena(Jugadores *jugador);
 static void registra_usuario(Jugadores **jugadores, int *número_jugadores);
 static int nuevo_usuario(Jugadores **jugadores, int *número_jugadores);
-static void nueva_partida(Jugadores *jugador, Partida *partida);
+static void guardarJugador(Jugadores *jugador);
 
 // Para depuración...
 
@@ -281,6 +283,8 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores) {
     // Inicialmente, el nuevo jugador no posee objetos.
     nuevo_jugador.objetos = NULL;
     nuevo_jugador.num_objetos = 0;
+    // El nickname será igual al id_jugador por defecto
+    strcpy(nuevo_jugador.nickname, nuevo_jugador.id_jugador);
     // Añadimos el nuevo jugador.
     ++*número_jugadores;
     *jugadores = realloc(
@@ -290,6 +294,9 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores) {
     (*jugadores)[*número_jugadores - 1] =
         nuevo_jugador; // Copiamos la estructura a la última posición.
 
+    // Guardamos el nuevo jugador en el archivo jugadores.txt
+    guardarJugador(&(*jugadores)[*número_jugadores - 1]);
+
     // PARA DEPURACIÓN. ELIMINAR ANTES DE ENTREGAR.
     muestra_usuarios(*jugadores, *número_jugadores);
 
@@ -297,26 +304,19 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores) {
   }
 }
 
-/*
-partida->num_objetos = 0;
-partida->num_conexiones = 0;
-partida->num_puzles = 0;
-*/
-
-// Crea una nueva partida.
-//
-// Inicializa la estructura partida para el jugador indicado.
-//
-// jugador (E)  Jugador que ha inciado sesión
-// partida (S)  Partida nueva sin inicializar.
-
-void nueva_partida(Jugadores *jugador, Partida *partida) {
-  strcpy(partida->id_jugador, jugador->id_jugador);
-  partida->id_sala_actual = 0;
-  partida->lista_objetos = NULL;
-  partida->num_objetos = 0;
-  partida->lista_conexiones = NULL;
-  partida->num_conexiones = 0;
-  partida->lista_puzles = NULL;
-  partida->num_puzles = 0;
+void guardarJugador(Jugadores *jugador) {
+  FILE *f = fopen("ficheros/jugadores.txt", "a");
+  if (!f) {
+    printf("Error: No se pudo abrir el archivo jugadores.txt para guardar\n");
+    return;
+  }
+  
+  /* Escribe el jugador en el formato: ID-Nombre-nickname-Contraseña */
+  fprintf(f, "%s-%s-%s-%s\n", 
+          jugador->id_jugador, 
+          jugador->nombre_jugador, 
+          jugador->nickname,
+          jugador->contrasena);
+  
+  fclose(f);
 }
