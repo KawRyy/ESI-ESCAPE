@@ -8,6 +8,8 @@
 
 //Módulo que se encarga de gestionar las condiciones de los objetos, conexiones y puzles, así como el inventario del jugador
 
+
+
 void ExaminarObjeto(Partida *par){ 
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de examinar objetos en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual
