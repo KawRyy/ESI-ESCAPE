@@ -41,7 +41,7 @@ static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
     putchar('\n');
     puts(">>> DEPURACIÓN");
     for (int k = 0; k < numero_jugadores; ++k)
-        printf("%02d-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador, jugador[k].jugador, jugador[k].contrasena);
+        printf("%02d-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador, jugador[k].id_jugador, jugador[k].contrasena);
     puts("<<< DEPURACIÓN\n");
 }
 
@@ -69,16 +69,18 @@ static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-int login(Jugadores **jugadores, int *numero_jugadores)
+Jugadores* login(Jugadores **jugadores, int *numero_jugadores)
 {
     Jugadores *jugador;
-    char usuario[sizeof (*jugadores)->jugador];
+    char usuario[5];  // Tamaño del id_jugador
     int sesión_iniciada = 0;
 
     // El proceso de login finaliza cuando se consigue iniciar sesión.
     while (!sesión_iniciada) {
         // Solicitamos las credenciales.
-        lee_cadena("Usuario: ", usuario, sizeof usuario);
+        lee_cadena("Usuario (ID): ", usuario, sizeof usuario);
+        // Elimina cualquier salto de línea residual
+        usuario[strcspn(usuario, "\n")] = '\0';
         // Buscamos un jugador que se corresponda con ese usuario.
         jugador = busca_usuario(usuario, *jugadores, *numero_jugadores);
         // Comprobamos si el uauario existe.     
@@ -90,7 +92,7 @@ int login(Jugadores **jugadores, int *numero_jugadores)
             registra_usuario(jugadores, numero_jugadores);
         }
     }
-    return jugador->id_jugador;
+    return jugador;
 }
 
 // Búsqueda de un usuario en el vector de jugadores.
@@ -113,7 +115,7 @@ Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_ju
     int encontrado = 0;
     int k;
     for (k = 0; k < numero_jugadores && !encontrado; ++k) {
-        if (!strcmp(usuario, jugador[k].jugador)) {  // ¿Las cadenas son iguales?
+        if (!strcmp(usuario, jugador[k].id_jugador)) {  // ¿Las cadenas son iguales?
             encontrado = 1;                          // Sí, terminamos el bucle.
         }
     }
@@ -252,12 +254,12 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
     Jugadores nuevo_jugador;
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
-    nuevo_jugador.id_jugador = *número_jugadores + 1;
+    sprintf(nuevo_jugador.id_jugador, "%04d", *número_jugadores + 1);
     // Obtenemos el nombre, el usuario y la contraseña del nuevo jugador.
     lee_cadena("Nombre: ", nuevo_jugador.nombre_jugador, sizeof nuevo_jugador.nombre_jugador);
-    lee_cadena("Usuario: ", nuevo_jugador.jugador, sizeof nuevo_jugador.jugador);
+    lee_cadena("Usuario: ", nuevo_jugador.id_jugador, sizeof nuevo_jugador.id_jugador);
     // Buscamos si ese jugador ya está registrado (solo se comprueba el usuario, puede haber personas con el mismo nombre).
-    if (busca_usuario(nuevo_jugador.jugador, *jugadores, *número_jugadores)) {
+    if (busca_usuario(nuevo_jugador.id_jugador, *jugadores, *número_jugadores)) {
        return 0;
     } else {
         lee_cadena("Contraseña: ", nuevo_jugador.contrasena, sizeof nuevo_jugador.contrasena);
@@ -291,7 +293,7 @@ partida->num_puzles = 0;
 
 void nueva_partida(Jugadores *jugador, Partida *partida)
 {
-    partida->id_jugador = jugador->id_jugador;
+    strcpy(partida->id_jugador, jugador->id_jugador);
     partida->id_sala_actual = 0;
     partida->lista_objetos = NULL;
     partida->num_objetos = 0;

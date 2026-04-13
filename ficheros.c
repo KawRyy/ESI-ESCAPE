@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "estructuras.h"
+
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
 static void reemplazar(const char *orig, const char *tmp) {
@@ -157,20 +159,20 @@ static int leer_jugadores(Jugadores **jugadores) {
     }
     *jugadores = tmp;
     memset(&((*jugadores)[n]), 0, sizeof(Jugadores));
-
-    (*jugadores)[n].id_jugador = atoi(id);
+    
+    CPY((*jugadores)[n].id_jugador, id);
     CPY((*jugadores)[n].nombre_jugador, nom);
-    CPY((*jugadores)[n].jugador, nick);
+    CPY((*jugadores)[n].nickname, nick);
     CPY((*jugadores)[n].contrasena, pw);
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
-        char **tmp_obj = realloc((*jugadores)[n].id_objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(char *));
+        Objetos *tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(Objetos));
         if (!tmp_obj) break;
-        (*jugadores)[n].id_objetos = tmp_obj;
-        (*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos] = malloc(strlen(obj) + 1);
-        if ((*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos])
-          strcpy((*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos++], obj);
+        (*jugadores)[n].objetos = tmp_obj;
+        memset(&((*jugadores)[n].objetos[(*jugadores)[n].num_objetos]), 0, sizeof(Objetos));
+        CPY((*jugadores)[n].objetos[(*jugadores)[n].num_objetos].id_objeto, obj);
+        (*jugadores)[n].num_objetos++;
         obj = strtok(NULL, ",");
       }
     }
@@ -188,12 +190,13 @@ int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j, i
   int nc = leer_conexiones(c);
   int no = leer_objetos(o);
   int nj = leer_jugadores(j);
+  *num_jugadores = nj;
 
   return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0 && nj >= 0) ? 1 : 0; /* Verifica si todas las lecturas fueron exitosas */
 }
 
 /* ── cargarPartida ──────────────────────────────────────────────── */
-int cargarPartida(Partida *par, int id_jugador) {
+int cargarPartida(Partida *par, char *id_jugador) {
   FILE *f;
   char line[512];
 
@@ -210,25 +213,23 @@ int cargarPartida(Partida *par, int id_jugador) {
     if (line[0] == '/' || line[0] == '\0')
       continue;
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
-    if (!id || !nom || !nick || atoi(id) != id_jugador) /* Ignora si faltan datos o el ID no coincide */
+    if (!id || !nom || !nick || strcmp(id, id_jugador) != 0) /* Ignora si faltan datos o el ID no coincide */
       continue;
-    jug.id_jugador = atoi(id);
     CPY(jug.nombre_jugador, nom);
-    CPY(jug.jugador, nick);
     if (pw)
-      CPY(jug.contraseña, pw);
+      CPY(jug.contrasena, pw);
     if (inv) {
       /* Procesa los items en el inventario que vienen separados por comas */
       char *obj = strtok(inv, ",");
       while (obj) {
-        /* Se usa realloc para extender dinamicamente la lista de punteros id_objeto */
-        char **tmp = realloc(jug.id_objetos, (jug.num_objetos + 1) * sizeof(char *));
+        /* Se usa realloc para extender dinamicamente la lista de Objetos */
+        Objetos *tmp = realloc(jug.objetos, (jug.num_objetos + 1) * sizeof(Objetos));
         if (!tmp)
           break;
-        jug.id_objetos = tmp;
-        jug.id_objetos[jug.num_objetos] = malloc(strlen(obj) + 1);
-        if (jug.id_objetos[jug.num_objetos])
-          strcpy(jug.id_objetos[jug.num_objetos++], obj);
+        jug.objetos = tmp;
+        memset(&(jug.objetos[jug.num_objetos]), 0, sizeof(Objetos));
+        CPY(jug.objetos[jug.num_objetos].id_objeto, obj);
+        jug.num_objetos++;
         obj = strtok(NULL, ",");
       }
     }
@@ -242,7 +243,7 @@ int cargarPartida(Partida *par, int id_jugador) {
   /* 2. Inicializar la partida con el estado base de objetos, conexiones y puzles:
    *    Se cargan todos los arrays desde sus ficheros de datos originales. */
   memset(par, 0, sizeof(Partida));
-  par->id_jugador = jug.id_jugador;
+  strcpy(par->id_jugador, jug.id_jugador);
   par->id_sala_actual = 1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
 
   /* Carga el estado base de objetos desde objetos.txt */
@@ -273,14 +274,13 @@ int cargarPartida(Partida *par, int id_jugador) {
    * los objetos en su bolsa se marcan con localizacion 0 antes de que partida.txt los sobreescriba */
   for (int i = 0; i < jug.num_objetos; i++) {
     for (int j = 0; j < par->num_objetos; j++) {
-      if (!strcmp(par->lista_objetos[j].id_objeto, jug.id_objetos[i])) {
+      if (!strcmp(par->lista_objetos[j].id_objeto, jug.objetos[i].id_objeto)) {
         par->lista_objetos[j].localizacion_objeto = 0; /* Lo marcamos como inventario */
         break;
       }
     }
-    free(jug.id_objetos[i]);
   }
-  free(jug.id_objetos);
+  free(jug.objetos);
 
   /* 3. Sobreescribir con el progreso guardado en partida.txt:
    *    Si existe un bloque para este jugador, sus datos sobreescriben el estado base
@@ -294,7 +294,7 @@ int cargarPartida(Partida *par, int id_jugador) {
       continue;
 
     if (!strncmp(line, "JUGADOR:", 8)) {
-      en_bloque = atoi(line + 9) == jug.id_jugador; /* Activa la lectura solo si es el bloque del jugador */
+      en_bloque = strcmp(line + 9, jug.id_jugador) == 0; /* Activa la lectura solo si es el bloque del jugador */
       continue;
     }
     if (!en_bloque)
@@ -364,14 +364,14 @@ void guardarPartida(Partida *par, Jugadores *jug) {
         strncpy(t, line, sizeof(t));
         t[strcspn(t, "\r\n")] = '\0';
         if (!strncmp(t, "JUGADOR:", 8))
-          skip = atoi(t + 9) == par->id_jugador; /* Omite las lineas del jugador actual en el guardado original (se van a reescribir) */
+          skip = strcmp(t + 9, par->id_jugador) == 0; /* Omite las lineas del jugador actual en el guardado original (se van a reescribir) */
         if (!skip)
           fputs(line,fout); /* Mantiene intacta la partida de los demas jugadores */
       }
       fclose(fin);
     }
     /* Escribe todos los datos del estado actual del jugador: sala, objetos, conexiones y puzles */
-    fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
+    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
     /* Guarda todos los objetos con su ubicacion actual (0 = inventario del jugador) */
     for (int i = 0; i < par->num_objetos; i++)
       fprintf(fout, "OBJETO: %s-%02d\n", par->lista_objetos[i].id_objeto, par->lista_objetos[i].localizacion_objeto);
@@ -397,7 +397,7 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       strncpy(t, line, sizeof(t));
       t[strcspn(t, "\r\n")] = '\0';
       char *id = strtok(t, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
-      if (!id || !nom || !nick || !pw || atoi(id) != par->id_jugador) {
+      if (!id || !nom || !nick || !pw || strcmp(id, par->id_jugador) != 0) {
         fputs(line, fout); /* Mantiene intacto el resto de jugadores */
         continue;
       }

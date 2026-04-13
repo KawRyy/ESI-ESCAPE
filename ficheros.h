@@ -1,11 +1,7 @@
 #ifndef FICHEROS_H
 #define FICHEROS_H
 
-#include "ficheros.h"
-#include "mapa.h"        
-#include "condiciones.h" 
-#include "usuarios.h"    
-#include "partida.h"        
+#include "estructuras.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,7 +21,7 @@ int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j, i
  * Los arrays internos de *par (lista_objetos, lista_conexiones,
  * lista_puzles) se reservan con malloc; el caller debe liberarlos.
  */
-int cargarPartida(Partida *par, int id_jugador);
+int cargarPartida(Partida *par, char *id_jugador);
 
 /*
  * guardarPartida: escribe el estado actual de *par (y el inventario
