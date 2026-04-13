@@ -37,7 +37,7 @@ static int leer_salas(Salas **salas) {
       continue;
     (*salas)[n].id_sala = atoi(id); /* Convierte el ID a numero entero */
     CPY((*salas)[n].nombre_sala, nom);
-    (*salas)[n].tipo_sala = strcmp(tipo, "INICIAL") == 0 ? 1 : strcmp(tipo, "NORMAL") == 0 ? 2 : strcmp(tipo, "SALIDA") == 0 ? 3 : 0; /* Asigna el valor numerico segun el tipo */
+    (*salas)[n].tipo_sala = !strcmp(tipo, "INICIAL")  ? 1 : !strcmp(tipo, "NORMAL") ? 2 : !strcmp(tipo, "SALIDA") ? 3 : 0; /* Asigna el valor numerico segun el tipo */
     CPY((*salas)[n].descripcion_sala, desc);
     n++;
   }
@@ -101,8 +101,8 @@ static int leer_conexiones(Conexiones **conexiones) {
     CPY((*conexiones)[n].id_conexion, id);
     (*conexiones)[n].id_sala_orig = atoi(orig); /* Convierte el ID origen a entero */
     (*conexiones)[n].id_sala_dest = atoi(dest); /* Convierte el ID destino a entero */
-    (*conexiones)[n].estado_conexion = strcmp(estado, "Activa") == 0 ? 1 : 0; /* Determina si la conexion esta activa */
-    (*conexiones)[n].condicion_conexion = strcmp(cond, "0") == 0 ? 0 : strncmp(cond, "OB", 2) == 0 ? 1 : strncmp(cond, "P", 1)  == 0 ? 2 : 0; /* Asigna numericamente la condicion */
+    (*conexiones)[n].estado_conexion = !strcmp(estado, "Activa") ? 1 : 0; /* Determina si la conexion esta activa */
+    (*conexiones)[n].condicion_conexion = !strcmp(cond, "0") ? 0 : !strncmp(cond, "OB", 2) ? 1 : !strncmp(cond, "P", 1)  ? 2 : 0; /* Asigna numericamente la condicion */
     n++;
   }
   fclose(f);
@@ -170,12 +170,12 @@ static int leer_jugadores(Jugadores **jugadores) {
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
-        char **tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(char *));
+        Objetos *tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(Objetos));
         if (!tmp_obj) break;
         (*jugadores)[n].objetos = tmp_obj;
-        (*jugadores)[n].objetos[(*jugadores)[n].num_objetos] = malloc(strlen(obj) + 1);
-        if ((*jugadores)[n].objetos[(*jugadores)[n].num_objetos])
-          strcpy((*jugadores)[n].objetos[(*jugadores)[n].num_objetos++], obj);
+        memset(&((*jugadores)[n].objetos[(*jugadores)[n].num_objetos]), 0, sizeof(Objetos));
+        CPY((*jugadores)[n].objetos[(*jugadores)[n].num_objetos].id_objeto, obj);
+        (*jugadores)[n].num_objetos++;
         obj = strtok(NULL, ",");
       }
     }
@@ -226,14 +226,14 @@ int cargarPartida(Partida *par, int id_jugador) {
       /* Procesa los items en el inventario que vienen separados por comas */
       char *obj = strtok(inv, ",");
       while (obj) {
-        /* Se usa realloc para extender dinamicamente la lista de punteros id_objeto */
-        char **tmp = realloc(jug.objetos, (jug.num_objetos + 1) * sizeof(char *));
+        /* Se usa realloc para extender dinamicamente la lista de Objetos */
+        Objetos *tmp = realloc(jug.objetos, (jug.num_objetos + 1) * sizeof(Objetos));
         if (!tmp)
           break;
         jug.objetos = tmp;
-        jug.objetos[jug.num_objetos] = malloc(strlen(obj) + 1);
-        if (jug.objetos[jug.num_objetos])
-          strcpy(jug.objetos[jug.num_objetos++], obj);
+        memset(&(jug.objetos[jug.num_objetos]), 0, sizeof(Objetos));
+        CPY(jug.objetos[jug.num_objetos].id_objeto, obj);
+        jug.num_objetos++;
         obj = strtok(NULL, ",");
       }
     }
@@ -278,12 +278,11 @@ int cargarPartida(Partida *par, int id_jugador) {
    * los objetos en su bolsa se marcan con localizacion 0 antes de que partida.txt los sobreescriba */
   for (int i = 0; i < jug.num_objetos; i++) {
     for (int j = 0; j < par->num_objetos; j++) {
-      if (strcmp(par->lista_objetos[j].id_objeto, jug.objetos[i]) == 0) {
+      if (!strcmp(par->lista_objetos[j].id_objeto, jug.objetos[i].id_objeto)) {
         par->lista_objetos[j].localizacion_objeto = 0; /* Lo marcamos como inventario */
         break;
       }
     }
-    free(jug.objetos[i]);
   }
   free(jug.objetos);
 
@@ -315,7 +314,7 @@ int cargarPartida(Partida *par, int id_jugador) {
       if (id && loc_str) {
         int loc = atoi(loc_str);
         for (int i = 0; i < par->num_objetos; i++) {
-          if (strcmp(par->lista_objetos[i].id_objeto, id) == 0) {
+          if (!strcmp(par->lista_objetos[i].id_objeto, id)) {
             par->lista_objetos[i].localizacion_objeto = loc;
             break;
           }
@@ -328,8 +327,8 @@ int cargarPartida(Partida *par, int id_jugador) {
       char *id = strtok(line + 10, "-"), *est = strtok(NULL, "-");
       if (!id) continue;
       for (int i = 0; i < par->num_conexiones; i++) {
-        if (strcmp(par->lista_conexiones[i].id_conexion, id) == 0) {
-          par->lista_conexiones[i].estado_conexion = (est && strcmp(est, "Activa") == 0) ? 1 : 0;
+        if (!strcmp(par->lista_conexiones[i].id_conexion, id)) {
+          par->lista_conexiones[i].estado_conexion = (est && !strcmp(est, "Activa")) ? 1 : 0;
           break;
         }
       }
@@ -340,8 +339,8 @@ int cargarPartida(Partida *par, int id_jugador) {
       char *id = strtok(line + 8, "-"), *est = strtok(NULL, "-");
       if (!id) continue;
       for (int i = 0; i < par->num_puzles; i++) {
-        if (strcmp(par->lista_puzles[i].id_puzle, id) == 0) {
-          par->lista_puzles[i].resuelto = (est && strcmp(est, "Resuelto") == 0) ? 1 : 0;
+        if (!strcmp(par->lista_puzles[i].id_puzle, id)) {
+          par->lista_puzles[i].resuelto = (est && !strcmp(est, "Resuelto")) ? 1 : 0;
           break;
         }
       }
