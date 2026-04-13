@@ -13,6 +13,8 @@ static void menu_juego(Partida **par, Jugadores *jug_login, Objetos **obj, Salas
 void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz, int* num_jugadores){
     int control = 0;  // Variable para controlar la opción seleccionada en el menú inicial
     int salir = 0;  // Variable para controlar cuándo salir del menú inicial
+    Jugadores *jug_login = NULL; // Puntero para almacenar el jugador que inicia sesión
+
     do{        system("cls");        printf("=================================\n");
         printf("    Bienvenido a ESI-ESCAPE\n");
         printf("=================================\n");
@@ -29,10 +31,8 @@ void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Co
 
         switch(control){
         case 1:
-        /* EL 3 ESTA HARDCODEADO NECESITAMOS EL NUMERO DE JUGADORES */
 
-
-            Jugadores *jug_login = login(jug, num_jugadores);
+            jug_login = login(jug, num_jugadores);
             if (jug_login != NULL) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
                 printf("Inicio de sesion exitoso... \n");
                 Sleep(1500); // Espera 1.5 segundos
