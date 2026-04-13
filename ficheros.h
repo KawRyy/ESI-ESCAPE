@@ -25,9 +25,15 @@ int cargarPartida(Partida *par, char *id_jugador);
 
 /*
  * guardarPartida: escribe el estado actual de *par (y el inventario
- * de *jug si no es NULL) en partida.txt, sobreescribiendo la entrada
+ * del jugador) en partida.txt, sobreescribiendo la entrada
  * anterior del mismo jugador.
  */
-void guardarPartida(Partida *par, Jugadores *jug);
+void guardarPartida(Partida *par);
+
+/*
+ * borrarPartida: elimina la entrada del jugador en partida.txt
+ * para iniciar una partida nueva limpia.
+ */
+void borrarPartida(char *id_jugador);
 
 #endif /* FICHEROS_H */
