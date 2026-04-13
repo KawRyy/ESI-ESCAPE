@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "mapa.h"        
+#include "condiciones.h" 
+#include "usuarios.h"    
+#include "partida.h"
+
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
 static void reemplazar(const char *orig, const char *tmp) {
@@ -32,7 +37,7 @@ static int leer_salas(Salas **salas) {
       continue;
     (*salas)[n].id_sala = atoi(id); /* Convierte el ID a numero entero */
     CPY((*salas)[n].nombre_sala, nom);
-    (*salas)[n].tipo_sala = !strcmp(tipo, "INICIAL")  ? 1 : !strcmp(tipo, "NORMAL") ? 2 : !strcmp(tipo, "SALIDA") ? 3 : 0; /* Asigna el valor numerico segun el tipo */
+    (*salas)[n].tipo_sala = strcmp(tipo, "INICIAL") == 0 ? 1 : strcmp(tipo, "NORMAL") == 0 ? 2 : strcmp(tipo, "SALIDA") == 0 ? 3 : 0; /* Asigna el valor numerico segun el tipo */
     CPY((*salas)[n].descripcion_sala, desc);
     n++;
   }
@@ -96,8 +101,8 @@ static int leer_conexiones(Conexiones **conexiones) {
     CPY((*conexiones)[n].id_conexion, id);
     (*conexiones)[n].id_sala_orig = atoi(orig); /* Convierte el ID origen a entero */
     (*conexiones)[n].id_sala_dest = atoi(dest); /* Convierte el ID destino a entero */
-    (*conexiones)[n].estado_conexion = !strcmp(estado, "Activa") ? 1 : 0; /* Determina si la conexion esta activa */
-    (*conexiones)[n].condicion_conexion = !strcmp(cond, "0") ? 0 : !strncmp(cond, "OB", 2) ? 1 : !strncmp(cond, "P", 1)  ? 2 : 0; /* Asigna numericamente la condicion */
+    (*conexiones)[n].estado_conexion = strcmp(estado, "Activa") == 0 ? 1 : 0; /* Determina si la conexion esta activa */
+    (*conexiones)[n].condicion_conexion = strcmp(cond, "0") == 0 ? 0 : strncmp(cond, "OB", 2) == 0 ? 1 : strncmp(cond, "P", 1)  == 0 ? 2 : 0; /* Asigna numericamente la condicion */
     n++;
   }
   fclose(f);
@@ -165,12 +170,12 @@ static int leer_jugadores(Jugadores **jugadores) {
     if (inv) {
       char *obj = strtok(inv, ",");
       while (obj) {
-        char **tmp_obj = realloc((*jugadores)[n].id_objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(char *));
+        char **tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(char *));
         if (!tmp_obj) break;
-        (*jugadores)[n].id_objetos = tmp_obj;
-        (*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos] = malloc(strlen(obj) + 1);
-        if ((*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos])
-          strcpy((*jugadores)[n].id_objetos[(*jugadores)[n].num_objetos++], obj);
+        (*jugadores)[n].objetos = tmp_obj;
+        (*jugadores)[n].objetos[(*jugadores)[n].num_objetos] = malloc(strlen(obj) + 1);
+        if ((*jugadores)[n].objetos[(*jugadores)[n].num_objetos])
+          strcpy((*jugadores)[n].objetos[(*jugadores)[n].num_objetos++], obj);
         obj = strtok(NULL, ",");
       }
     }
@@ -216,19 +221,19 @@ int cargarPartida(Partida *par, int id_jugador) {
     CPY(jug.nombre_jugador, nom);
     CPY(jug.jugador, nick);
     if (pw)
-      CPY(jug.contraseña, pw);
+      CPY(jug.contrasena, pw);
     if (inv) {
       /* Procesa los items en el inventario que vienen separados por comas */
       char *obj = strtok(inv, ",");
       while (obj) {
         /* Se usa realloc para extender dinamicamente la lista de punteros id_objeto */
-        char **tmp = realloc(jug.id_objetos, (jug.num_objetos + 1) * sizeof(char *));
+        char **tmp = realloc(jug.objetos, (jug.num_objetos + 1) * sizeof(char *));
         if (!tmp)
           break;
-        jug.id_objetos = tmp;
-        jug.id_objetos[jug.num_objetos] = malloc(strlen(obj) + 1);
-        if (jug.id_objetos[jug.num_objetos])
-          strcpy(jug.id_objetos[jug.num_objetos++], obj);
+        jug.objetos = tmp;
+        jug.objetos[jug.num_objetos] = malloc(strlen(obj) + 1);
+        if (jug.objetos[jug.num_objetos])
+          strcpy(jug.objetos[jug.num_objetos++], obj);
         obj = strtok(NULL, ",");
       }
     }
@@ -273,14 +278,14 @@ int cargarPartida(Partida *par, int id_jugador) {
    * los objetos en su bolsa se marcan con localizacion 0 antes de que partida.txt los sobreescriba */
   for (int i = 0; i < jug.num_objetos; i++) {
     for (int j = 0; j < par->num_objetos; j++) {
-      if (!strcmp(par->lista_objetos[j].id_objeto, jug.id_objetos[i])) {
+      if (strcmp(par->lista_objetos[j].id_objeto, jug.objetos[i]) == 0) {
         par->lista_objetos[j].localizacion_objeto = 0; /* Lo marcamos como inventario */
         break;
       }
     }
-    free(jug.id_objetos[i]);
+    free(jug.objetos[i]);
   }
-  free(jug.id_objetos);
+  free(jug.objetos);
 
   /* 3. Sobreescribir con el progreso guardado en partida.txt:
    *    Si existe un bloque para este jugador, sus datos sobreescriben el estado base
@@ -310,7 +315,7 @@ int cargarPartida(Partida *par, int id_jugador) {
       if (id && loc_str) {
         int loc = atoi(loc_str);
         for (int i = 0; i < par->num_objetos; i++) {
-          if (!strcmp(par->lista_objetos[i].id_objeto, id)) {
+          if (strcmp(par->lista_objetos[i].id_objeto, id) == 0) {
             par->lista_objetos[i].localizacion_objeto = loc;
             break;
           }
@@ -323,8 +328,8 @@ int cargarPartida(Partida *par, int id_jugador) {
       char *id = strtok(line + 10, "-"), *est = strtok(NULL, "-");
       if (!id) continue;
       for (int i = 0; i < par->num_conexiones; i++) {
-        if (!strcmp(par->lista_conexiones[i].id_conexion, id)) {
-          par->lista_conexiones[i].estado_conexion = (est && !strcmp(est, "Activa")) ? 1 : 0;
+        if (strcmp(par->lista_conexiones[i].id_conexion, id) == 0) {
+          par->lista_conexiones[i].estado_conexion = (est && strcmp(est, "Activa") == 0) ? 1 : 0;
           break;
         }
       }
@@ -335,8 +340,8 @@ int cargarPartida(Partida *par, int id_jugador) {
       char *id = strtok(line + 8, "-"), *est = strtok(NULL, "-");
       if (!id) continue;
       for (int i = 0; i < par->num_puzles; i++) {
-        if (!strcmp(par->lista_puzles[i].id_puzle, id)) {
-          par->lista_puzles[i].resuelto = (est && !strcmp(est, "Resuelto")) ? 1 : 0;
+        if (strcmp(par->lista_puzles[i].id_puzle, id) == 0) {
+          par->lista_puzles[i].resuelto = (est && strcmp(est, "Resuelto") == 0) ? 1 : 0;
           break;
         }
       }

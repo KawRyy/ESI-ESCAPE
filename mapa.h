@@ -1,5 +1,5 @@
-#ifndef SALAS_Y_CONEXIONES_H
-#define SALAS_Y_CONEXIONES_H
+#ifndef MAPA_H
+#define MAPA_H
 
 
 typedef struct {

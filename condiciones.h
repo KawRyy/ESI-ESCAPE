@@ -1,5 +1,5 @@
-#ifndef OBJETOS_Y_PUZZLES_H
-#define OBJETOS_Y_PUZZLES_H
+#ifndef CONDICIONES_H
+#define CONDICIONES_H
 
 
 typedef struct {

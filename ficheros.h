@@ -1,11 +1,7 @@
 #ifndef FICHEROS_H
 #define FICHEROS_H
 
-#include "ficheros.h"
-#include "mapa.h"        
-#include "condiciones.h" 
-#include "usuarios.h"    
-#include "partida.h"        
+#include "usuarios.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
