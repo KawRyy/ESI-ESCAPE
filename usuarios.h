@@ -33,9 +33,9 @@
     Postcondición:
 
       Modifica *jugadores y *numero_jugadores si se registran nuevos usuarios
-      Devuelve el id del jugador que inicia sesión    
+      Devuelve un puntero al jugador que inicia sesión, o NULL si falla    
 */
 
-int login(Jugadores **jugadores, int *numero_jugadores);
+Jugadores* login(Jugadores **jugadores, int *numero_jugadores);
 
 #endif /* USUARIOS_H */

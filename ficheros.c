@@ -160,7 +160,9 @@ static int leer_jugadores(Jugadores **jugadores) {
     *jugadores = tmp;
     memset(&((*jugadores)[n]), 0, sizeof(Jugadores));
     
+    CPY((*jugadores)[n].id_jugador, id);
     CPY((*jugadores)[n].nombre_jugador, nom);
+    CPY((*jugadores)[n].nickname, nick);
     CPY((*jugadores)[n].contrasena, pw);
     if (inv) {
       char *obj = strtok(inv, ",");
@@ -188,12 +190,13 @@ int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j, i
   int nc = leer_conexiones(c);
   int no = leer_objetos(o);
   int nj = leer_jugadores(j);
+  *num_jugadores = nj;
 
   return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0 && nj >= 0) ? 1 : 0; /* Verifica si todas las lecturas fueron exitosas */
 }
 
 /* ── cargarPartida ──────────────────────────────────────────────── */
-int cargarPartida(Partida *par, int id_jugador) {
+int cargarPartida(Partida *par, char *id_jugador) {
   FILE *f;
   char line[512];
 
@@ -210,7 +213,7 @@ int cargarPartida(Partida *par, int id_jugador) {
     if (line[0] == '/' || line[0] == '\0')
       continue;
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
-    if (!id || !nom || !nick || atoi(id) != id_jugador) /* Ignora si faltan datos o el ID no coincide */
+    if (!id || !nom || !nick || strcmp(id, id_jugador) != 0) /* Ignora si faltan datos o el ID no coincide */
       continue;
     CPY(jug.nombre_jugador, nom);
     if (pw)
@@ -240,7 +243,7 @@ int cargarPartida(Partida *par, int id_jugador) {
   /* 2. Inicializar la partida con el estado base de objetos, conexiones y puzles:
    *    Se cargan todos los arrays desde sus ficheros de datos originales. */
   memset(par, 0, sizeof(Partida));
-  par->id_jugador = jug.id_jugador;
+  strcpy(par->id_jugador, jug.id_jugador);
   par->id_sala_actual = 1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
 
   /* Carga el estado base de objetos desde objetos.txt */
@@ -291,7 +294,7 @@ int cargarPartida(Partida *par, int id_jugador) {
       continue;
 
     if (!strncmp(line, "JUGADOR:", 8)) {
-      en_bloque = atoi(line + 9) == jug.id_jugador; /* Activa la lectura solo si es el bloque del jugador */
+      en_bloque = strcmp(line + 9, jug.id_jugador) == 0; /* Activa la lectura solo si es el bloque del jugador */
       continue;
     }
     if (!en_bloque)
@@ -361,14 +364,14 @@ void guardarPartida(Partida *par, Jugadores *jug) {
         strncpy(t, line, sizeof(t));
         t[strcspn(t, "\r\n")] = '\0';
         if (!strncmp(t, "JUGADOR:", 8))
-          skip = atoi(t + 9) == par->id_jugador; /* Omite las lineas del jugador actual en el guardado original (se van a reescribir) */
+          skip = strcmp(t + 9, par->id_jugador) == 0; /* Omite las lineas del jugador actual en el guardado original (se van a reescribir) */
         if (!skip)
           fputs(line,fout); /* Mantiene intacta la partida de los demas jugadores */
       }
       fclose(fin);
     }
     /* Escribe todos los datos del estado actual del jugador: sala, objetos, conexiones y puzles */
-    fprintf(fout, "JUGADOR: %02d\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
+    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
     /* Guarda todos los objetos con su ubicacion actual (0 = inventario del jugador) */
     for (int i = 0; i < par->num_objetos; i++)
       fprintf(fout, "OBJETO: %s-%02d\n", par->lista_objetos[i].id_objeto, par->lista_objetos[i].localizacion_objeto);
@@ -394,7 +397,7 @@ void guardarPartida(Partida *par, Jugadores *jug) {
       strncpy(t, line, sizeof(t));
       t[strcspn(t, "\r\n")] = '\0';
       char *id = strtok(t, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
-      if (!id || !nom || !nick || !pw || atoi(id) != par->id_jugador) {
+      if (!id || !nom || !nick || !pw || strcmp(id, par->id_jugador) != 0) {
         fputs(line, fout); /* Mantiene intacto el resto de jugadores */
         continue;
       }

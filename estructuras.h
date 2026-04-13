@@ -34,7 +34,7 @@ typedef struct {
 } Conexiones;
 
 typedef struct {
-    int id_jugador;        // ID del usuario que juega
+    char id_jugador[5];    // ID del usuario que juega
     int id_sala_actual;    // Dónde se quedó el jugador
 
     // Listas dinámicas para reflejar los cambios en el mundo

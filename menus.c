@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include "menus.h"      
 #include "usuarios.h"    
@@ -23,15 +23,16 @@ void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Co
         printf("Seleccione una opción: ");
         if(scanf("%d", &control) != 1) {
             printf("Opción no válida. Por favor, seleccione una opción del menú.\n");
-            while (getchar() != '\n'); // Limpia el buffer de entrada
         }
+        while (getchar() != '\n'); // Limpia el buffer de entrada siempre
 
         switch(control){
         case 1:
         /* EL 3 ESTA HARDCODEADO NECESITAMOS EL NUMERO DE JUGADORES */
 
 
-            if (login(jug, *num_jugadores) != -1) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
+            Jugadores *jug_login = login(jug, num_jugadores);
+            if (jug_login != NULL) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
                 printf("Inicio de sesión exitoso... \n");
                 menu_principal(par, jug, obj, sal, con, puz); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
             }

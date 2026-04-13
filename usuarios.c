@@ -69,16 +69,18 @@ static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
     número_jugadores    (E)     Puntero al número de jugadores.
 */
 
-int login(Jugadores **jugadores, int *numero_jugadores)
+Jugadores* login(Jugadores **jugadores, int *numero_jugadores)
 {
     Jugadores *jugador;
-    char usuario[sizeof (*jugadores)->id_jugador];
+    char usuario[5];  // Tamaño del id_jugador
     int sesión_iniciada = 0;
 
     // El proceso de login finaliza cuando se consigue iniciar sesión.
     while (!sesión_iniciada) {
         // Solicitamos las credenciales.
-        lee_cadena("Usuario: ", usuario, sizeof usuario);
+        lee_cadena("Usuario (ID): ", usuario, sizeof usuario);
+        // Elimina cualquier salto de línea residual
+        usuario[strcspn(usuario, "\n")] = '\0';
         // Buscamos un jugador que se corresponda con ese usuario.
         jugador = busca_usuario(usuario, *jugadores, *numero_jugadores);
         // Comprobamos si el uauario existe.     
@@ -90,7 +92,7 @@ int login(Jugadores **jugadores, int *numero_jugadores)
             registra_usuario(jugadores, numero_jugadores);
         }
     }
-    return jugador->id_jugador;
+    return jugador;
 }
 
 // Búsqueda de un usuario en el vector de jugadores.
@@ -252,7 +254,7 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
     Jugadores nuevo_jugador;
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
-    nuevo_jugador.id_jugador = *número_jugadores + 1;
+    sprintf(nuevo_jugador.id_jugador, "%04d", *número_jugadores + 1);
     // Obtenemos el nombre, el usuario y la contraseña del nuevo jugador.
     lee_cadena("Nombre: ", nuevo_jugador.nombre_jugador, sizeof nuevo_jugador.nombre_jugador);
     lee_cadena("Usuario: ", nuevo_jugador.id_jugador, sizeof nuevo_jugador.id_jugador);
@@ -291,7 +293,7 @@ partida->num_puzles = 0;
 
 void nueva_partida(Jugadores *jugador, Partida *partida)
 {
-    partida->id_jugador = jugador->id_jugador;
+    strcpy(partida->id_jugador, jugador->id_jugador);
     partida->id_sala_actual = 0;
     partida->lista_objetos = NULL;
     partida->num_objetos = 0;
