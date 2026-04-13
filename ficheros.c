@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mapa.h"        
-#include "condiciones.h" 
-#include "usuarios.h"
+
+#include "estructuras.h"
 
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
@@ -160,10 +159,8 @@ static int leer_jugadores(Jugadores **jugadores) {
     }
     *jugadores = tmp;
     memset(&((*jugadores)[n]), 0, sizeof(Jugadores));
-
-    (*jugadores)[n].id_jugador = atoi(id);
+    
     CPY((*jugadores)[n].nombre_jugador, nom);
-    CPY((*jugadores)[n].jugador, nick);
     CPY((*jugadores)[n].contrasena, pw);
     if (inv) {
       char *obj = strtok(inv, ",");
@@ -215,9 +212,7 @@ int cargarPartida(Partida *par, int id_jugador) {
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
     if (!id || !nom || !nick || atoi(id) != id_jugador) /* Ignora si faltan datos o el ID no coincide */
       continue;
-    jug.id_jugador = atoi(id);
     CPY(jug.nombre_jugador, nom);
-    CPY(jug.jugador, nick);
     if (pw)
       CPY(jug.contrasena, pw);
     if (inv) {

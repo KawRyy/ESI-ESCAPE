@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "ficheros.h"
 #include "mapa.h"    
 #include "estructuras.h" 
 
