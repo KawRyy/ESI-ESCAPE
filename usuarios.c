@@ -45,8 +45,8 @@ static void muestra_usuarios(Jugadores *jugador, int numero_jugadores) {
   putchar('\n');
   puts(">>> DEPURACIÓN");
   for (int k = 0; k < numero_jugadores; ++k)
-    printf("%02d-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador,
-           jugador[k].id_jugador, jugador[k].contrasena);
+    printf("%02d-%s-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador,
+           jugador[k].id_jugador, jugador[k].nickname, jugador[k].contrasena);
   puts("<<< DEPURACIÓN\n");
 }
 
