@@ -1,7 +1,7 @@
 #ifndef FICHEROS_H
 #define FICHEROS_H
 
-#include "usuarios.h"
+#include "estructuras.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

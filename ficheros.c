@@ -2,11 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "mapa.h"        
 #include "condiciones.h" 
-#include "usuarios.h"    
-#include "partida.h"
+#include "usuarios.h"
 
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
