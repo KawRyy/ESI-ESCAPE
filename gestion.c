@@ -1,5 +1,5 @@
-#include "estructuras.h"
 #include "gestion.h"
+#include "estructuras.h"
 #include "ficheros.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,161 +12,109 @@ static void reemplazar(const char *orig, const char *tmp) {
   rename(tmp, orig);
 }
 
-int cargarPartida(Partida *par, char *id_jugador) {
+int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos,
+                  Conexiones **lista_conexiones, Puzles **lista_puzles) {
   FILE *f;
   char line[512];
 
-  /* 1. Buscar jugador en jugadores.txt:
-   *    Se abre el fichero y se busca linea a linea un usuario cuyo id_jugador
-   *    coincida con el 'id_jugador' proporcionado como parametro. */
-  Jugadores jug;
-  memset(&jug, 0, sizeof(Jugadores));
-  int hallado = 0;
-  if ((f = fopen("ficheros/jugadores.txt", "r")) == NULL)
-    return 0;
-  while (fgets(line, sizeof(line), f)) {
-    line[strcspn(line, "\r\n")] = '\0';
-    if (line[0] == '/' || line[0] == '\0')
-      continue;
-    char line_copy[512];
-    strncpy(line_copy, line, sizeof(line_copy) - 1);
-    line_copy[sizeof(line_copy) - 1] = '\0';
-    char *id = strtok(line_copy, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); /* Extrae campos separados por '-' */
-    if (!id || !nom || !nick || strcmp(id, id_jugador) != 0) /* Ignora si faltan datos o el ID no coincide */
-      continue;
-    CPY(jug.id_jugador, id);
-    CPY(jug.nombre_jugador, nom);
-    if (pw)
-      CPY(jug.contrasena, pw);
-    if (inv) {
-      /* Procesa los items en el inventario que vienen separados por comas */
-      char *obj = strtok(inv, ",");
-      while (obj) {
-        /* Se usa realloc para extender dinamicamente la lista de Objetos */
-        Objetos *tmp = realloc(jug.objetos, (jug.num_objetos + 1) * sizeof(Objetos));
-        if (!tmp)
-          break;
-        jug.objetos = tmp;
-        memset(&(jug.objetos[jug.num_objetos]), 0, sizeof(Objetos));
-        CPY(jug.objetos[jug.num_objetos].id_objeto, obj);
-        jug.num_objetos++;
-        obj = strtok(NULL, ",");
-      }
-    }
-    hallado = 1;
-    break;
-  }
-  fclose(f);
-  if (!hallado)
-    return 0;
+  // Recarga el estado base limpio en memoria para evitar el sangrado de estado (State Bleed)
+  if (*lista_objetos) { free(*lista_objetos); *lista_objetos = NULL; }
+  int num_objetos = leer_objetos(lista_objetos);
 
-  /* 2. Inicializar la partida con el estado base de objetos, conexiones y puzles:
-   *    Se cargan todos los arrays desde sus ficheros de datos originales. */
-  memset(par, 0, sizeof(Partida));
-  CPY(par->id_jugador, jug.id_jugador);
-  par->id_sala_actual = 1; /* El id 0 se utiliza para el inventario, el inicio es 1 */
+  if (*lista_conexiones) { free(*lista_conexiones); *lista_conexiones = NULL; }
+  int num_conexiones = leer_conexiones(lista_conexiones);
 
-  /* Carga el estado base de objetos desde objetos.txt */
-  Objetos *base_objs = NULL;
-  int num_base = leer_objetos(&base_objs);
-  if (num_base > 0) {
-    par->lista_objetos = base_objs;
-    par->num_objetos = num_base;
-  }
+  if (*lista_puzles) { free(*lista_puzles); *lista_puzles = NULL; }
+  int num_puzles = leer_puzles(lista_puzles);
 
-  /* Carga el estado base de conexiones desde conexiones.txt */
-  Conexiones *base_conex = NULL;
-  int num_conex = leer_conexiones(&base_conex);
-  if (num_conex > 0) {
-    par->lista_conexiones = base_conex;
-    par->num_conexiones = num_conex;
-  }
+  // 1. Inicializamos la sala donde va a empezar el jugador
+  *id_sala_actual = 1;
 
-  /* Carga el estado base de puzles desde puzles.txt */
-  Puzles *base_puzles = NULL;
-  int num_puzles_base = leer_puzles(&base_puzles);
-  if (num_puzles_base > 0) {
-    par->lista_puzles = base_puzles;
-    par->num_puzles = num_puzles_base;
-  }
-
-  /* Aplica el inventario del jugador desde jugadores.txt como estado inicial de los objetos:
-   * los objetos en su bolsa se marcan con localizacion 0 antes de que partida.txt los sobreescriba */
-  for (int i = 0; i < jug.num_objetos; i++) {
-    for (int j = 0; j < par->num_objetos; j++) {
-      if (!strcmp(par->lista_objetos[j].id_objeto, jug.objetos[i].id_objeto)) {
-        par->lista_objetos[j].localizacion_objeto = 0; /* Lo marcamos como inventario */
+  // 2. Aplicamos el inventario del jugador como estado inicial en las
+  // estructuras globales (localizacion = 0)
+  for (int i = 0; i < jug->num_objetos; i++) {
+    for (int j = 0; j < num_objetos; j++) {
+      if (strcmp((*lista_objetos)[j].id_objeto, jug->objetos[i].id_objeto) == 0) {
+        (*lista_objetos)[j].localizacion_objeto = 0;
         break;
       }
     }
   }
-  free(jug.objetos);
 
-  /* 3. Sobreescribir con el progreso guardado en partida.txt:
-   *    Si existe un bloque para este jugador, sus datos sobreescriben el estado base
-   *    campo a campo: ubicacion de objetos, estado de conexiones y estado de puzles. */
+  // 3. Sobreescribir el resto del mundo con el progreso guardado en partida.txt:
   if ((f = fopen("ficheros/partida.txt", "r")) == NULL)
-    return 1;
+    return 1; // Si no hay archivo, devolvemos 1 (comienza limpio)
+
   int en_bloque = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0';
     if (line[0] == '/' || line[0] == '\0')
       continue;
 
-    if (!strncmp(line, "JUGADOR:", 8) && strlen(line) > 9) {
-      en_bloque = strcmp(line + 9, jug.id_jugador) == 0; /* Activa la lectura solo si es el bloque del jugador */
+    // Creamos una copia de la linea para tokenizarla y obtener la clave y el valor
+    char line_copy[512];
+    strncpy(line_copy, line, sizeof(line_copy) - 1);
+    line_copy[sizeof(line_copy) - 1] = '\0';
+
+    char *clave = strtok(line_copy, ":");
+    char *valor = strtok(NULL, "");
+    if (!clave || !valor)
+      continue;
+
+    // Eliminamos espacio inicial en el valor si lo hay
+    if (valor[0] == ' ')
+      valor++;
+
+    if (strcmp(clave, "JUGADOR") == 0) {
+      en_bloque = (strcmp(valor, jug->id_jugador) == 0); /* Activa la lectura solo si es el bloque del jugador */
       continue;
     }
     if (!en_bloque)
       continue;
 
-    if (!strncmp(line, "SALA:", 5)) {
-      par->id_sala_actual = atoi(line + 6);
+    if (strcmp(clave, "SALA") == 0) {
+      *id_sala_actual = atoi(valor);
       continue;
     }
-    if (!strncmp(line, "OBJETO:", 7)) {
-      /* Sobreescribe la ubicacion del objeto en lista_objetos segun el id guardado */
-      char obj_copy[512];
-      strncpy(obj_copy, line + 8, sizeof(obj_copy) - 1);
-      obj_copy[sizeof(obj_copy) - 1] = '\0';
-      char *id = strtok(obj_copy, "-"), *loc_str = strtok(NULL, "-");
-      if (id && loc_str) {
+    if (strcmp(clave, "OBJETO") == 0) {
+      /* Sobreescribe la ubicacion del objeto en las estructuras globales */
+      char *id_objeto_str = strtok(valor, "-"), *loc_str = strtok(NULL, "-");
+      if (id_objeto_str && loc_str) {
         int loc = atoi(loc_str);
-        for (int i = 0; i < par->num_objetos; i++) {
-          if (!strcmp(par->lista_objetos[i].id_objeto, id)) {
-            par->lista_objetos[i].localizacion_objeto = loc;
+        for (int i = 0; i < num_objetos; i++) {
+          if (strcmp((*lista_objetos)[i].id_objeto, id_objeto_str) == 0) {
+            (*lista_objetos)[i].localizacion_objeto = loc;
             break;
           }
         }
       }
       continue;
     }
-    if (!strncmp(line, "CONEXION:", 9)) {
-      /* Sobreescribe el estado de la conexion en lista_conexiones segun el id guardado */
-      char conexion_copy[512];
-      strncpy(conexion_copy, line + 10, sizeof(conexion_copy) - 1);
-      conexion_copy[sizeof(conexion_copy) - 1] = '\0';
-      char *id = strtok(conexion_copy, "-"), *est = strtok(NULL, "-");
-      if (!id) continue;
-      for (int i = 0; i < par->num_conexiones; i++) {
-        if (!strcmp(par->lista_conexiones[i].id_conexion, id)) {
-          par->lista_conexiones[i].estado_conexion = (est && !strcmp(est, "Activa")) ? 1 : 0;
-          break;
+    if (strcmp(clave, "CONEXION") == 0) {
+      /* Sobreescribe el estado de la conexion en las estructuras globales */
+      char *id_conexion_str = strtok(valor, "-"),
+           *estado_str = strtok(NULL, "-");
+      if (id_conexion_str && estado_str) {
+        for (int i = 0; i < num_conexiones; i++) {
+          if (strcmp((*lista_conexiones)[i].id_conexion, id_conexion_str) == 0) {
+            (*lista_conexiones)[i].estado_conexion =
+                (strcmp(estado_str, "Activa") == 0) ? 1 : 0;
+            break;
+          }
         }
       }
       continue;
     }
-    if (!strncmp(line, "PUZZLE:", 7)) {
-      /* Sobreescribe el estado del puzle en lista_puzles segun el id guardado */
-      char puzzle_copy[512];
-      strncpy(puzzle_copy, line + 8, sizeof(puzzle_copy) - 1);
-      puzzle_copy[sizeof(puzzle_copy) - 1] = '\0';
-      char *id = strtok(puzzle_copy, "-"), *est = strtok(NULL, "-");
-      if (!id) continue;
-      for (int i = 0; i < par->num_puzles; i++) {
-        if (!strcmp(par->lista_puzles[i].id_puzle, id)) {
-          par->lista_puzles[i].resuelto = (est && !strcmp(est, "Resuelto")) ? 1 : 0;
-          break;
+    if (strcmp(clave, "PUZZLE") == 0) {
+      /* Sobreescribe el estado del puzle en las estructuras globales */
+      char *id_puzle_str = strtok(valor, "-"), *estado_str = strtok(NULL, "-");
+      if (id_puzle_str && estado_str) {
+        for (int i = 0; i < num_puzles; i++) {
+          if (strcmp((*lista_puzles)[i].id_puzle, id_puzle_str) == 0) {
+            (*lista_puzles)[i].resuelto =
+                (strcmp(estado_str, "Resuelto") == 0) ? 1 : 0;
+            break;
+          }
         }
       }
       continue;
@@ -176,13 +124,24 @@ int cargarPartida(Partida *par, char *id_jugador) {
   return 1;
 }
 
-void guardarPartida(Partida *par) {
+void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
+                    Conexiones *lista_conexiones, Puzles *lista_puzles) {
   FILE *fin, *fout;
   char line[512];
 
+  // Cargamos en memoria los listados limpios base directamente para extraer cuentas puras
+  Objetos *base_obj = NULL;
+  Conexiones *base_con = NULL;
+  Puzles *base_puz = NULL;
+
+  int num_objetos = leer_objetos(&base_obj);
+  int num_conexiones = leer_conexiones(&base_con);
+  int num_puzles = leer_puzles(&base_puz);
+
   /* 1. Actualizacion de partida.txt:
-   *    En lugar de modificar en linea, se copia todo el contenido original excepto
-   *    las entradas del jugador en cuestion, que se reescriben al final del nuevo fichero tmp. */
+   *    En lugar de modificar en linea, se copia todo el contenido original
+   * excepto las entradas del jugador en cuestion, que se reescriben al final
+   * del nuevo fichero tmp. */
   if ((fout = fopen("ficheros/partida_tmp.txt", "w")) != NULL) {
     int skip = 0;
     if ((fin = fopen("ficheros/partida.txt", "r")) != NULL) {
@@ -191,26 +150,62 @@ void guardarPartida(Partida *par) {
         strncpy(t, line, sizeof(t));
         t[strcspn(t, "\r\n")] = '\0';
         if (!strncmp(t, "JUGADOR:", 8) && strlen(t) > 9)
-          skip = strcmp(t + 9, par->id_jugador) == 0; /* Omite las lineas del jugador actual en el guardado original (se van a reescribir) */
+          skip = strcmp(t + 9, jug->id_jugador) == 0; /* Omite las lineas del jugador actual */
         if (!skip)
-          fputs(line,fout); /* Mantiene intacta la partida de los demas jugadores */
+          fputs(line, fout); /* Mantiene intacta la partida de los demas jugadores */
       }
       fclose(fin);
     }
-    /* Escribe todos los datos del estado actual del jugador: sala, objetos, conexiones y puzles */
-    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", par->id_jugador, par->id_sala_actual);
-    /* Guarda todos los objetos con su ubicacion actual (0 = inventario del jugador) */
-    for (int i = 0; i < par->num_objetos; i++)
-      fprintf(fout, "OBJETO: %s-%02d\n", par->lista_objetos[i].id_objeto, par->lista_objetos[i].localizacion_objeto);
-    /* Guarda todas las conexiones con su estado actual */
-    for (int i = 0; i < par->num_conexiones; i++)
-      fprintf(fout, "CONEXION: %s-%s\n", par->lista_conexiones[i].id_conexion, par->lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada");
-    /* Guarda todos los puzles con su estado actual */
-    for (int i = 0; i < par->num_puzles; i++)
-      fprintf(fout, "PUZZLE: %s-%s\n", par->lista_puzles[i].id_puzle, par->lista_puzles[i].resuelto ? "Resuelto" : "Pendiente");
+    /* Escribe la base del jugador */
+    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", jug->id_jugador, *id_sala_actual);
+
+    /* Guarda solo los objetos que han cambiado de ubicacion */
+    for (int i = 0; i < num_objetos; i++) {
+      for (int j = 0; j < num_objetos; j++) {
+        if (strcmp(lista_objetos[i].id_objeto, base_obj[j].id_objeto) == 0) {
+          if (lista_objetos[i].localizacion_objeto != base_obj[j].localizacion_objeto) {
+            fprintf(fout, "OBJETO: %s-%02d\n", lista_objetos[i].id_objeto,
+                    lista_objetos[i].localizacion_objeto);
+          }
+          break;
+        }
+      }
+    }
+
+    /* Guarda solo las conexiones cuyo estado ha cambiado */
+    for (int i = 0; i < num_conexiones; i++) {
+      for (int j = 0; j < num_conexiones; j++) {
+        if (strcmp(lista_conexiones[i].id_conexion, base_con[j].id_conexion) == 0) {
+          if (lista_conexiones[i].estado_conexion != base_con[j].estado_conexion) {
+            fprintf(fout, "CONEXION: %s-%s\n", lista_conexiones[i].id_conexion,
+                    lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada");
+          }
+          break;
+        }
+      }
+    }
+
+    /* Guarda solo los puzles cuyo estado ha cambiado */
+    for (int i = 0; i < num_puzles; i++) {
+      for (int j = 0; j < num_puzles; j++) {
+        if (strcmp(lista_puzles[i].id_puzle, base_puz[j].id_puzle) == 0) {
+          if (lista_puzles[i].resuelto != base_puz[j].resuelto) {
+            fprintf(fout, "PUZZLE: %s-%s\n", lista_puzles[i].id_puzle,
+                    lista_puzles[i].resuelto ? "Resuelto" : "Pendiente");
+          }
+          break;
+        }
+      }
+    }
+
     fclose(fout);
     reemplazar("ficheros/partida.txt", "ficheros/partida_tmp.txt");
   }
+
+  /* Liberamos la memoria temporal puramente dinamica */
+  if (base_obj) free(base_obj);
+  if (base_con) free(base_con);
+  if (base_puz) free(base_puz);
 
   /* 2. Actualizacion de jugadores.txt:
    *    Solo se modifica el campo inventario del jugador actual;
@@ -219,7 +214,10 @@ void guardarPartida(Partida *par) {
   fout = fopen("ficheros/jugadores_tmp.txt", "w");
   if (fin && fout) {
     while (fgets(line, sizeof(line), fin)) {
-      if (line[0] == '/' && line[1] == '/') { fputs(line, fout); continue; }
+      if (line[0] == '/' && line[1] == '/') {
+        fputs(line, fout);
+        continue;
+      }
       char t[512];
       strncpy(t, line, sizeof(t) - 1);
       t[sizeof(t) - 1] = '\0';
@@ -227,22 +225,25 @@ void guardarPartida(Partida *par) {
       char t_copy[512];
       strncpy(t_copy, t, sizeof(t_copy) - 1);
       t_copy[sizeof(t_copy) - 1] = '\0';
-      char *id = strtok(t_copy, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
-      if (!id || !nom || !nick || !pw || strcmp(id, par->id_jugador) != 0) {
+      char *id = strtok(t_copy, "-"), *nom = strtok(NULL, "-"),
+           *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
+      if (!id || !nom || !nick || !pw || strcmp(id, jug->id_jugador) != 0) {
         fputs(line, fout); /* Mantiene intacto el resto de jugadores */
         continue;
       }
       /* Reescribe la linea del jugador actual con el inventario actualizado */
       fprintf(fout, "%s-%s-%s-%s", id, nom, nick, pw);
       int cnt = 0;
-      for (int i = 0; i < par->num_objetos; i++)
-        if (par->lista_objetos[i].localizacion_objeto == 0)
-          fprintf(fout, "%s%s", cnt++ ? "," : "-", par->lista_objetos[i].id_objeto);
+      for (int i = 0; i < num_objetos; i++)
+        if (lista_objetos[i].localizacion_objeto == 0)
+          fprintf(fout, "%s%s", cnt++ ? "," : "-", lista_objetos[i].id_objeto);
       fprintf(fout, "\n");
     }
   }
-  if (fin) fclose(fin);
-  if (fout) fclose(fout);
+  if (fin)
+    fclose(fin);
+  if (fout)
+    fclose(fout);
   if (fin && fout)
     reemplazar("ficheros/jugadores.txt", "ficheros/jugadores_tmp.txt");
   else
@@ -253,6 +254,7 @@ void borrarPartida(char *id_jugador) {
   FILE *fin, *fout;
   char line[512];
 
+  // 1. Limpiar el archivo de la partida global
   if ((fout = fopen("ficheros/partida_tmp.txt", "w")) != NULL) {
     int skip = 0;
     if ((fin = fopen("ficheros/partida.txt", "r")) != NULL) {
@@ -261,31 +263,83 @@ void borrarPartida(char *id_jugador) {
         strncpy(t, line, sizeof(t));
         t[strcspn(t, "\r\n")] = '\0';
         if (!strncmp(t, "JUGADOR:", 8) && strlen(t) > 9)
-          skip = strcmp(t + 9, id_jugador) == 0; 
+          skip = strcmp(t + 9, id_jugador) == 0;
         if (!skip)
-          fputs(line, fout); 
+          fputs(line, fout);
       }
       fclose(fin);
     }
     fclose(fout);
     reemplazar("ficheros/partida.txt", "ficheros/partida_tmp.txt");
   }
+
+  // 2. Limpiar el inventario residual del jugador en el fichero de usuarios
+  fin = fopen("ficheros/jugadores.txt", "r");
+  fout = fopen("ficheros/jugadores_tmp.txt", "w");
+  if (fin && fout) {
+    while (fgets(line, sizeof(line), fin)) {
+      if (line[0] == '/' && line[1] == '/') {
+        fputs(line, fout);
+        continue;
+      }
+      char t[512];
+      strncpy(t, line, sizeof(t) - 1);
+      t[sizeof(t) - 1] = '\0';
+      t[strcspn(t, "\r\n")] = '\0';
+      
+      char t_copy[512];
+      strncpy(t_copy, t, sizeof(t_copy) - 1);
+      t_copy[sizeof(t_copy) - 1] = '\0';
+      
+      char *id = strtok(t_copy, "-"), *nom = strtok(NULL, "-"),
+           *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-");
+
+      if (!id || !nom || !nick || !pw || strcmp(id, id_jugador) != 0) {
+        fputs(line, fout); // Conserva los demás jugadores sin tocar su inventario
+        continue;
+      }
+      // Reescribe la linea del jugador actual PERO SIN incluir objetos adicionales
+      fprintf(fout, "%s-%s-%s-%s\n", id, nom, nick, pw);
+    }
+  }
+  if (fin) fclose(fin);
+  if (fout) fclose(fout);
+  if (fin && fout) {
+    reemplazar("ficheros/jugadores.txt", "ficheros/jugadores_tmp.txt");
+  } else {
+    remove("ficheros/jugadores_tmp.txt");
+  }
 }
 
-// Crea una nueva partida.
-//
-// Inicializa la estructura partida para el jugador indicado.
-//
-// jugador (E)  Jugador que ha inciado sesión
-// partida (S)  Partida nueva sin inicializar.
+void nueva_partida(Jugadores *jugador, int *id_sala_actual,
+                   Objetos **lista_objetos, Conexiones **lista_conexiones,
+                   Puzles **lista_puzles) {
+  // 1. Reiniciar sala actual
+  *id_sala_actual = 1;
 
-void nueva_partida(Jugadores *jugador, Partida *partida) {
-  strcpy(partida->id_jugador, jugador->id_jugador);
-  partida->id_sala_actual = 0;
-  partida->lista_objetos = NULL;
-  partida->num_objetos = 0;
-  partida->lista_conexiones = NULL;
-  partida->num_conexiones = 0;
-  partida->lista_puzles = NULL;
-  partida->num_puzles = 0;
+  // 2. Limpiar inventario del jugador
+  if (jugador->objetos) {
+    free(jugador->objetos);
+    jugador->objetos = NULL;
+  }
+  jugador->num_objetos = 0;
+
+  // 3. Recargar el estado puro del mundo desde los ficheros
+  if (*lista_objetos) {
+    free(*lista_objetos);
+    *lista_objetos = NULL;
+  }
+  leer_objetos(lista_objetos);
+
+  if (*lista_conexiones) {
+    free(*lista_conexiones);
+    *lista_conexiones = NULL;
+  }
+  leer_conexiones(lista_conexiones);
+
+  if (*lista_puzles) {
+    free(*lista_puzles);
+    *lista_puzles = NULL;
+  }
+  leer_puzles(lista_puzles);
 }
