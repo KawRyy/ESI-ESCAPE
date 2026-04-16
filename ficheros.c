@@ -26,218 +26,215 @@ int contar_lineas(const char *ruta) {
   fclose(f);
   return count;
 }
-
 //Precondicion: recibe un puntero a un array de Salas (inicialmente NULL)
-//Postcondicion: lee el fichero de salas, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de salas leidas o -1 si hubo error. El formato del fichero debe ser: ID-NOMBRE-TIPO-DESCRIPCION (ej: 01-Sala Inicial-INICIAL-Descripcion de la sala)
+//Postcondicion: lee el fichero de salas, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de salas leidas o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-TIPO-DESCRIPCION (ej: 01-Sala Inicial-INICIAL-Descripcion de la sala)
 static int leer_salas(Salas **salas) {
-  int total = contar_lineas("ficheros/salas.txt"); // Cuenta el numero de lineas validas para dimensionar el array
+  FILE *f = fopen("ficheros/salas.txt", "r"); //Abre el fichero de salas
+  if (!f) return -1; // Si no se pudo abrir, devuelve -1
+
   *salas = NULL;
-  if (total <= 0)
-    return total < 0 ? -1 : 0; // Si no hay lineas validas, devuelve 0; si hubo error al abrir, devuelve -1
-
-  *salas = calloc(total, sizeof(Salas)); // Asigna memoria para el array de salas
-  if (!*salas)
-    return -1; // Si no se pudo asignar memoria, devuelve -1
-
-  FILE *f = fopen("ficheros/salas.txt", "r"); // Abre el fichero de salas para lectura
-  if (!f)
-    free(*salas); // Si no se pudo abrir el fichero, libera la memoria asignada y devuelve -1
-    *salas = NULL;
-    return -1;
-
   char line[512]; // Buffer para leer lineas
   int n = 0;
+
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
-    if (line[0] == '/' || line[0] == '\0')
-      continue; // Ignora lineas vacias o comentarios
-    char *id_sala_str = strtok(line, "-"), *nombre_sala_str = strtok(NULL, "-"), *tipo_sala_str = strtok(NULL, "-"), *descripcion_sala_str = strtok(NULL, "-"); // Separa campos por '-'
-    if (!id_sala_str || !nombre_sala_str || !tipo_sala_str || !descripcion_sala_str)
-      continue;
+    if (line[0] == '/' || line[0] == '\0') continue; // Ignora lineas vacias o comentarios
 
-    (*salas)[n].id_sala = atoi(id_sala_str); // Convierte el ID a numero entero
-    CPY((*salas)[n].nombre_sala, nombre_sala_str); // Copia el nombre de la sala
-    (*salas)[n].tipo_sala = (strcmp(tipo_sala_str, "INICIAL") == 0)  ? 1 : (strcmp(tipo_sala_str, "NORMAL") == 0) ? 2 : (strcmp(tipo_sala_str, "SALIDA") == 0) ? 3 : 0; // Asigna el valor numerico segun el tipo
-    CPY((*salas)[n].descripcion_sala, descripcion_sala_str); // Copia la descripcion de la sala
-    n++;
+    Salas *tmp = realloc(*salas, (n + 1) * sizeof(Salas));
+    if (!tmp) {
+      free(*salas); // Si no se pudo asignar memoria, libera el array actual y devuelve -1
+      *salas = NULL;
+      fclose(f);
+      return -1;
+    }
+    *salas = tmp; // Asigna el nuevo puntero al array de salas
+
+    char *id_sala_str = strtok(line, "-"), *nombre_sala_str = strtok(NULL, "-"), *tipo_sala_str = strtok(NULL, "-"), *descripcion_sala_str = strtok(NULL, "-"); // Separa campos por '-'
+
+    if (id_sala_str && nombre_sala_str && tipo_sala_str && descripcion_sala_str) {
+      (*salas)[n].id_sala = atoi(id_sala_str); // Convierte el ID de sala a entero
+      CPY((*salas)[n].nombre_sala, nombre_sala_str); // Copia el nombre de la sala
+      (*salas)[n].tipo_sala = (strcmp(tipo_sala_str, "INICIAL") == 0) ? 1 : (strcmp(tipo_sala_str, "NORMAL") == 0) ? 2 : 3; // Determina el tipo de sala (1: INICIAL, 2: NORMAL, 3: SALIDA)
+      CPY((*salas)[n].descripcion_sala, descripcion_sala_str); // Copia la descripcion de la sala
+      n++;
+    }
   }
-  fclose(f);
-  return n;
+
+  fclose(f); // Cierra el fichero de salas
+  return n; // Devuelve el número de salas leídas exitosamente
 }
 
 //Precondicion: recibe un puntero a un array de Puzles (inicialmente NULL)
-//Postcondicion: lee el fichero de puzles, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de puzles leidos o -1 si hubo error. El formato del fichero debe ser: ID-SALA-TIPO-DESCRIPCION-SOLUCION (ej: P01-01-CODIGO-Descripcion del puzle-1234)
+//Postcondicion: lee el fichero de puzles, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de puzles leidos o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-SALA-TIPO-DESCRIPCION-SOLUCION (ej: P01-01-CODIGO-Descripcion del puzle-1234)
 static int leer_puzles(Puzles **puzles) {
-  int total = contar_lineas("ficheros/puzles.txt"); // Cuenta el numero de lineas validas para dimensionar el array
+  FILE *f = fopen("ficheros/puzles.txt", "r"); //Abre el fichero de puzles
+  if (!f) return -1; // Si no se pudo abrir, devuelve -1
+
   *puzles = NULL;
-  if (total <= 0)
-    return total < 0 ? -1 : 0; // Si no hay lineas validas, devuelve 0; si hubo error al abrir, devuelve -1
-
-  *puzles = calloc(total, sizeof(Puzles)); // Asigna memoria para el array de puzles
-  if (!*puzles)
-    return -1; // Si no se pudo asignar memoria, devuelve -1
-
-  FILE *f = fopen("ficheros/puzles.txt", "r"); // Abre el fichero de puzles
-  if (!f)
-    free(*puzles); // Si no se pudo abrir el fichero, libera la memoria asignada y devuelve -1
-    *puzles = NULL;
-    return -1;
-
-  char line[512];
+  char line[512]; // Buffer para leer lineas
   int n = 0;
+
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
-    if (line[0] == '/' || line[0] == '\0')
-      continue; // Ignora lineas vacias o comentarios
-    char *id_puzle_str = strtok(line, "-");
-    strtok(NULL, "-"); // Ignora el campo tipo del fichero, se determina dinámicamente por el contenido de la solución
-    char *id_sala_puzle_str = strtok(NULL, "-"), *descripcion_puzle_str = strtok(NULL, "-"), *solucion_puzle_str = strtok(NULL, "-"); // Separa campos por '-'
-    if (!id_puzle_str || !id_sala_puzle_str || !descripcion_puzle_str || !solucion_puzle_str)
-      continue;
+    if (line[0] == '/' || line[0] == '\0') continue; // Ignora lineas vacias o comentarios
 
-    CPY((*puzles)[n].id_puzle, id_puzle_str); // Copia el ID del puzle
-    (*puzles)[n].id_sala_puzle = atoi(id_sala_puzle_str); // Convierte el ID de sala a entero
+    Puzles *tmp = realloc(*puzles, (n + 1) * sizeof(Puzles)); // Redimensiona el array de puzles para agregar un nuevo puzle
+    if (!tmp) {
+      free(*puzles); // Si no se pudo asignar memoria, libera el array actual y devuelve -1
+      *puzles = NULL;
+      fclose(f);
+      return -1;
+    }
+    *puzles = tmp; // Asigna el nuevo puntero al array de puzles
+    memset(&(*puzles)[n], 0, sizeof(Puzles)); // Limpia la nueva entrada de puzle
 
-    // Determina el tipo de elemento del puzle (1: CÓDIGO ; 2: PALABRA)
-    // Usamos el contenido de la solución. Si posee letras, será una PALABRA.
-    (*puzles)[n].tipo_elemento = (strspn(solucion_puzle_str, "0123456789") == strlen(solucion_puzle_str)) ? 1 : 2;
+    char *id_puzle_str = strtok(line, "-"); // Separa campos por '-'
+    strtok(NULL, "-"); // Salta el tipo del fichero
+    char *id_sala_puzle_str = strtok(NULL, "-");
+    char *descripcion_puzle_str = strtok(NULL, "-");
+    char *solucion_puzle_str = strtok(NULL, "-");
 
-    CPY((*puzles)[n].descripcion_puzle, descripcion_puzle_str); // Copia la descripción del puzle
-    CPY((*puzles)[n].solucion_puzle, solucion_puzle_str); // Copia la solución del puzle
-    n++;
+    // Verifica que se hayan obtenido todos los campos necesarios para crear el puzle
+    if (id_puzle_str && id_sala_puzle_str && descripcion_puzle_str && solucion_puzle_str) {
+      CPY((*puzles)[n].id_puzle, id_puzle_str); // Copia el ID del puzle
+      (*puzles)[n].id_sala_puzle = atoi(id_sala_puzle_str); // Convierte el ID de sala a entero
+      // Lógica de tipo: 1 si es numérico, 2 si tiene letras
+      (*puzles)[n].tipo_elemento = (strspn(solucion_puzle_str, "0123456789") == strlen(solucion_puzle_str)) ? 1 : 2;
+      CPY((*puzles)[n].descripcion_puzle, descripcion_puzle_str); // Copia la descripcion del puzle
+      CPY((*puzles)[n].solucion_puzle, solucion_puzle_str); // Copia la solucion del puzle
+      (*puzles)[n].resuelto = 0; // Inicialmente, el puzle no está resuelto
+      n++;
+    }
   }
-  fclose(f);
-  return n;
+  fclose(f); // Cierra el fichero de puzles
+  return n; // Devuelve el número de puzles leídos exitosamente
 }
 
 //Precondicion: recibe un puntero a un array de Conexiones (inicialmente NULL)
-//Postcondicion: lee el fichero de conexiones, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de conexiones leidas o -1 si hubo error. El formato del fichero debe ser: ID-SALA_ORIGEN-SALA_DESTINO-ESTADO-CONICIONANTE (ej: C01-01-02-Activa-OB01)
+//Postcondicion: lee el fichero de conexiones, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de conexiones leidas o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-SALA_ORIGEN-SALA_DESTINO-ESTADO-CONDICIONANTE (ej: C01-01-02-Activa-0)
 static int leer_conexiones(Conexiones **conexiones) {
-  int total = contar_lineas("ficheros/conexiones.txt"); // Cuenta el numero de lineas validas para dimensionar el array
+  FILE *f = fopen("ficheros/conexiones.txt", "r"); //Abre el fichero de conexiones
+  if (!f) return -1; // Si no se pudo abrir, devuelve -1
+
   *conexiones = NULL;
-  if (total <= 0)
-    return total < 0 ? -1 : 0; // Si no hay lineas validas, devuelve 0; si hubo error al abrir, devuelve -1
-
-  *conexiones = calloc(total, sizeof(Conexiones)); // Asigna memoria para el array de conexiones
-  if (!*conexiones)
-    return -1; // Si no se pudo asignar memoria, devuelve -1
-
-  FILE *f = fopen("ficheros/conexiones.txt", "r"); // Abre el fichero de conexiones
-  if (!f)
-    free(*conexiones); // Si no se pudo abrir el fichero, libera la memoria asignada y devuelve -1
-    *conexiones = NULL;
-    return -1;
-
-  char line[512];
+  char line[512]; // Buffer para leer lineas
   int n = 0;
+
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
-    if (line[0] == '/' || line[0] == '\0')
-      continue; // Ignora lineas vacias o comentarios
-    char *id_conexion_str = strtok(line, "-"), *id_sala_orig_str = strtok(NULL, "-"), *id_sala_dest_str = strtok(NULL, "-"), *estado_conexion_str = strtok(NULL, "-"), *id_condicionante_str = strtok(NULL, "-"); // Separa campos por '-'
-    if (!id_conexion_str || !id_sala_orig_str || !id_sala_dest_str || !estado_conexion_str || !id_condicionante_str)
-      continue;
+    if (line[0] == '/' || line[0] == '\0') continue; // Ignora lineas vacias o comentarios
 
-    CPY((*conexiones)[n].id_conexion, id_conexion_str); // Copia el ID de la conexión
-    (*conexiones)[n].id_sala_orig = atoi(id_sala_orig_str); // Convierte el ID origen a entero
-    (*conexiones)[n].id_sala_dest = atoi(id_sala_dest_str); // Convierte el ID destino a entero
-    (*conexiones)[n].estado_conexion = (strcmp(estado_conexion_str, "Activa") == 0) ? 1 : 0; // Determina si la conexion esta activa
-    CPY((*conexiones)[n].id_condicionante, id_condicionante_str); // Copia el ID del condicionante (ej: "OB01", "P01", "0")
-    n++;
+    Conexiones *tmp = realloc(*conexiones, (n + 1) * sizeof(Conexiones)); // Redimensiona el array de conexiones para agregar una nueva conexión
+    if (!tmp) {
+      free(*conexiones); // Si no se pudo asignar memoria, libera el array actual y devuelve -1
+      *conexiones = NULL;
+      fclose(f);
+      return -1;
+    }
+    *conexiones = tmp; // Asigna el nuevo puntero al array de conexiones
+
+    char *id_con = strtok(line, "-"), *orig = strtok(NULL, "-"), *dest = strtok(NULL, "-"), *est = strtok(NULL, "-"), *cond = strtok(NULL, "-"); // Separa campos por '-'
+
+    if (id_con && orig && dest && est && cond) {
+      CPY((*conexiones)[n].id_conexion, id_con); // Copia el ID de la conexión
+      (*conexiones)[n].id_sala_orig = atoi(orig); // Convierte el ID de sala origen a entero
+      (*conexiones)[n].id_sala_dest = atoi(dest); // Convierte el ID de sala destino a entero
+      (*conexiones)[n].estado_conexion = (strcmp(est, "Activa") == 0) ? 1 : 0; // Determina el estado de la conexión (1: Activa, 0: Bloqueada)
+      CPY((*conexiones)[n].id_condicionante, cond); // Copia el ID del condicionante (objeto o puzle que condiciona la conexión, o "0" si no tiene)
+      n++;
+    }
   }
-  fclose(f);
-  return n;
+  fclose(f); // Cierra el fichero de conexiones
+  return n; // Devuelve el número de conexiones leídas exitosamente
 }
 
 //Precondicion: recibe un puntero a un array de Objetos (inicialmente NULL)
-//Postcondicion: lee el fichero de objetos, asigna dinamicamente el array y lo
+//Postcondicion: lee el fichero de objetos, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de objetos leidos o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-DESCRIPCION-UBICACION (ej: OB01-Objeto Uno-Descripcion del objeto-01)
 static int leer_objetos(Objetos **objetos) {
-  int total = contar_lineas("ficheros/objetos.txt"); // Cuenta el numero de lineas validas para dimensionar el array
-  *objetos = NULL;
-  if (total <= 0)
-    return total < 0 ? -1 : 0; // Si no hay lineas validas, devuelve 0; si hubo error al abrir, devuelve -1
+  FILE *f = fopen("ficheros/objetos.txt", "r"); //Abre el fichero de objetos
+  if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
-  *objetos = calloc(total, sizeof(Objetos)); // Asigna memoria para el array de objetos
-  if (!*objetos)
-    return -1; // Si no se pudo asignar memoria, devuelve -1
-
-  FILE *f = fopen("ficheros/objetos.txt", "r"); // Abre el fichero de objetos
-  if (!f)
-    free(*objetos); // Si no se pudo abrir el fichero, libera la memoria asignada y devuelve -1
-    *objetos = NULL;
-    return -1;
-
+  *objetos = NULL; // Inicializa el puntero a NULL para luego asignar memoria dinámicamente
   char line[512];
   int n = 0;
+
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
-    if (line[0] == '/' || line[0] == '\0')
-      continue; // Ignora lineas vacias o comentarios
-    char *id_objeto_str = strtok(line, "-"), *nombre_objeto_str = strtok(NULL, "-"), *descripcion_objeto_str = strtok(NULL, "-"), *localizacion_objeto_str = strtok(NULL, "-"); // Separa campos por '-'
-    if (!id_objeto_str || !nombre_objeto_str || !descripcion_objeto_str || !localizacion_objeto_str)
-      continue;
+    if (line[0] == '/' || line[0] == '\0') continue; // Ignora lineas vacias o comentarios
 
-    CPY((*objetos)[n].id_objeto, id_objeto_str); // Copia el ID del objeto
-    CPY((*objetos)[n].nombre_objeto, nombre_objeto_str); // Copia el nombre del objeto
-    CPY((*objetos)[n].descripcion_objeto, descripcion_objeto_str); // Copia la descripcion del objeto
-    (*objetos)[n].localizacion_objeto = atoi(localizacion_objeto_str); // Convierte la localizacion a entero
-    n++;
+    Objetos *tmp = realloc(*objetos, (n + 1) * sizeof(Objetos)); // Redimensiona el array de objetos para agregar un nuevo objeto
+    if (!tmp) {
+      free(*objetos); // Si no se pudo asignar memoria, libera el array actual y devuelve -1
+      *objetos = NULL;
+      fclose(f);
+      return -1;
+    }
+    *objetos = tmp; // Asigna el nuevo puntero al array de objetos
+
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *desc = strtok(NULL, "-"), *loc = strtok(NULL, "-"); // Separa campos por '-'
+
+    if (id && nom && desc && loc) { 
+      CPY((*objetos)[n].id_objeto, id); // Copia el ID del objeto
+      CPY((*objetos)[n].nombre_objeto, nom); // Copia el nombre del objeto
+      CPY((*objetos)[n].descripcion_objeto, desc); // Copia la descripcion del objeto
+      (*objetos)[n].localizacion_objeto = atoi(loc); // Convierte la ubicación a entero (0 = inventario, >0 = sala)
+      n++;
+    }
   }
-  fclose(f);
-  return n;
+  fclose(f); // Cierra el fichero de objetos
+  return n; // Devuelve el número de objetos leídos exitosamente
 }
 
 //Precondicion: recibe un puntero a un array de Jugadores (inicialmente NULL)
-//Postcondicion: lee el fichero de jugadores, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de jugadores leidos o -1 si hubo error. El formato del fichero debe ser: ID-NOMBRE-NICKNAME-CONTRASENA-INVENTARIO (ej: J01-Jugador Uno-jug1-pass1-OB01,OB02)
+//Postcondicion: lee el fichero de jugadores, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de jugadores leidos o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-NICKNAME-CONTRASENA-OBJETOS (ej: J01-Jugador Uno-jug1-pass123-OB01,OB02)
 static int leer_jugadores(Jugadores **jugadores) {
-  int total = contar_lineas("ficheros/jugadores.txt"); // Cuenta el numero de lineas validas para dimensionar el array
-  *jugadores = NULL;
-  if (total <= 0)
-    return total < 0 ? -1 : 0; // Si no hay lineas validas, devuelve 0; si hubo error al abrir, devuelve -1
+  FILE *f = fopen("ficheros/jugadores.txt", "r"); //Abre el fichero de jugadores
+  if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
-  *jugadores = calloc(total, sizeof(Jugadores)); // Asigna memoria para el array de jugadores
-  if (!*jugadores)
-    return -1; // Si no se pudo asignar memoria, devuelve -1
-
-  FILE *f = fopen("ficheros/jugadores.txt", "r"); // Abre el fichero de jugadores
-  if (!f)
-    free(*jugadores); // Si no se pudo abrir el fichero, libera la memoria asignada y devuelve -1
-    *jugadores = NULL;
-    return -1;
-
+  *jugadores = NULL; // Inicializa el puntero a NULL para luego asignar memoria dinámicamente
   char line[512];
   int n = 0;
+
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
-    if (line[0] == '/' || line[0] == '\0')
-      continue; // Ignora lineas vacias o comentarios
-    char *id_jugador_str = strtok(line, "-"), *nombre_jugador_str = strtok(NULL, "-"), *nickname_str = strtok(NULL, "-"), *contrasena_str = strtok(NULL, "-"), *inv_str = strtok(NULL, "-");
-    if (!id_jugador_str || !nombre_jugador_str || !nickname_str || !contrasena_str)
-      continue;
+    if (line[0] == '/' || line[0] == '\0') continue; // Ignora lineas vacias o comentarios
 
-    CPY((*jugadores)[n].id_jugador, id_jugador_str); // Copia el ID del jugador
-    CPY((*jugadores)[n].nombre_jugador, nombre_jugador_str); // Copia el nombre del jugador
-    CPY((*jugadores)[n].nickname, nickname_str); // Copia el nickname del jugador
-    CPY((*jugadores)[n].contrasena, contrasena_str); // Copia la contraseña del jugador
-
-    // El inventario de cada jugador mantiene su asignación dinámica por ser local anidada
-    if (inv_str) {
-      char *obj_str = strtok(inv_str, ",");
-      while (obj_str) {
-        Objetos *tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(Objetos)); // Redimensiona el array de objetos del jugador para agregar un nuevo objeto
-        if (!tmp_obj)
-          break;
-        (*jugadores)[n].objetos = tmp_obj; // Asigna el nuevo puntero al array de objetos del jugador
-        memset(&((*jugadores)[n].objetos[(*jugadores)[n].num_objetos]), 0, sizeof(Objetos)); // Limpia la nueva entrada de objeto
-        CPY((*jugadores)[n].objetos[(*jugadores)[n].num_objetos].id_objeto, obj_str); // Copia el ID del objeto al inventario del jugador
-        (*jugadores)[n].num_objetos++;
-        obj_str = strtok(NULL, "-"); 
-      }
+    Jugadores *tmp_jug = realloc(*jugadores, (n + 1) * sizeof(Jugadores)); // Redimensiona el array de jugadores para agregar un nuevo jugador
+    if (!tmp_jug) {
+      free(*jugadores); // Si no se pudo asignar memoria, libera el array actual y devuelve -1
+      *jugadores = NULL;
+      fclose(f);
+      return -1;
     }
-    n++;
+    *jugadores = tmp_jug; // Asigna el nuevo puntero al array de jugadores
+    memset(&(*jugadores)[n], 0, sizeof(Jugadores)); // Inicializa punteros a NULL y contadores a 0
+
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); // Separa campos por '-'. El último campo (inventario) es opcional, por lo que puede ser NULL
+
+    if (id && nom && nick && pw) {
+      CPY((*jugadores)[n].id_jugador, id); // Copia el ID del jugador
+      CPY((*jugadores)[n].nombre_jugador, nom); // Copia el nombre del jugador
+      CPY((*jugadores)[n].nickname, nick); // Copia el nickname del jugador
+      CPY((*jugadores)[n].contrasena, pw); // Copia la contraseña del jugador
+
+      if (inv) {
+        char *obj_token = strtok(inv, ","); // Separa los objetos del inventario por comas. Cada token es un ID de objeto
+        while (obj_token) { 
+          Objetos *tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(Objetos));// Redimensiona el array de objetos del jugador para agregar un nuevo objeto al inventario
+          if (tmp_obj) { 
+            (*jugadores)[n].objetos = tmp_obj; // Asigna el nuevo puntero al array de objetos del jugador
+            memset(&(*jugadores)[n].objetos[(*jugadores)[n].num_objetos], 0, sizeof(Objetos)); // Limpia la nueva entrada de objeto
+            CPY((*jugadores)[n].objetos[(*jugadores)[n].num_objetos].id_objeto, obj_token); // Copia el ID del objeto al inventario del jugador
+            (*jugadores)[n].num_objetos++;
+          }
+          obj_token = strtok(NULL, ","); // Corregido: antes usabas '-' aquí
+        }
+      }
+      n++;
+    }
   }
-  fclose(f);
-  return n;
+  fclose(f); // Cierra el fichero de jugadores
+  return n; // Devuelve el número de jugadores leídos exitosamente
 }
 
 //Precondicion: recibe punteros a arrays de Salas, Conexiones, Puzles, Objetos y Jugadores (inicialmente NULL) y punteros a enteros para almacenar el numero de cada entidad
@@ -260,7 +257,7 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
   char line[512];
 
   // Recarga el estado base limpio en memoria para evitar el sangrado de estado
-  // (State Bleed)
+
   if (*lista_objetos) {
     free(*lista_objetos); // Si ya hay un array de objetos cargado, lo libera para evitar fugas de memoria
     *lista_objetos = NULL;
@@ -282,8 +279,7 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
   // 1. Inicializamos la sala donde va a empezar el jugador
   *id_sala_actual = 1;
 
-  // 2. Aplicamos el inventario del jugador como estado inicial en las
-  // estructuras globales (localizacion = 0)
+  // 2. Aplicamos el inventario del jugador como estado inicial en las estructuras globales (localizacion = 0)
   for (int i = 0; i < jug->num_objetos; i++) {
     for (int j = 0; j < num_objetos; j++) {
       if (strcmp((*lista_objetos)[j].id_objeto, jug->objetos[i].id_objeto) == 0) {
@@ -527,7 +523,7 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
 }
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
-//Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros para comenzar una nueva partida. Devuelve 1 si se reinicio correctamente o 0 si hubo error al leer los ficheros (en cuyo caso se mantiene el estado actual)
+//Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros para comenzar una nueva partida.
 void nueva_partida(Jugadores *jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
   // 1. Reiniciar sala actual
   *id_sala_actual = 1;
