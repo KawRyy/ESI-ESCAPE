@@ -39,6 +39,8 @@ static int leer_salas(Salas **salas) {
 
   FILE *f = fopen("ficheros/salas.txt", "r");
   if (!f)
+    free(*salas);
+    *salas = NULL;
     return -1;
 
   char line[512];
@@ -74,6 +76,8 @@ static int leer_puzles(Puzles **puzles) {
 
   FILE *f = fopen("ficheros/puzles.txt", "r");
   if (!f)
+    free(*puzles);
+    *puzles = NULL;
     return -1;
 
   char line[512];
@@ -116,6 +120,8 @@ static int leer_conexiones(Conexiones **conexiones) {
 
   FILE *f = fopen("ficheros/conexiones.txt", "r");
   if (!f)
+    free(*conexiones);
+    *conexiones = NULL;
     return -1;
 
   char line[512];
@@ -152,6 +158,8 @@ static int leer_objetos(Objetos **objetos) {
 
   FILE *f = fopen("ficheros/objetos.txt", "r");
   if (!f)
+    free(*objetos);
+    *objetos = NULL;
     return -1;
 
   char line[512];
@@ -187,6 +195,8 @@ static int leer_jugadores(Jugadores **jugadores) {
 
   FILE *f = fopen("ficheros/jugadores.txt", "r");
   if (!f)
+    free(*jugadores);
+    *jugadores = NULL;
     return -1;
 
   char line[512];
@@ -450,7 +460,14 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
   jug->num_objetos = 0;
   for (int i = 0; i < num_objetos; i++) {
     if (lista_objetos[i].localizacion_objeto == 0) {
-      jug->objetos = realloc(jug->objetos, (jug->num_objetos + 1) * sizeof(Objetos));
+      Objetos *tmp = realloc(jug->objetos, (jug->num_objetos + 1) * sizeof(Objetos));
+      if (!tmp) {
+        free(jug->objetos);
+        jug->objetos = NULL;
+        jug->num_objetos = 0;
+        break;
+      }
+      jug->objetos = tmp;
       memset(&jug->objetos[jug->num_objetos], 0, sizeof(Objetos));
       CPY(jug->objetos[jug->num_objetos].id_objeto, lista_objetos[i].id_objeto);
       jug->num_objetos++;
