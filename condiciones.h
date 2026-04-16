@@ -23,6 +23,6 @@ void Inventario(Objetos *obj, Jugadores *jug, int num_objetos);
 void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual);
 void SoltarObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual);
 void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *con, int id_sala_actual);
-void ResolverPuzle(Puzles *puz, Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual);
+void ResolverPuzle(Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual);
 
 #endif
