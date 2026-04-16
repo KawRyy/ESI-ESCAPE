@@ -13,8 +13,8 @@ void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual){
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual
    int j = 0; // Indica si se ha encontrado algún objeto en la sala actual para mostrar, para evitar mostrar el mensaje de "No hay objetos en esta sala" varias veces si hay varios objetos
     for(int i = 0; i < num_objetos; i++){
-        if(obj[i]->localizacion_objeto == id_sala_actual){ // Si el objeto está en la sala actual
-            printf("%s   ->     %s\n", obj[i]->nombre_objeto, obj[i]->descripcion_objeto);
+        if(obj[i].localizacion_objeto == id_sala_actual){ // Si el objeto está en la sala actual
+            printf("%s   ->     %s\n", obj[i].nombre_objeto, obj[i].descripcion_objeto);
             j = 1; // Se ha encontrado un objeto en la sala actual
         }
     } if (j == 0){
@@ -35,8 +35,8 @@ void Inventario(Objetos *obj, Jugadores *jug, int num_objetos){
         printf("Tienes %d objetos en el inventario:\n", jug->num_objetos);
     }
    for(int i = 0; i < num_objetos; i++){
-        if(obj[i]->localizacion_objeto == 0){ //  Si el objeto está en el inventario
-            printf("%s   ->     %s\n", obj[i]->nombre_objeto, obj[i]->descripcion_objeto);
+        if(obj[i].localizacion_objeto == 0){ //  Si el objeto está en el inventario
+            printf("%s   ->     %s\n", obj[i].nombre_objeto, obj[i].descripcion_objeto);
         }
     }
 }
@@ -51,23 +51,23 @@ void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actu
     int j = 0; // Indica si se ha encontrado algún objeto en la sala actual para coger, para evitar mostrar el mensaje de "No hay objetos en esta sala" varias veces si hay varios objetos
 
     for(i = 0; i < num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en la sala actual
-        if(obj[i]->localizacion_objeto == id_sala_actual){ // Si el objeto está en la sala actual
-            printf("%s   ->    ¿Deseas coger este objeto? (1: Si, 0: No)\n", obj[i]->nombre_objeto);
+        if(obj[i].localizacion_objeto == id_sala_actual){ // Si el objeto está en la sala actual
+            printf("%s   ->    ¿Deseas coger este objeto? (1: Si, 0: No)\n", obj[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
 
             if(respuesta == 1){
                 // 1. Cambiamos la localización a 0 (Inventario)
-                obj[i]->localizacion_objeto = 0;
+                obj[i].localizacion_objeto = 0;
                 
                 // 2. Incrementamos el contador y redimensionamos el array
                 jug->num_objetos++;
                 jug->objetos = realloc(jug->objetos, jug->num_objetos * sizeof(Objetos));
                 
                 // 3. Copiamos el struct entero al último hueco
-                jug->objetos[jug->num_objetos - 1] = *obj[i];
+                jug->objetos[jug->num_objetos - 1] = obj[i];
 
-                printf("Has cogido el objeto %s\n", obj[i]->nombre_objeto);
+                printf("Has cogido el objeto %s\n", obj[i].nombre_objeto);
                 j = 1;
             }
         }
@@ -156,12 +156,12 @@ void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *co
 
                 if(respuesta == 1){
                     for(k = 0; k < num_conexiones  && j == 0; k++){ // Recorre la lista de conexiones para comprobar si el objeto puede ser usado en alguna de ellas
-                        if(con[k]->id_sala_orig == id_sala_actual && con[k]->estado_conexion == 0 && strcmp(con[k]->id_condicionante, jug->objetos[i].id_objeto) == 0){ 
-                         // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id del condicionante de la conexión
-                        con[k]->estado_conexion = 1; // Cambia el estado de la conexión a abierta
-                    printf("Has usado %s para abrir la conexion hacia la sala %d\n", jug->objetos[i].nombre_objeto, con[k]->id_sala_dest);
-                    abierto = 1; // Indica que se ha abierto una conexión
-                    j = 1; // Indica que se ha usado un objeto y se sale del bucle de objetos para evitar mostrar el mensaje de "El objeto no se puede usar en esta situación" varias veces si hay varios objetos en el inventario
+                        if(ComprobarConexion(con, k, id_sala_actual, jug->objetos[i].id_objeto) == 1){ 
+                            // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id del condicionante de la conexión
+                            printf("Has usado el objeto %s \n", jug->objetos[i].nombre_objeto);
+                            AbrirConexion(con, k); // Cambia el estado de la conexión a abierta
+                            abierto = 1; // Indica que se ha abierto una conexión
+                            j = 1; // Indica que se ha usado un objeto y se sale del bucle de objetos para evitar mostrar el mensaje de "El objeto no se puede usar en esta situación" varias veces si hay varios objetos en el inventario
                 } 
             }
             } if (abierto == 0){
@@ -172,7 +172,7 @@ void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *co
         }
 }
 
-void ResolverPuzle(Puzles *puz, Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual){
+void ResolverPuzle(Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de resolver puzles en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los puzles que se encuentran en la sala actual y se pregunta al jugador si desea intentar resolver alguno de ellos.
 //Si el jugador decide intentar resolver un puzle, se le pide que introduzca la solución. Si la solución introducida es correcta, se muestra un mensaje de éxito y se marca el puzle como resuelto.
@@ -183,27 +183,28 @@ void ResolverPuzle(Puzles *puz, Jugadores *jug, int num_conexiones, Puzles *puz,
      
         for(k = 0; k < num_conexiones && j == 0; k++){ //Recorre la lista de conexiones para encontrar las que parten de la sala actual y tienen como condicionante el puzle que se está evaluando
         for(i = 0; i < num_puzles && j == 0; i++){ //Recorre la lista de puzles para encontrar los que están en la sala actual
-        if(con[k]->id_sala_orig == id_sala_actual && con[k]->estado_conexion == 0 && strcmp(con[k]->id_condicionante, puz[i]->id_puzle) == 0){ // Detecta los puzles que están en la sala actual
-            printf("%s   ->    ¿Deseas intentar resolver este puzle? (1: Si, 0: No)\n", puz[i]->descripcion_puzle);
-            int respuesta;
-            scanf("%d", &respuesta);
+            if(ComprobarConexion(con, k,id_sala_actual, puz[i].id_puzle) == 1){ // Si la conexión es desde la sala actual, tiene una condición de tipo puzle y el id del puzle coincide con el id del condicionante de la conexión
+                printf("%s   ->    ¿Deseas intentar resolver este puzle? (1: Si, 0: No)\n", puz[i].descripcion_puzle);
+                int respuesta;
+                scanf("%d", &respuesta);
 
-            if(respuesta == 1){
-                char solucion[51];
-                printf("%s:\n", puz[i]->descripcion_puzle);
-                printf("Introduce la solucion:\n");
-                // Limpiar el buffer de entrada antes de leer la solución, para evitar problemas con scanf y fgets
-                while(getchar() != '\n'); // Limpiar buffer
-                fgets(solucion, 51, stdin); // Lee la solución introducida por el jugador
-                solucion[strcspn(solucion, "\n")] = '\0'; // Elimina el carácter de nueva línea
-                if(strcmp(solucion, puz[i]->solucion_puzle) == 0){ // Si la solución introducida coincide con la solución del puzle
-                    puz[i]->resuelto = 1; // Marca el puzle como resuelto
-                    con[k]->estado_conexion = 1; // Cambia el estado de la conexión a abierta
-                    printf("Has resuelto el puzle %s\n", puz[i]->descripcion_puzle);
+                if(respuesta == 1){
+                    char solucion[51];
+                    printf("%s:\n", puz[i].descripcion_puzle);
+                    printf("Introduce la solucion:\n");
+                    // Limpiar el buffer de entrada antes de leer la solución, para evitar problemas con scanf y fgets
+                    while(getchar() != '\n'); // Limpiar buffer
+                        fgets(solucion, 51, stdin); // Lee la solución introducida por el jugador
+                        solucion[strcspn(solucion, "\n")] = '\0'; // Elimina el carácter de nueva línea
+                        if(strcmp(solucion, puz[i].solucion_puzle) == 0){ // Si la solución introducida coincide con la solución del puzle
+                            puz[i].resuelto = 1; // Marca el puzle como resuelto
+                            printf("Has resuelto el puzle %s\n", puz[i].descripcion_puzle);
+                    AbrirConexion(con, k); // Cambia el estado de la conexión a abierta
+                    
                 
                     j = 1; // Indica que se ha resuelto un puzle y se sale del bucle
                 } else {
-                    printf("La solucion introducida no es correcta para el puzle %s\n", puz[i]->descripcion_puzle);
+                    printf("La solucion introducida no es correcta para el puzle %s\n", puz[i].descripcion_puzle);
                 }
             
             }
@@ -213,4 +214,21 @@ void ResolverPuzle(Puzles *puz, Jugadores *jug, int num_conexiones, Puzles *puz,
 } if (j == 0){
         printf("No hay puzles en esta sala para resolver\n");
     }
+}
+
+int ComprobarConexion(Conexiones *con, int k,int id_sala_actual, char *n){
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos o resolver puzles en el menú de acciones del jugador
+//Postcondición: Se comprueba si la conexión con índice k en la lista de conexiones tiene como sala de origen la sala actual, tiene el estado de conexión a 0 (bloqueada) y tiene como condicionante el id del objeto o puzle que se está evaluando.
+    if(con[k].id_sala_orig == id_sala_actual && con[k].estado_conexion == 0 && strcmp(con[k].id_condicionante, n) == 0){
+        return 1; // La conexión está bloqueada por un objeto que se encuentra en el inventario del jugador
+    }else{
+        return 0; // La conexión no está bloqueada por un objeto que se encuentra en el inventario del jugador
+    }
+}
+
+void AbrirConexion(Conexiones *con, int k){
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos o resolver puzles en el menú de acciones del jugador, y se ha comprobado que la conexión con índice k en la lista de conexiones tiene como sala de origen la sala actual, tiene el estado de conexión a 0 (bloqueada) y tiene como condicionante el id del objeto o puzle que se está evaluando.
+//Postcondición: Se cambia el estado de la conexión con índice k en la lista de conexiones a 1 (abierta) y se muestra un mensaje indicando que se ha abierto la conexión hacia la sala de destino de dicha conexión.
+     con[k].estado_conexion = 1; // Cambia el estado de la conexión a abierta
+     printf("Has abierto la conexion hacia la sala %d\n", con[k].id_sala_dest);
 }

@@ -1,7 +1,6 @@
 #ifndef CONDICIONES_H
 #define CONDICIONES_H
 
-#include "estructuras.h"
 
 typedef struct {
     char id_objeto[5];
@@ -19,11 +18,11 @@ typedef struct {
     int resuelto; // 0: PENDIENTE ; 1: RESUELTO
 } Puzles;
 
-void ExaminarObjeto(Partida *par);  
-void Inventario(Partida *par, Jugadores *jug);
-void CogerObjeto(Jugadores *jug, Partida *par);
-void SoltarObjeto(Jugadores *jug, Partida *par);
-void UsarObjeto(Partida *par, Jugadores *jug);
-void ResolverPuzle(Partida *par);
+void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual);  
+void Inventario(Objetos *obj, Jugadores *jug, int num_objetos);
+void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual);
+void SoltarObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual);
+void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *con, int id_sala_actual);
+void ResolverPuzle(Puzles *puz, Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual);
 
 #endif
