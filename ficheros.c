@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "estructuras.h"
-
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
 static void reemplazar(const char *orig, const char *tmp) {
@@ -12,30 +10,46 @@ static void reemplazar(const char *orig, const char *tmp) {
   rename(tmp, orig);
 }
 
+int contar_lineas(const char *ruta) {
+  FILE *f = fopen(ruta, "r");
+  if (!f)
+    return -1;
+  char line[512];
+  int count = 0;
+  while (fgets(line, sizeof(line), f)) {
+    line[strcspn(line, "\r\n")] = '\0';
+    if (line[0] == '/' || line[0] == '\0')
+      continue;
+    count++;
+  }
+  fclose(f);
+  return count;
+}
+
 /* ── leer_salas ─────────────────────────────────────────────────── */
 static int leer_salas(Salas **salas) {
-  FILE *f = fopen("ficheros/salas.txt", "r");
-  char line[512];
-  int n = 0;
+  int total = contar_lineas("ficheros/salas.txt");
   *salas = NULL;
+  if (total <= 0)
+    return total < 0 ? -1 : 0;
+
+  *salas = calloc(total, sizeof(Salas));
+  if (!*salas)
+    return -1;
+
+  FILE *f = fopen("ficheros/salas.txt", "r");
   if (!f)
     return -1;
 
+  char line[512];
+  int n = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
       continue; /* Ignora lineas vacias o comentarios */
-    char *id_sala_str = strtok(line, "-"), *nombre_sala_str = strtok(NULL, "-"),*tipo_sala_str = strtok(NULL, "-"),*descripcion_sala_str = strtok(NULL, "-"); /* Separa campos por '-' */
+    char *id_sala_str = strtok(line, "-"), *nombre_sala_str = strtok(NULL, "-"), *tipo_sala_str = strtok(NULL, "-"), *descripcion_sala_str = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id_sala_str || !nombre_sala_str || !tipo_sala_str || !descripcion_sala_str)
       continue;
-
-    Salas *tmp = realloc(*salas, (n + 1) * sizeof(Salas));
-    if (!tmp) {
-      fclose(f);
-      return -1;
-    }
-    *salas = tmp;
-    memset(&((*salas)[n]), 0, sizeof(Salas));
 
     (*salas)[n].id_sala = atoi(id_sala_str); /* Convierte el ID a numero entero */
     CPY((*salas)[n].nombre_sala, nombre_sala_str);
@@ -49,13 +63,21 @@ static int leer_salas(Salas **salas) {
 
 /* ── leer_puzles ────────────────────────────────────────────────── */
 static int leer_puzles(Puzles **puzles) {
-  FILE *f = fopen("ficheros/puzles.txt", "r");
-  char line[512];
-  int n = 0;
+  int total = contar_lineas("ficheros/puzles.txt");
   *puzles = NULL;
+  if (total <= 0)
+    return total < 0 ? -1 : 0;
+
+  *puzles = calloc(total, sizeof(Puzles));
+  if (!*puzles)
+    return -1;
+
+  FILE *f = fopen("ficheros/puzles.txt", "r");
   if (!f)
     return -1;
 
+  char line[512];
+  int n = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -65,14 +87,6 @@ static int leer_puzles(Puzles **puzles) {
     char *id_sala_puzle_str = strtok(NULL, "-"), *descripcion_puzle_str = strtok(NULL, "-"), *solucion_puzle_str = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id_puzle_str || !id_sala_puzle_str || !descripcion_puzle_str || !solucion_puzle_str)
       continue;
-
-    Puzles *tmp = realloc(*puzles, (n + 1) * sizeof(Puzles));
-    if (!tmp) {
-      fclose(f);
-      return -1;
-    }
-    *puzles = tmp;
-    memset(&((*puzles)[n]), 0, sizeof(Puzles));
 
     CPY((*puzles)[n].id_puzle, id_puzle_str);
     (*puzles)[n].id_sala_puzle = atoi(id_sala_puzle_str); /* Convierte el ID de sala a entero */
@@ -91,13 +105,21 @@ static int leer_puzles(Puzles **puzles) {
 
 /* ── leer_conexiones ────────────────────────────────────────────── */
 static int leer_conexiones(Conexiones **conexiones) {
-  FILE *f = fopen("ficheros/conexiones.txt", "r");
-  char line[512];
-  int n = 0;
+  int total = contar_lineas("ficheros/conexiones.txt");
   *conexiones = NULL;
+  if (total <= 0)
+    return total < 0 ? -1 : 0;
+
+  *conexiones = calloc(total, sizeof(Conexiones));
+  if (!*conexiones)
+    return -1;
+
+  FILE *f = fopen("ficheros/conexiones.txt", "r");
   if (!f)
     return -1;
 
+  char line[512];
+  int n = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -105,14 +127,6 @@ static int leer_conexiones(Conexiones **conexiones) {
     char *id_conexion_str = strtok(line, "-"), *id_sala_orig_str = strtok(NULL, "-"), *id_sala_dest_str = strtok(NULL, "-"), *estado_conexion_str = strtok(NULL, "-"), *id_condicionante_str = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id_conexion_str || !id_sala_orig_str || !id_sala_dest_str || !estado_conexion_str || !id_condicionante_str)
       continue;
-
-    Conexiones *tmp = realloc(*conexiones, (n + 1) * sizeof(Conexiones));
-    if (!tmp) {
-      fclose(f);
-      return -1;
-    }
-    *conexiones = tmp;
-    memset(&((*conexiones)[n]), 0, sizeof(Conexiones));
 
     CPY((*conexiones)[n].id_conexion, id_conexion_str);
     (*conexiones)[n].id_sala_orig = atoi(id_sala_orig_str); /* Convierte el ID origen a entero */
@@ -127,13 +141,21 @@ static int leer_conexiones(Conexiones **conexiones) {
 
 /* ── leer_objetos ───────────────────────────────────────────────── */
 static int leer_objetos(Objetos **objetos) {
-  FILE *f = fopen("ficheros/objetos.txt", "r");
-  char line[512];
-  int n = 0;
+  int total = contar_lineas("ficheros/objetos.txt");
   *objetos = NULL;
+  if (total <= 0)
+    return total < 0 ? -1 : 0;
+
+  *objetos = calloc(total, sizeof(Objetos));
+  if (!*objetos)
+    return -1;
+
+  FILE *f = fopen("ficheros/objetos.txt", "r");
   if (!f)
     return -1;
 
+  char line[512];
+  int n = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -141,14 +163,6 @@ static int leer_objetos(Objetos **objetos) {
     char *id_objeto_str = strtok(line, "-"), *nombre_objeto_str = strtok(NULL, "-"), *descripcion_objeto_str = strtok(NULL, "-"), *localizacion_objeto_str = strtok(NULL, "-"); /* Separa campos por '-' */
     if (!id_objeto_str || !nombre_objeto_str || !descripcion_objeto_str || !localizacion_objeto_str)
       continue;
-
-    Objetos *tmp = realloc(*objetos, (n + 1) * sizeof(Objetos));
-    if (!tmp) {
-      fclose(f);
-      return -1;
-    }
-    *objetos = tmp;
-    memset(&((*objetos)[n]), 0, sizeof(Objetos));
 
     CPY((*objetos)[n].id_objeto, id_objeto_str);
     CPY((*objetos)[n].nombre_objeto, nombre_objeto_str);
@@ -162,13 +176,21 @@ static int leer_objetos(Objetos **objetos) {
 
 /* ── leer_jugadores ─────────────────────────────────────────────── */
 static int leer_jugadores(Jugadores **jugadores) {
-  FILE *f = fopen("ficheros/jugadores.txt", "r");
-  char line[512];
-  int n = 0;
+  int total = contar_lineas("ficheros/jugadores.txt");
   *jugadores = NULL;
+  if (total <= 0)
+    return total < 0 ? -1 : 0;
+
+  *jugadores = calloc(total, sizeof(Jugadores));
+  if (!*jugadores)
+    return -1;
+
+  FILE *f = fopen("ficheros/jugadores.txt", "r");
   if (!f)
     return -1;
 
+  char line[512];
+  int n = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; /* Elimina saltos de linea */
     if (line[0] == '/' || line[0] == '\0')
@@ -177,23 +199,19 @@ static int leer_jugadores(Jugadores **jugadores) {
     if (!id_jugador_str || !nombre_jugador_str || !nickname_str || !contrasena_str)
       continue;
 
-    Jugadores *tmp = realloc(*jugadores, (n + 1) * sizeof(Jugadores));
-    if (!tmp) {
-      fclose(f);
-      return -1;
-    }
-    *jugadores = tmp;
-    memset(&((*jugadores)[n]), 0, sizeof(Jugadores));
-
     CPY((*jugadores)[n].id_jugador, id_jugador_str);
     CPY((*jugadores)[n].nombre_jugador, nombre_jugador_str);
     CPY((*jugadores)[n].nickname, nickname_str);
     CPY((*jugadores)[n].contrasena, contrasena_str);
+
+    // El inventario de cada jugador mantiene su asignación dinámica por ser
+    // local anidada
     if (inv_str) {
       char *obj_str = strtok(inv_str, ",");
       while (obj_str) {
         Objetos *tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(Objetos));
-        if (!tmp_obj) break;
+        if (!tmp_obj)
+          break;
         (*jugadores)[n].objetos = tmp_obj;
         memset(&((*jugadores)[n].objetos[(*jugadores)[n].num_objetos]), 0, sizeof(Objetos));
         CPY((*jugadores)[n].objetos[(*jugadores)[n].num_objetos].id_objeto, obj_str);
@@ -208,30 +226,39 @@ static int leer_jugadores(Jugadores **jugadores) {
 }
 
 /* ── volcado ────────────────────────────────────────────────────── */
-int volcado(Salas **s, Conexiones **c, Puzles **p, Objetos **o, Jugadores **j, int *num_jugadores) {
+int volcado(Salas **s, int *num_s, Conexiones **c, int *num_c, Puzles **p, int *num_p, Objetos **o, int *num_o, Jugadores **j, int *num_j) {
 
-  int ns = leer_salas(s);
-  int np = leer_puzles(p);
-  int nc = leer_conexiones(c);
-  int no = leer_objetos(o);
-  int nj = leer_jugadores(j);
-  *num_jugadores = nj;
+  *num_s = leer_salas(s);
+  *num_p = leer_puzles(p);
+  *num_c = leer_conexiones(c);
+  *num_o = leer_objetos(o);
+  *num_j = leer_jugadores(j);
 
-  return (ns >= 0 && np >= 0 && nc >= 0 && no >= 0 && nj >= 0) ? 1 : 0; /* Verifica si todas las lecturas fueron exitosas */
+  return (*num_s >= 0 && *num_p >= 0 && *num_c >= 0 && *num_o >= 0 && *num_j >= 0) ? 1 : 0; /* Verifica si todas las lecturas fueron exitosas */
 }
 
 int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
   FILE *f;
   char line[512];
 
-  // Recarga el estado base limpio en memoria para evitar el sangrado de estado (State Bleed)
-  if (*lista_objetos) { free(*lista_objetos); *lista_objetos = NULL; }
+  // Recarga el estado base limpio en memoria para evitar el sangrado de estado
+  // (State Bleed)
+  if (*lista_objetos) {
+    free(*lista_objetos);
+    *lista_objetos = NULL;
+  }
   int num_objetos = leer_objetos(lista_objetos);
 
-  if (*lista_conexiones) { free(*lista_conexiones); *lista_conexiones = NULL; }
+  if (*lista_conexiones) {
+    free(*lista_conexiones);
+    *lista_conexiones = NULL;
+  }
   int num_conexiones = leer_conexiones(lista_conexiones);
 
-  if (*lista_puzles) { free(*lista_puzles); *lista_puzles = NULL; }
+  if (*lista_puzles) {
+    free(*lista_puzles);
+    *lista_puzles = NULL;
+  }
   int num_puzles = leer_puzles(lista_puzles);
 
   // 1. Inicializamos la sala donde va a empezar el jugador
@@ -248,7 +275,8 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
     }
   }
 
-  // 3. Sobreescribir el resto del mundo con el progreso guardado en partida.txt:
+  // 3. Sobreescribir el resto del mundo con el progreso guardado en
+  // partida.txt:
   if ((f = fopen("ficheros/partida.txt", "r")) == NULL)
     return 1; // Si no hay archivo, devolvemos 1 (comienza limpio)
 
@@ -258,7 +286,8 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
     if (line[0] == '/' || line[0] == '\0')
       continue;
 
-    // Creamos una copia de la linea para tokenizarla y obtener la clave y el valor
+    // Creamos una copia de la linea para tokenizarla y obtener la clave y el
+    // valor
     char line_copy[512];
     strncpy(line_copy, line, sizeof(line_copy) - 1);
     line_copy[sizeof(line_copy) - 1] = '\0';
@@ -332,7 +361,8 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
   FILE *fin, *fout;
   char line[512];
 
-  // Cargamos en memoria los listados limpios base directamente para extraer cuentas puras
+  // Cargamos en memoria los listados limpios base directamente para extraer
+  // cuentas puras
   Objetos *base_obj = NULL;
   Conexiones *base_con = NULL;
   Puzles *base_puz = NULL;
@@ -360,7 +390,8 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
       fclose(fin);
     }
     /* Escribe la base del jugador */
-    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", jug->id_jugador, *id_sala_actual);
+    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", jug->id_jugador,
+            *id_sala_actual);
 
     /* Guarda solo los objetos que han cambiado de ubicacion */
     for (int i = 0; i < num_objetos; i++) {
@@ -403,9 +434,28 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
   }
 
   /* Liberamos la memoria temporal puramente dinamica */
-  if (base_obj) free(base_obj);
-  if (base_con) free(base_con);
-  if (base_puz) free(base_puz);
+  if (base_obj)
+    free(base_obj);
+  if (base_con)
+    free(base_con);
+  if (base_puz)
+    free(base_puz);
+
+  /* Sincronizar memoria en caliente de Jugadores (inventario)
+   * Asegura que el estado coincida si el usuario hace recargas en caliente */
+  if (jug->objetos) {
+    free(jug->objetos);
+    jug->objetos = NULL;
+  }
+  jug->num_objetos = 0;
+  for (int i = 0; i < num_objetos; i++) {
+    if (lista_objetos[i].localizacion_objeto == 0) {
+      jug->objetos = realloc(jug->objetos, (jug->num_objetos + 1) * sizeof(Objetos));
+      memset(&jug->objetos[jug->num_objetos], 0, sizeof(Objetos));
+      CPY(jug->objetos[jug->num_objetos].id_objeto, lista_objetos[i].id_objeto);
+      jug->num_objetos++;
+    }
+  }
 
   /* 2. Actualizacion de jugadores.txt:
    *    Solo se modifica el campo inventario del jugador actual;

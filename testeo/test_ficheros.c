@@ -59,12 +59,17 @@ static void test_volcado(void) {
       "Iniciando llamada a volcado(&salas, &conexiones, &puzles, &objetos)...");
 
   Salas *salas = NULL;
+  int num_s = 0;
   Conexiones *conexiones = NULL;
+  int num_c = 0;
   Puzles *puzles = NULL;
+  int num_p = 0;
   Objetos *objetos = NULL;
+  int num_o = 0;
   Jugadores *jugadores = NULL;
+  int num_j = 0;
 
-  int ret = volcado(&salas, &conexiones, &puzles, &objetos, &jugadores);
+  int ret = volcado(&salas, &num_s, &conexiones, &num_c, &puzles, &num_p, &objetos, &num_o, &jugadores, &num_j);
 
   printf("\n--- Resultados del volcado ---\n");
   ASSERT(ret == 1,
