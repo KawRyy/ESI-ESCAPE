@@ -162,6 +162,7 @@ static void menu_juego(Partida **par, Jugadores *jug_login, Objetos **obj, Salas
                 system("cls");
                 printf("===== SALIDAS ===== \n");
                 ExaminarSalidas(*par); // Llama a la función para examinar las salidas disponibles desde la sala actual
+                accionMover(*par, *sal); // Llama a la función para moverse a otra sala si la salida está abierta
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 4:
