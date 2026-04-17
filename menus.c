@@ -7,6 +7,9 @@
 #include "condiciones.h" 
 #include "ficheros.h"
 
+static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int num_jugadores); // Declaración de la función para mostrar el menú principal, se define después del menú inicial para evitar problemas de orden de funciones
+static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int num_jugadores); // Declaración de la función para mostrar el menú de juego, se define después del menú principal para evitar problemas de orden de funciones
+
 void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int *num_jugadores){
     int control = 0;  // Variable para controlar la opción seleccionada en el menú inicial
     int salir = 0;  // Variable para controlar cuándo salir del menú inicial
