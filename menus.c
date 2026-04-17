@@ -60,7 +60,6 @@ static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Cone
     int control = 0; // Variable para controlar la opción seleccionada en el menú principal
     int salir = 0; // Variable para controlar cuándo salir del menú principal
 
-    int id_sala_actual = 0; // Variable para almacenar la sala actual del jugador, se inicializa en 0 y se actualizará al cargar o iniciar una partida
     do{
         system("cls");
         printf("=================================\n");
@@ -197,7 +196,7 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
             case 10:
                 printf("Guardando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
-                guardarPartida(jug, num_jugadores, id_sala_actual, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
+                guardarPartida(jug, num_jugadores, *id_sala_actual, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
                 break;
             case 11:
                 printf("Saliendo al menu principal...\n");
