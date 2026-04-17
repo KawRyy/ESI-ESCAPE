@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "condiciones.h" 
-#include "menus.h"       
-#include "usuarios.h"  
-#include "mapa.h" 
+#include "condiciones.h"
 
 //Módulo que se encarga de gestionar las condiciones de los objetos, conexiones y puzles, así como el inventario del jugador
 
@@ -25,7 +22,6 @@ void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual){
 void Inventario(Objetos *obj, Jugadores *jug, int num_objetos){ 
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de ver el inventario en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador
-   
     if(jug->num_objetos == 0){ // Si el jugador no tiene objetos en el inventario
         printf("No tienes objetos en el inventario\n");
         return; // Salir de la función para evitar recorrer la lista de objetos
@@ -215,4 +211,3 @@ void ResolverPuzle(Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzl
         printf("No hay puzles en esta sala para resolver\n");
     }
 }
-

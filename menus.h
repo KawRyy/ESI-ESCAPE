@@ -1,8 +1,14 @@
 #ifndef MENUS_H
 #define MENUS_H
+// (MÓDULO DE FLUJO DE DATOS)
 
-#include "estructuras.h"
+// AUTOR:
 
-void menu_inicial(Partida **par, Jugadores **jug, Objetos **obj, Salas **sal, Conexiones **con, Puzles **puz, int* num_jugadores);
+#include "condiciones.h"
+#include "usuarios.h"
+#include "mapa.h"
+#include "ficheros.h"
+
+void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int *num_jugadores);
 
 #endif /* MENUS_H */

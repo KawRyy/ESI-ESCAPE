@@ -42,7 +42,6 @@ static void lee_cadena(const char *mensaje, char *cadena, int n);
 static int solicita_contrasena(Jugadores* jugador);
 static void registra_usuario(Jugadores **jugadores, int *número_jugadores);
 static int nuevo_usuario(Jugadores **jugadores, int *número_jugadores);
-static void nueva_partida(Jugadores *jugador, Partida *partida);
 
 
 // Para depuración...

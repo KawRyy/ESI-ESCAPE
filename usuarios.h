@@ -1,28 +1,8 @@
-/*
-    Alejandro Palomo Medina
-   
-    Módulo: Usuarios (usuarios.h)
-
-
-    Gestión de usuarios del juego.
-
-
-    Dependencias:
-
-
-    ...
-    ...
-    ...
-*/
-
-
 #ifndef USUARIOS_H
 #define USUARIOS_H
+// (MÓDULO DE PROCESAMIENTO)
 
-#include "estructuras.h"
-
-// #include "partida.h"
-
+#include "condiciones.h"
 
 // PENDIENTE
 //
@@ -100,7 +80,6 @@ typedef struct {
 // Luego, no se puede olvidar liberar toda la memoria asignada dinámicamente.
 // Por ejemplo, se puede hacer al final de main.
 
-/*
 typedef struct {
     int id_jugador;             // Identificador del jugador.
     char nombre_jugador[21];    // Nombre del jugador.
@@ -109,7 +88,7 @@ typedef struct {
     Objetos *objetos;           // Puntero a vector dinámico de objetos (o NULL si no hay ninguno).
     int num_objetos;            // Número de objetos.
 } Jugadores;
-*/
+
 
 /*
     Login. Incluye la posibilidad de registrar nuevos usuarios.
