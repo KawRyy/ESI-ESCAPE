@@ -49,12 +49,12 @@ typedef struct {
 } Partida;
 
 typedef struct {
-    char id_jugador[5];
-    char nombre_jugador[16];
-    char nickname[16];
-    char contrasena[16];
-    Objetos *objetos; // Array dinámico de objetos en el inventario del jugador
-    int num_objetos;
+    int id_jugador;             // Identificador del jugador.
+    char nombre_jugador[21];    // Nombre del jugador.
+    char jugador[11];           // Nombre de usuario (nickname).
+    char contrasena[9];         // Contraseña.
+    Objetos *objetos;           // Puntero a vector dinámico de objetos (o NULL si no hay ninguno).
+    int num_objetos;            // Número de objetos.
 } Jugadores;
 
 #endif
