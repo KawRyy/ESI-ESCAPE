@@ -212,9 +212,9 @@ static int leer_jugadores(Jugadores **jugadores) {
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); // Separa campos por '-'. El último campo (inventario) es opcional, por lo que puede ser NULL
 
     if (id && nom && nick && pw) {
-      CPY((*jugadores)[n].id_jugador, id); // Copia el ID del jugador
+      (*jugadores)[n].id_jugador = atoi(id); // Convierte el ID del jugador a entero
       CPY((*jugadores)[n].nombre_jugador, nom); // Copia el nombre del jugador
-      CPY((*jugadores)[n].nickname, nick); // Copia el nickname del jugador
+      CPY((*jugadores)[n].jugador, nick); // Copia el nickname del jugador
       CPY((*jugadores)[n].contrasena, pw); // Copia la contraseña del jugador
 
       if (inv) {
@@ -252,34 +252,12 @@ int volcado(Salas **s, int *num_s, Conexiones **c, int *num_c, Puzles **p, int *
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
 //Postcondicion: carga el progreso del jugador desde partida.txt, actualizando la sala actual, la ubicacion de los objetos, el estado de las conexiones y el estado de los puzles. Devuelve 1 si se cargo correctamente o 0 si hubo error al abrir partida.txt (en cuyo caso se mantiene el estado base limpio)
-int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
+int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
+  Jugadores *jug = &((*jugadores)[indice_jugador]);
   FILE *f;
   char line[512];
 
-  // Recarga el estado base limpio en memoria para evitar el sangrado de estado
-
-  if (*lista_objetos) {
-    free(*lista_objetos); // Si ya hay un array de objetos cargado, lo libera para evitar fugas de memoria
-    *lista_objetos = NULL;
-  }
-  int num_objetos = leer_objetos(lista_objetos); // Carga el listado base de objetos para luego aplicar el progreso del jugador
-
-  if (*lista_conexiones) {
-    free(*lista_conexiones); // Si ya hay un array de conexiones cargado, lo libera para evitar fugas de memoria
-    *lista_conexiones = NULL;
-  }
-  int num_conexiones = leer_conexiones(lista_conexiones); // Carga el listado base de conexiones para luego aplicar el progreso del jugador
-
-  if (*lista_puzles) {
-    free(*lista_puzles); // Si ya hay un array de puzles cargado, lo libera para evitar fugas de memoria
-    *lista_puzles = NULL;
-  }
-  int num_puzles = leer_puzles(lista_puzles); // Carga el listado base de puzles para luego aplicar el progreso del jugador
-
-  // 1. Inicializamos la sala donde va a empezar el jugador
-  *id_sala_actual = 1;
-
-  // 2. Aplicamos el inventario del jugador como estado inicial en las estructuras globales (localizacion = 0)
+  // 1. Aplicamos el inventario del jugador como estado inicial en las estructuras globales (localizacion = 0)
   for (int i = 0; i < jug->num_objetos; i++) {
     for (int j = 0; j < num_objetos; j++) {
       if (strcmp((*lista_objetos)[j].id_objeto, jug->objetos[i].id_objeto) == 0) {
@@ -289,7 +267,7 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
     }
   }
 
-  // 3. Sobreescribir el resto del mundo con el progreso guardado en partida.txt:
+  // 2. Sobreescribir el resto del mundo con el progreso guardado en partida.txt:
   if ((f = fopen("ficheros/partida.txt", "r")) == NULL)
     return 1; // Si no hay archivo, devolvemos 1 (comienza limpio)
 
@@ -314,7 +292,7 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
       valor++;
 
     if (strcmp(clave, "JUGADOR") == 0) {
-      en_bloque = (strcmp(valor, jug->id_jugador) == 0); // Activa la lectura solo si es el bloque del jugador
+      en_bloque = (atoi(valor) == jug->id_jugador); // Activa la lectura solo si es el bloque del jugador
       continue;
     }
     if (!en_bloque) // Si no estamos en el bloque del jugador, ignoramos el resto de lineas
@@ -371,7 +349,8 @@ int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos, 
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
 //Postcondicion: guarda el progreso del jugador en partida.txt, actualizando solo las entradas correspondientes al jugador para mantener intacto el progreso de los demas jugadores. Devuelve 1 si se guardo correctamente o 0 si hubo error al abrir partida.txt (en cuyo caso no se modifica el archivo)
-void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos, Conexiones *lista_conexiones, Puzles *lista_puzles) {
+void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos *lista_objetos, Conexiones *lista_conexiones, Puzles *lista_puzles) {
+  Jugadores *jug = &((*jugadores)[indice_jugador]);
   FILE *fin, *fout;
   char line[512];
 
@@ -397,14 +376,14 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
         t[sizeof(t) - 1] = '\0'; // Asegura la terminación nula del string
         t[strcspn(t, "\r\n")] = '\0'; // Elimina saltos de linea
         if (!strncmp(t, "JUGADOR:", 8) && strlen(t) > 9)
-          skip = strcmp(t + 9, jug->id_jugador) == 0; // Omite las lineas del jugador actual
+          skip = (atoi(t + 9) == jug->id_jugador); // Omite las lineas del jugador actual
         if (!skip)
           fputs(line, fout); // Mantiene intacta la partida de los demas jugadores
       }
       fclose(fin);
     }
     // Escribe la base del jugador
-    fprintf(fout, "JUGADOR: %s\nSALA: %02d\n", jug->id_jugador,
+    fprintf(fout, "JUGADOR: %d\nSALA: %02d\n", jug->id_jugador,
             *id_sala_actual);
 
     // Guarda solo los objetos que han cambiado de ubicacion
@@ -497,7 +476,7 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
       strncpy(t_copy, t, sizeof(t_copy) - 1); // Copia la línea a otro buffer para tokenizar sin modificar el original
       t_copy[sizeof(t_copy) - 1] = '\0';
       char *id = strtok(t_copy, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"); // Tokeniza la línea para extraer los campos del jugador
-      if (!id || !nom || !nick || !pw || strcmp(id, jug->id_jugador) != 0) {
+      if (!id || !nom || !nick || !pw || atoi(id) != jug->id_jugador) {
         fputs(line, fout); //Mantiene intacto el resto de jugadores
         continue;
       }
@@ -523,8 +502,9 @@ void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
 }
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
-//Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros para comenzar una nueva partida.
-void nueva_partida(Jugadores *jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
+//Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros.
+void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
+  Jugadores *jugador = &((*jugadores)[indice_jugador]);
   // 1. Reiniciar sala actual
   *id_sala_actual = 1;
 

@@ -19,15 +19,10 @@ int contar_lineas(const char *ruta);
  * volcado: carga todos los ficheros de datos del mundo del juego.
  * Retorna 1 si todos los ficheros se cargaron correctamente, 0 si alguno falló.
  */
-int volcado(Salas **s, int *num_s, Conexiones **c, int *num_c, Puzles **p,
-            int *num_p, Objetos **o, int *num_o, Jugadores **j, int *num_j);
+int volcado(Salas **s, int *num_s, Conexiones **c, int *num_c, Puzles **p, int *num_p, Objetos **o, int *num_o, Jugadores **j, int *num_j);
 
-void guardarPartida(Jugadores *jug, int *id_sala_actual, Objetos *lista_objetos,
-                    Conexiones *lista_conexiones, Puzles *lista_puzles);
-int cargarPartida(Jugadores *jug, int *id_sala_actual, Objetos **lista_objetos,
-                  Conexiones **lista_conexiones, Puzles **lista_puzles);
-void nueva_partida(Jugadores *jugador, int *id_sala_actual,
-                   Objetos **lista_objetos, Conexiones **lista_conexiones,
-                   Puzles **lista_puzles);
+void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos *lista_objetos, Conexiones *lista_conexiones, Puzles *lista_puzles);
+int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles);
+void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles);
 
 #endif /* FICHEROS_H */
