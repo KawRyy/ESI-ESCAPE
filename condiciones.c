@@ -19,16 +19,16 @@ void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual){
     }
 }
 
-void Inventario(Objetos *obj, Jugadores *jug, int num_objetos){ 
+void Inventario(Objetos *obj, Jugadores *jug, int num_objetos, int n){ 
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de ver el inventario en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador
-    if(jug->num_objetos == 0){ // Si el jugador no tiene objetos en el inventario
+    if(jug[n].num_objetos == 0){ // Si el jugador no tiene objetos en el inventario
         printf("No tienes objetos en el inventario\n");
         return; // Salir de la función para evitar recorrer la lista de objetos
-    } if(jug->num_objetos == 1){
+    } if(jug[n].num_objetos == 1){
         printf("Tienes 1 objeto en el inventario:\n");
-    } if(jug->num_objetos > 1){
-        printf("Tienes %d objetos en el inventario:\n", jug->num_objetos);
+    } if(jug[n].num_objetos > 1){
+        printf("Tienes %d objetos en el inventario:\n", jug[n].num_objetos);
     }
    for(int i = 0; i < num_objetos; i++){
         if(obj[i].localizacion_objeto == 0){ //  Si el objeto está en el inventario
@@ -38,7 +38,7 @@ void Inventario(Objetos *obj, Jugadores *jug, int num_objetos){
 }
 
 
-void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual){
+void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual, int n){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de coger objetos en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual y se pregunta al jugador si desea coger alguno de ellos. 
 //Si el jugador decide coger un objeto, este se añade a su inventario y se elimina de la sala.
@@ -57,11 +57,11 @@ void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actu
                 obj[i].localizacion_objeto = 0;
                 
                 // 2. Incrementamos el contador y redimensionamos el array
-                jug->num_objetos++;
-                jug->objetos = realloc(jug->objetos, jug->num_objetos * sizeof(Objetos));
+                jug[n].num_objetos++;
+                jug[n].objetos = realloc(jug[n].objetos, jug[n].num_objetos * sizeof(Objetos));
                 
                 // 3. Copiamos el struct entero al último hueco
-                jug->objetos[jug->num_objetos - 1] = obj[i];
+                jug[n].objetos[jug[n].num_objetos - 1] = obj[i];
 
                 printf("Has cogido el objeto %s\n", obj[i].nombre_objeto);
                 j = 1;
@@ -73,32 +73,32 @@ void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actu
 }
 
 
- void SoltarObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual){
+ void SoltarObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual, int n){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de soltar objetos en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea soltar alguno de ellos. 
 //Si el jugador decide soltar un objeto, este se elimina de su inventario y se añade a la sala actual.
 
     int i = 0; // Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en el inventario para soltar, para evitar mostrar el mensaje de "No tienes objetos en el inventario" varias veces si hay varios objetos
-   if(jug->num_objetos == 0){
+   if(jug[n].num_objetos == 0){
         printf("No tienes objetos en el inventario para soltar\n");
         int j = 1; // Indica que no hay objetos en el inventario para soltar
     }
 
-    for(i = 0; i < jug->num_objetos && j == 0; i++){  // Recorre la lista de objetos para encontrar los que están en el inventario
-        printf("%s   ->    ¿Deseas soltar este objeto? (1: Si, 0: No)\n", jug->objetos[i].nombre_objeto);
+    for(i = 0; i < jug[n].num_objetos && j == 0; i++){  // Recorre la lista de objetos para encontrar los que están en el inventario
+        printf("%s   ->    ¿Deseas soltar este objeto? (1: Si, 0: No)\n", jug[n].objetos[i].nombre_objeto);
         int respuesta;
         scanf("%d", &respuesta);
 
         if(respuesta == 1){
             // Guardamos el nombre antes de eliminar el objeto del inventario
             char nombre[16];
-            strcpy(nombre, jug->objetos[i].nombre_objeto);
+            strcpy(nombre, jug[n].objetos[i].nombre_objeto);
 
             // 1. Cambiamos la localización en obj
             int encontrado_en_partida = 0; // Indica si se ha encontrado el objeto en la lista de la partida para actualizar su localización, para evitar mostrar el mensaje de error varias veces si hay varios objetos en el inventario
             for(int m = 0; m < num_objetos && encontrado_en_partida == 0; m++){ // Recorre la lista de objetos de la partida para encontrar el objeto que se va a soltar y cambiar su localización a la sala actual
-                if(strcmp(obj[m].id_objeto, jug->objetos[i].id_objeto) == 0){
+                if(strcmp(obj[m].id_objeto, jug[n].objetos[i].id_objeto) == 0){
                     obj[m].localizacion_objeto = id_sala_actual; // Cambia la localización del objeto a la sala actual
                     encontrado_en_partida = 1; 
                 }
@@ -109,18 +109,18 @@ void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actu
 
             // 2. Eliminamos el objeto del inventario del jugador
             int encontrado = 0;
-            for(int k = 0; k < jug->num_objetos && encontrado == 0; k++){ // Recorre la lista de objetos del inventario para encontrar el objeto que se va a soltar y eliminarlo
-                if(strcmp(jug->objetos[k].id_objeto, jug->objetos[i].id_objeto) == 0){ // Si el id del objeto del inventario coincide con el id del objeto que se va a soltar
+            for(int k = 0; k < jug[n].num_objetos && encontrado == 0; k++){ // Recorre la lista de objetos del inventario para encontrar el objeto que se va a soltar y eliminarlo
+                if(strcmp(jug[n].objetos[k].id_objeto, jug[n].objetos[i].id_objeto) == 0){ // Si el id del objeto del inventario coincide con el id del objeto que se va a soltar
                     // 3. Mover el último elemento al hueco (si no es el último)
-                    if(k < jug->num_objetos - 1){ // Si el objeto a eliminar no es el último, se mueve el último al hueco del objeto a eliminar
-                        jug->objetos[k] = jug->objetos[jug->num_objetos - 1];
+                    if(k < jug[n].num_objetos - 1){ // Si el objeto a eliminar no es el último, se mueve el último al hueco del objeto a eliminar
+                        jug[n].objetos[k] = jug[n].objetos[jug[n].num_objetos - 1];
                     }
-                    jug->num_objetos--;
-                    if(jug->num_objetos > 0){ // Redimensionar solo si quedan objetos, para evitar realloc a 0
-                        jug->objetos = realloc(jug->objetos, jug->num_objetos * sizeof(Objetos));
+                    jug[n].num_objetos--;
+                    if(jug[n].num_objetos > 0){ // Redimensionar solo si quedan objetos, para evitar realloc a 0
+                        jug[n].objetos = realloc(jug[n].objetos, jug[n].num_objetos * sizeof(Objetos));
                     } else {
-                        free(jug->objetos);
-                        jug->objetos = NULL;
+                        free(jug[n].objetos);
+                        jug[n].objetos = NULL;
                     }
                     encontrado = 1;
                 }
@@ -134,7 +134,7 @@ void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actu
 
 
 
-void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *con, int id_sala_actual){
+void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *con, int id_sala_actual, int n){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea usar alguno de ellos. 
 //Si el jugador decide usar un objeto, se comprueba si este puede ser usado en la situación actual (por ejemplo, 
@@ -145,30 +145,30 @@ void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *co
     int k = 0; // Variable para recorrer la lista de conexiones
     int abierto = 0; // Indica si se ha abierto alguna conexión usando el objeto
        
-            for(i = 0; i < jug->num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en el inventario
-                printf("%s   ->    ¿Deseas usar este objeto? (1: Si, 0: No)\n", jug->objetos[i].nombre_objeto); // Muestra los objetos del inventario para preguntar si se desea usar alguno
+            for(i = 0; i < jug[n].num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en el inventario
+                printf("%s   ->    ¿Deseas usar este objeto? (1: Si, 0: No)\n", jug[n].objetos[i].nombre_objeto); // Muestra los objetos del inventario para preguntar si se desea usar alguno
                 int respuesta;
                 scanf("%d", &respuesta);
 
                 if(respuesta == 1){
                     for(k = 0; k < num_conexiones  && j == 0; k++){ // Recorre la lista de conexiones para comprobar si el objeto puede ser usado en alguna de ellas
-                        if(ComprobarConexion(con, k, id_sala_actual, jug->objetos[i].id_objeto) == 1){ 
+                        if(ComprobarConexion(con, k, id_sala_actual, jug[n].objetos[i].id_objeto) == 1){ 
                             // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id del condicionante de la conexión
-                            printf("Has usado el objeto %s \n", jug->objetos[i].nombre_objeto);
+                            printf("Has usado el objeto %s \n", jug[n].objetos[i].nombre_objeto);
                             AbrirConexion(con, k); // Cambia el estado de la conexión a abierta
                             abierto = 1; // Indica que se ha abierto una conexión
                             j = 1; // Indica que se ha usado un objeto y se sale del bucle de objetos para evitar mostrar el mensaje de "El objeto no se puede usar en esta situación" varias veces si hay varios objetos en el inventario
                 } 
             }
             } if (abierto == 0){
-                printf("El objeto %s no se puede usar en esta situacion\n", jug->objetos[i].nombre_objeto);
+                printf("El objeto %s no se puede usar en esta situacion\n", jug[n].objetos[i].nombre_objeto);
         }
     }if (j == 0){
         printf("No hay conexiones que puedan ser abiertas con los objetos en el inventario\n");
         }
 }
 
-void ResolverPuzle(Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual){
+void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de resolver puzles en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los puzles que se encuentran en la sala actual y se pregunta al jugador si desea intentar resolver alguno de ellos.
 //Si el jugador decide intentar resolver un puzle, se le pide que introduzca la solución. Si la solución introducida es correcta, se muestra un mensaje de éxito y se marca el puzle como resuelto.
