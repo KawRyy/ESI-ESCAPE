@@ -40,8 +40,8 @@
 static Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores);
 static void lee_cadena(const char *mensaje, char *cadena, int n);
 static int solicita_contrasena(Jugadores* jugador);
-static void registra_usuario(Jugadores **jugadores, int *número_jugadores);
-static int nuevo_usuario(Jugadores **jugadores, int *número_jugadores);
+static void registra_usuario(Jugadores **jugadores, int *numero_jugadores);
+static int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores);
 static void nueva_partida(Jugadores *jugador, Partida *partida);
 
 
@@ -92,11 +92,11 @@ int login(Jugadores **jugadores, int *numero_jugadores)
 {
     Jugadores *jugador;
     char usuario[sizeof (*jugadores)->jugador];
-    int sesión_iniciada = 0;
+    int sesion_iniciada = 0;
 
 
     // El proceso de login finaliza cuando se consigue iniciar sesión.
-    while (!sesión_iniciada) {
+    while (!sesion_iniciada) {
         // Solicitamos las credenciales.
         lee_cadena("Usuario: ", usuario, sizeof usuario);
         // Buscamos un jugador que se corresponda con ese usuario.
@@ -104,7 +104,7 @@ int login(Jugadores **jugadores, int *numero_jugadores)
         // Comprobamos si el uauario existe.    
         if (jugador) {    // O, equivalentemente, jugador != NULL.
             // El usuario existe, solicitamos ls contraseña.
-            sesión_iniciada = solicita_contrasena(jugador);
+            sesion_iniciada = solicita_contrasena(jugador);
         } else {
             // El usuario no existe, informamos y damos la opción de registrarse como nuevo usuario.
             registra_usuario(jugadores, numero_jugadores);
@@ -198,7 +198,7 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
         if (strlen(linea) < n)
             longitud_correcta = 1;
         else
-            printf("No introduzca un número de caracteres superior a %d.\n\n", n - 1);
+            printf("No introduzca un numero de caracteres superior a %d.\n\n", n - 1);
     }
     // Copia la línea resultante en la cadena.
     strcpy(cadena, linea);
@@ -281,18 +281,18 @@ void registra_usuario(Jugadores **jugadores, int *numero_jugadores)
 // - 1  Indica que el usuario se ha registrado con éxito.
 
 
-int nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
+int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores)
 {
     Jugadores nuevo_jugador;
 
 
     // El id del nuevo jugador se obtiene incrementando el número de jugadores.
-    nuevo_jugador.id_jugador = *número_jugadores + 1;
+    nuevo_jugador.id_jugador = *numero_jugadores + 1;
     // Obtenemos el nombre, el usuario y la contraseña del nuevo jugador.
     lee_cadena("Nombre: ", nuevo_jugador.nombre_jugador, sizeof nuevo_jugador.nombre_jugador);
     lee_cadena("Usuario: ", nuevo_jugador.jugador, sizeof nuevo_jugador.jugador);
     // Buscamos si ese jugador ya está registrado (solo se comprueba el usuario, puede haber personas con el mismo nombre).
-    if (busca_usuario(nuevo_jugador.jugador, *jugadores, *número_jugadores)) {
+    if (busca_usuario(nuevo_jugador.jugador, *jugadores, *numero_jugadores)) {
        return 0;
     } else {
         lee_cadena("Contraseña: ", nuevo_jugador.contrasena, sizeof nuevo_jugador.contrasena);
@@ -300,13 +300,13 @@ int nuevo_usuario(Jugadores **jugadores, int *número_jugadores)
         nuevo_jugador.objetos = NULL;
         nuevo_jugador.num_objetos = 0;
         // Añadimos el nuevo jugador.
-        ++*número_jugadores;
-        *jugadores = realloc(*jugadores, sizeof(Jugadores) * *número_jugadores);  // Reservamos espacio para una estructura extra.
-        (*jugadores)[*número_jugadores - 1] = nuevo_jugador;                    // Copiamos la estructura a la última posición.
+        ++*numero_jugadores;
+        *jugadores = realloc(*jugadores, sizeof(Jugadores) * *numero_jugadores);  // Reservamos espacio para una estructura extra.
+        (*jugadores)[*numero_jugadores - 1] = nuevo_jugador;                    // Copiamos la estructura a la última posición.
 
 
         // PARA DEPURACIÓN. ELIMINAR ANTES DE ENTREGAR.
-        muestra_usuarios(*jugadores, *número_jugadores);
+        muestra_usuarios(*jugadores, *numero_jugadores);
 
 
         return 1;
