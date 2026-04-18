@@ -35,10 +35,9 @@ static void lee_cadena(const char *mensaje, char *cadena, int n);
 static int solicita_contrasena(Jugadores* jugador);
 static void registra_usuario(Jugadores **jugadores, int *numero_jugadores);
 static int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores);
-static void nueva_partida(Jugadores *jugador, Partida *partida);
+// static void nueva_partida(Jugadores *jugador, Partida *partida);
 
 // Para depuración...
-
 
 static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
 {
@@ -51,7 +50,6 @@ static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
 
 /*
     ENUNCIADO
-
 
     La ejecución del programa comienza con un mensaje inicial solicitando el usuario y contraseña para
     acceder a ESI-ESCAPE. Los datos introducidos se deberán contrastar con los datos previamente
