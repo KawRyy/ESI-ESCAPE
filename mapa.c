@@ -23,32 +23,40 @@ void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual){ /
 
 void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas *sal) {
     char respuesta;
-    int encontrado = 0; // Bandera para saber si hay alguna conexión válida
+    int encontrado = 0;
 
     for (int i = 0; i < num_conexiones; i++) {
-        // Comprobamos si la conexión sale de nuestra sala y está abierta
-        if (con[i].id_sala_orig == *id_sala_actual && con[i].estado_conexion == 1) {
+        // 1. Comprobamos si la sala actual es parte de esta conexión (ya sea origen o destino)
+        if (con[i].estado_conexion == 1 && 
+           (con[i].id_sala_orig == *id_sala_actual || con[i].id_sala_dest == *id_sala_actual)) {
+            
             encontrado = 1;
-            int destino = con[i].id_sala_dest;
+
+            // 2. Lógica de intercambio: Si mi sala es el origen, voy al destino. 
+            // Si mi sala es el destino, voy al origen.
+            int destino;
+            if (*id_sala_actual == con[i].id_sala_orig) {
+                destino = con[i].id_sala_dest;
+            } else {
+                destino = con[i].id_sala_orig;
+            }
 
             printf("\n>>> ¿Quieres entrar a: %s? (S/N)\n", sal[destino].nombre_sala);
             printf("---- DESCRIPCION ----\n%s\n", sal[destino].descripcion_sala);
 
-            // Lectura segura de un solo carácter
             if (scanf(" %c", &respuesta) != 1) {
-                printf("Error en la lectura.\n");
                 while (getchar() != '\n'); 
             }
 
-            // Comprobación de respuesta (S o N)
             if (respuesta == 'S' || respuesta == 's') {
                 *id_sala_actual = destino; 
                 printf("Te has movido a la sala: %s\n", sal[destino].nombre_sala);
+                return; // IMPORTANTE: Salir de la función al moverte para no procesar más conexiones en el mismo turno
             } else if (respuesta == 'N' || respuesta == 'n') {
                 printf("Decides no entrar.\n");
             } else {
-                printf("Respuesta no valida (usa S o N).\n");
-                i--; // Opcional: repetir la pregunta para esta misma conexión
+                printf("Respuesta no valida.\n");
+                i--; 
             }
         }
     }

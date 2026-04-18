@@ -32,10 +32,10 @@ void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **
 
         switch(control){
         case 1:
-            if (login(jug, num_jugadores) != NULL) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
+            if (login(jug, num_jugadores) > -1) { // Llama a la función de login y verifica si el inicio de sesión fue exitoso
                 printf("Inicio de sesion exitoso... \n");
                 Sleep(1500); // Espera 1.5 segundos
-                menu_principal(sal, num_salas, &id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, num_jugadores); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
+                menu_principal(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, *num_jugadores); // Llama a la función para mostrar el menú principal y gestionar las opciones del juego
             }                                                                                                                                // El num_jugadores no se vuelve a modificar luego pasamos por valor
             else{
                 printf("Inicio de sesion fallido... \n");
@@ -83,26 +83,26 @@ static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Cone
                 Sleep(1500); // Espera 1.5 segundos
                 system("cls");
                 // (3.1) FLUJO DE DATOS: Como las estructuras base ya están inicializadas con los datos de los ficheros, se llama directamente al menú de juego pasando las estructuras base
-                menu_juego(sal, num_salas, &id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, num_jugadores); // Pasamos directamente las estrucuturas base al menu de juego
+                menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, num_jugadores); // Pasamos directamente las estrucuturas base al menu de juego
                 break;
             case 2:
                 printf("Cargando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
                 system("cls");
                 // (3.2) FLUJO DE DATOS: Se llama a la función para cargar una partida guardada, se comparan las estructuras base con la partida guardada y se actualizan las estructuras base con los datos de la partida guardada, incluyendo la sala actual del jugador
-                if(cargarPartida(jug, num_jugadores, &id_sala_actual, obj, num_objetos, con, num_conexiones, puz, num_puzles) == 0) { // Llama a la función para cargar una partida guardada y actualizar el estado del juego
+                if(cargarPartida(jug, num_jugadores, id_sala_actual, obj, num_objetos, con, num_conexiones, puz, num_puzles) == 0) { // Llama a la función para cargar una partida guardada y actualizar el estado del juego
                     printf("Error al cargar la partida.\n");
                     Sleep(1000); // Espera 1 segundo
                     system("cls");
                 } else {
-                    menu_juego(sal, num_salas, &id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, num_jugadores); // Llama al menú de juego pasando las estructuras actualizadas con los datos de la partida cargada
+                    menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, num_jugadores); // Llama al menú de juego pasando las estructuras actualizadas con los datos de la partida cargada
                 }
                 break;
             case 3:
                 printf("Gracias por jugar. Hasta luego!\n");
                 Sleep(1000); // Espera 1 segundo
                 // (3.3) FLUJO DE DATOS: Se llama a la función para reiniciar el estado de la partida actual, se liberan las estructuras dinámicas y se vuelven a inicializar con los datos de los ficheros para que el jugador pueda iniciar sesión con otro usuario o iniciar una nueva partida sin salir del programa
-                reinicio(jug, num_jugadores, &id_sala_actual, obj, con, puz); // Llama a la función para reiniciar el estado de la partida actual y limpiar los datos cargados (Por si el jugador quiere volver a iniciar sesión o iniciar una nueva partida sin salir del programa)
+                reinicio(jug, num_jugadores, id_sala_actual, obj, con, puz); // Llama a la función para reiniciar el estado de la partida actual y limpiar los datos cargados (Por si el jugador quiere volver a iniciar sesión o iniciar una nueva partida sin salir del programa)
                 salir = 1; // Establece la variable salir a 1 para salir del menú principal
                 break;
             default:
@@ -196,7 +196,7 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
             case 10:
                 printf("Guardando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
-                guardarPartida(jug, num_jugadores, *id_sala_actual, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
+                guardarPartida(jug, num_jugadores, id_sala_actual, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
                 break;
             case 11:
                 printf("Saliendo al menu principal...\n");

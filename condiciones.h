@@ -6,14 +6,8 @@
 
 #include "mapa.h" // Se incluyen las estructuras de mapa para el .c, se refleja aqui por legibilidad
 #include "usuarios.h" // Se incluyen las estructuras de usuarios para el .c, se refleja aqui por legibilidad
+#include "temp.h"
 
-typedef struct {
-    char id_objeto[5];
-    char nombre_objeto[16];
-    char descripcion_objeto[51];
-    /* SE MODIFICA DURANTE LA PARTIDA */
-    int localizacion_objeto; // 0: INVENTARIO ; ID: SALA (se indica el id_sala)
-} Objetos;
 
 typedef struct {
     char id_puzle[5];
