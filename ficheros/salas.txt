@@ -6,7 +6,7 @@
 01-Biblioteca-INICIAL-Lugar donde inicia el jugador, bastante grande con 2 salidas: al laboratorio y al aula de teoria
 02-Aula_de_Teoria-NORMAL-Sala grande situada al lado de la biblioteca, conecta con la sala de seminario
 03-Aula_de_Seminario-NORMAL-Pequeña sala que conecta con el aula de teoria
-04-Laboratorio-NORMAL-Pequeña sala que se encuentra cerca de la bibliotecay conecta con el pasillo principal
+04-Laboratorio-NORMAL-Pequeña sala que se encuentra cerca de la biblioteca y conecta con el pasillo principal
 05-Pasillo_Principal-NORMAL-Gran sala la cual tiene conexiones con laboratorio, vestibulo, cafeteria y secretaria
 06-Cafeteria-NORMAL-Sala situada despues del pasillo principal
 07-Secretaria-NORMAL-Sala situada despues del pasillo principal y que conecta con el taller

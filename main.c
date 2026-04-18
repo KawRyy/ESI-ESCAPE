@@ -1,34 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ficheros.h"   
-#include "menus.h"       
-#include "mapa.h"        
-#include "condiciones.h" 
-#include "usuarios.h"  
+#include "ficheros.h"
+#include "menus.h"
 
-int main() {
-    /* Se vuelcan al inicio del juego y son invariantes */
-    Objetos *obj = NULL; // Puntero para almacenar la lista de objetos del juego
-    int num_obj = 0;
-    Salas *sal = NULL; // Puntero para almacenar la lista de salas del juego
-    int num_sal = 0;
-    Conexiones *con = NULL; // Puntero para almacenar la lista de conexiones del juego
-    int num_con = 0;
-    Puzles *puz = NULL; // Puntero para almacenar la lista de puzles del juego
-    int num_puz = 0;
+int main(){
+    // DECLARACION DE ESTRUCTURAS QUE SE MODIFICARAN DURANTE LA PARTIDA
+    Objetos *obj = NULL;
+    int num_objetos = 0; // Necesario para el vector dinámico de objetos, dependiendo del numero de objetos en el fichero, se actualiza en el volcado
+    Puzles *puz = NULL;
+    int num_puzles = 0; // IDEM
+    Conexiones *con = NULL;
+    int num_conexiones = 0; // IDEM
+
+    // DECLARACION DE LA ESTRUCTURA DE USUARIOS, SE INICIALIZA EN EL VOLCADO CON LOS JUGADORES EXISTENTES, SE MODIFICA EN EL LOGIN AÑADIENDO UN NUEVO USUARIO (SI PROCEDE)
+    Jugadores *jug = NULL;
+    int num_jugadores = 0; // Necesario para el vector dinámico de jugadores, se actualiza en el login
+
+    // DECLARACION DE LA ESTRUCTURA SALAS, NO SE MODIFICA
+    Salas *sal = NULL;
+    int num_salas = 0; // IDEM
+    int id_sala_actual = 0; // Variable para almacenar el ID de la sala actual del jugador, la sala inicial es 0
+
+    // (1) FLUJO DE DATOS: Se vuelcan los datos de los ficheros a las estructuras dinámicas que se modificaran en partida
+    volcado(&sal, &num_salas, &con, &num_conexiones, &puz, &num_puzles, &obj, &num_objetos, &jug, &num_jugadores);
+
+    // (2) FLUJO DE DATOS: Se pasan las direcciones de las estructuras de datos inicializadas al modulo de flujo de datos
+    menu_inicial(&sal, num_salas, &id_sala_actual, &con, num_conexiones, &puz, num_puzles, &obj, num_objetos, &jug, &num_jugadores);
+    // Pasamos por valor el numero de estructuras pues no se volverán a modificar durante la partida
     
-    /* Se vuelcan al cargar partida y contienen la informacion del jugador y de las variaciones de las otras estructuras */
-    Jugadores *jug = NULL; // Puntero para almacenar la lista de jugadores del juego
-    Partida *par = NULL; // Puntero para almacenar la partida del jugador
-    int num_jugadores = 0; // Variable para almacenar el número de jugadores cargados desde el archivo
-
-    int succes = volcado(&sal, &num_sal, &con, &num_con, &puz, &num_puz, &obj, &num_obj, &jug, &num_jugadores); // Variable para controlar si se han cargado correctamente los datos del juego
-    if (succes == 0) { // Si hubo un error al cargar los datos, se muestra un mensaje de error y se termina el programa
-        printf("Error al cargar los datos del juego desde los archivos\n");
-        return 1;
-    }
-
-    menu_inicial(&par, &jug, &obj, &sal, &con, &puz, &num_jugadores); // Llama a la función para mostrar el menú inicial e iniciar la ejecución del juego
-
-    return 0; // Termina el programa con éxito
+    return 0;
 }
