@@ -20,10 +20,10 @@ typedef struct {
 } Puzles;
 
 void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual);  
-void Inventario(Objetos *obj, Jugadores *jug, int num_objetos);
-void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual);
-void SoltarObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual);
-void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *con, int id_sala_actual);
-void ResolverPuzle(Jugadores *jug, int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual);
+void Inventario(Objetos *obj, Jugadores *jug, int num_objetos, int n);
+void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual, int n);
+void SoltarObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual, int n);
+void UsarObjeto(Objetos *obj, Jugadores *jug, int num_conexiones, Conexiones *con, int id_sala_actual, int n);
+void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual);
 
 #endif /* CONDICIONES_H */
