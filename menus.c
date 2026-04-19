@@ -80,7 +80,12 @@ static void menu_principal(Salas **sal, int *num_salas, int *id_sala_actual, Con
         printf("        Menu Principal\n");
         printf("=================================\n");
         printf("1. Nueva Partida\n");
-        printf("2. Cargar Partida\n");
+        int hay_partida = existePartida((*jug)[indice_jugador].id_jugador);
+        if (hay_partida) {
+            printf("2. Cargar Partida\n");
+        } else {
+            printf("2. [No disponible] Cargar Partida\n");
+        }
         printf("3. Salir al inicio de sesion\n");
         printf("Seleccione una opcion: ");
         if(scanf("%d", &control) != 1){ // Scanf devuelve el numero de exitos de lectura
@@ -100,6 +105,11 @@ static void menu_principal(Salas **sal, int *num_salas, int *id_sala_actual, Con
                 menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador, inv); // Pasamos directamente las estructuras base al menu de juego
                 break;
             case 2:
+                if (!existePartida((*jug)[indice_jugador].id_jugador)) {
+                    printf("No tienes ninguna partida guardada. Inicia una 'Nueva Partida' primero.\n");
+                    Sleep(2000);
+                    break;
+                }
                 printf("Cargando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
                 system("cls");

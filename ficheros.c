@@ -1,4 +1,5 @@
 #include "ficheros.h"
+// Módulo de ficheros
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -548,4 +549,28 @@ void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, In
     *lista_puzles = NULL;
   }
   *num_puzles = leer_puzles(lista_puzles);
+}
+
+//Precondicion: recibe el ID del jugador
+//Postcondicion: devuelve 1 si el jugador tiene una partida guardada en partida.txt, 0 en caso contrario
+int existePartida(int id_jugador) {
+    FILE *f = fopen("partida.txt", "r");
+    if (!f) return 0;
+
+    char line[512]; // Linea que se lee del fichero
+    char busqueda1[64]; // Busqueda para el ID del jugador
+    sprintf(busqueda1, "JUGADOR: %d", id_jugador);
+    char busqueda2[64]; // Busqueda para el ID del jugador con ceros a la izquierda
+    sprintf(busqueda2, "JUGADOR: %02d", id_jugador);
+
+    while (fgets(line, sizeof(line), f)) {
+        line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
+        if (strcmp(line, busqueda1) == 0 || strcmp(line, busqueda2) == 0) { // Compara la linea con las busquedas
+            fclose(f); // Cierra el fichero
+            return 1; // Devuelve 1 si encuentra la partida
+        }
+    }
+
+    fclose(f);
+    return 0;
 }
