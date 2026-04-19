@@ -151,7 +151,6 @@ static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexio
             printf("Opcion no valida. Por favor, seleccione una opcion del menu.\n");
             while(getchar() != '\n'); // Limpia el buffer de entrada
             Sleep(1000); // Espera 1 segundo
-            system("cls");
         }
         while(getchar() != '\n'); // Limpia el buffer de entrada siempre
 
@@ -165,14 +164,14 @@ static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexio
                 system("cls");
                 printf("===== OBJETOS EN LA SALA ===== \n");
                 ExaminarObjeto(*obj, *num_objetos, *id_sala_actual); // Llama a la función para examinar los objetos presentes en la sala actual
-                Sleep(1500); // Espera 1.5 segundos
+                Sleep(3000); // Espera 3 segundos
                 system("cls");
                 break;
             case 3:
                 system("cls");
                 printf("===== SALIDAS ===== \n");
                 ExaminarSalidas(*con, *num_conexiones, *id_sala_actual, *sal); // Llama a la función para examinar las salidas disponibles desde la sala actual
-                Sleep(1500); // Espera 1.5 segundos
+                Sleep(3000); // Espera 3 segundos
                 system("cls");
                 break;
             case 4:
@@ -200,14 +199,14 @@ static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexio
                 system("cls");
                 printf("===== INVENTARIO ===== \n");
                 MostrarInventario(*obj, inv, *num_objetos); // Llama a la función para mostrar el inventario del jugador
-                Sleep(1500); // Espera 1.5 segundos
+                Sleep(2500); // Espera 2.5 segundos
                 system("cls");
                 break;
             case 8:
                 system("cls");
                 printf("===== USAR OBJETO ===== \n");
                 UsarObjeto(*obj, inv, *num_conexiones, *con, *id_sala_actual); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
-                Sleep(1500); // Espera 1.5 segundos
+                Sleep(2500); // Espera 2.5 segundos
                 system("cls");
                 break;
             case 9:
