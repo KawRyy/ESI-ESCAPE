@@ -157,7 +157,9 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
 
         switch(control){
             case 1:
-            DescribirSala(*sal, *id_sala_actual); // Llama a la función para describir la sala actual del jugador
+                DescribirSala(*sal, *id_sala_actual); // Llama a la función para describir la sala actual del jugador
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 2:
                 system("cls");
