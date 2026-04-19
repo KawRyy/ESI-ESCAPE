@@ -45,7 +45,7 @@ void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **
                 if (indice_jugador >= 0) {
                     printf("Inicio de sesion exitoso... \n");
                     Sleep(1500); // Espera 1.5 segundos
-                    menu_principal(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador, &inv);
+                    menu_principal(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador, inv);
                 } else {
                     printf("Error interno: jugador no encontrado.\n");
                     Sleep(1000);

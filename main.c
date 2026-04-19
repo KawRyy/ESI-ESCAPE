@@ -11,7 +11,7 @@ int main(){
     int num_puzles = 0; // IDEM
     Conexiones *con = NULL;
     int num_conexiones = 0; // IDEM
-    Inventario *inv = NULL;
+    Inventario inv = {NULL, 0};
 
     // DECLARACION DE LA ESTRUCTURA DE USUARIOS, SE INICIALIZA EN EL VOLCADO CON LOS JUGADORES EXISTENTES, SE MODIFICA EN EL LOGIN AÑADIENDO UN NUEVO USUARIO (SI PROCEDE)
     Jugadores *jug = NULL;
@@ -26,7 +26,7 @@ int main(){
     volcado(&sal, &num_salas, &con, &num_conexiones, &puz, &num_puzles, &obj, &num_objetos, &jug, &num_jugadores);
 
     // (2) FLUJO DE DATOS: Se pasan las direcciones de las estructuras de datos inicializadas al modulo de flujo de datos
-    menu_inicial(&sal, num_salas, &id_sala_actual, &con, num_conexiones, &puz, num_puzles, &obj, num_objetos, &jug, &num_jugadores);
+    menu_inicial(&sal, num_salas, &id_sala_actual, &con, num_conexiones, &puz, num_puzles, &obj, num_objetos, &jug, &num_jugadores, &inv);
     // Pasamos por valor el numero de estructuras pues no se volverán a modificar durante la partida
     
     return 0;
