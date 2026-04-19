@@ -6,22 +6,48 @@
 
 //Modulo que se encarga de gestionar las acciones relacionadas con el mapa, como examinar las salidas de la sala actual o moverse a otra sala, gestionando las salas y las conexiones
 
-void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual){ // Función para examinar las salidas disponibles desde la sala actual del jugador
-//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de examinar salidas en el menú de acciones del jugador
-//Postcondición: Se muestra la descripción de las conexiones que parten de la sala actual, indicando si están abiertas o bloqueadas.
+void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual, Salas *sal) { 
+    // Función para examinar las salidas disponibles desde la sala actual del jugador
+    // Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de examinar salidas en el menú de acciones del jugador
+    // Postcondición: Se muestra la descripción de las conexiones que parten de la sala actual, indicando si están abiertas o bloqueadas.
 
-    for(int i = 0; i < num_conexiones; i++){
-        if(con[i].id_sala_orig == id_sala_actual){ // Si la conexión es desde la sala actual 
-            if(con[i].estado_conexion == 1){ // Si la conexión está abierta
-                printf("Hacia sala %d (abierta)\n", con[i].id_sala_dest);
-            } else { // Si la conexión está bloqueada
-                printf("Hacia sala %d (bloqueada)\n", con[i].id_sala_dest);
+    int salidas_encontradas = 0; 
+
+    for(int i = 0; i < num_conexiones; i++) {
+        // Comprobamos si la sala actual está en cualquiera de los extremos de la conexión
+        if(con[i].id_sala_orig == id_sala_actual || con[i].id_sala_dest == id_sala_actual) { 
+            
+            salidas_encontradas = 1;
+
+            // Determinamos cuál es la sala objetivo a la que mira esta conexión
+            int sala_conectada;
+            if(con[i].id_sala_orig == id_sala_actual) {
+                sala_conectada = con[i].id_sala_dest; 
+            } else {
+                sala_conectada = con[i].id_sala_orig; 
+            }
+
+            // Imprimimos el estado hacia la sala conectada, incluyendo su nombre
+            // Usamos %s para imprimir sal[sala_conectada].nombre_sala
+            if(con[i].estado_conexion == 1) { 
+                printf("Hacia sala %d - %s (abierta)\n", sala_conectada, sal[sala_conectada].nombre_sala);
+            } else { 
+                printf("Hacia sala %d - %s (bloqueada)\n", sala_conectada, sal[sala_conectada].nombre_sala);
             }
         }
     }  
+
+    // Si el bucle termina y no encontró ninguna conexión asociada a la sala actual
+    if (salidas_encontradas == 0) {
+        printf("No parece haber ninguna salida desde esta sala.\n");
+    }
 }
 
 void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas *sal) {
+    // Función para moverse a otra sala desde la sala actual del jugador
+    // Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de entrar a otra sala en el menú de acciones del jugador
+    // Postcondición: Se pregunta al jugador por cada conexión que parte de la sala actual si desea entrar a la sala conectada. Si el jugador decide entrar a una sala conectada, se cambia la sala actual a esa sala y se muestra un mensaje indicando el cambio de sala. Si el jugador decide no entrar a ninguna de las salas conectadas no se modifica su posicion.
+   
     char respuesta;
     int encontrado = 0;
 
