@@ -1,9 +1,7 @@
 /*
-    Alejandro Palomo Medina 
-
     Módulo: Usuarios (usuarios.h/usuarios.c)
 
-    Prrograma de prueba para el módulo.Gestión de usuarios del juego.
+    Programa de prueba para el módulo.Gestión de usuarios del juego.
 
     Dependencias:
 

@@ -1,14 +1,9 @@
 /*
-    Alejandro Palomo Medina
-   
     Módulo: Usuarios (usuarios.c)
-
 
     Gestión de usuarios del juego.
 
-
     Dependencias:
-
 
     - "usuarios.h"
     - Varias cabeceras de la biblioteca de C
@@ -47,19 +42,26 @@ static int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores);
 */
 
 /*
-    El enunciado dice que se emplee memoria dinámica, se entiende que cuando sea necesario, es
-    decir, cuando no se conozca de antemano el número de objetos necesarios. Si el tamaño es fijo y
-    conocido, no tiene sentido (no vamos a poner las variables locales en memoria dinámica).
+  Login. Incluye la posibilidad de registrar nuevos usuarios.
 
-    Para poder añadir un nuevo jugador, necesitamos modificar el vector de jugadores y el número de
-    jugadores, pasándolos por referencia, es decir, con punteros.
+  Para poder añadir un nuevo jugador si se opta por registrar un nuevo usuario, necesitamos
+  modificar el vector de jugadores y el número de jugadores, pasándolos por referencia, es
+  decir, con punteros.
 
-    Devuelve el id del jugador que inicia sesión.
+  - jugadores           (E/S)   Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
+  - numero_jugadores    (E)     Puntero al número de jugadores.
 
-    Parámetros:
+  Devuelve el id del usuario que inicia la sesión.
 
-    jugadores           (E/S)   Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
-    número_jugadores    (E)     Puntero al número de jugadores.
+  Precondición:
+
+    *jugadores apunta a un vector reservado con memoria dinámica o es NULL (si no hay jugadores)
+    *numero_jugadores > 0 y contiene el número de jugadores que contiene el vector dinámico
+
+  Postcondición:
+
+    Modifica *jugadores y *numero_jugadores si se registran nuevos usuarios
+    Devuelve el id del jugador que inicia sesión    
 */
 
 int login(Jugadores **jugadores, int *numero_jugadores)
@@ -93,15 +95,15 @@ int login(Jugadores **jugadores, int *numero_jugadores)
 //
 // Parámetros:
 //
-// usuario          (E)      Nombre de usuario
-// jugador          (E)      Vector de jugadores (puntero a su primer elemento)
-// numero_jugadores (E)      Número de juhadores del vector
+// - usuario          (E)      Nombre de usuario
+// - jugador          (E)      Vector de jugadores (puntero a su primer elemento)
+// - numero_jugadores (E)      Número de juhadores del vector
 //
 // Valor devuelto:
 //
 // Puntero al (primer) jugador con ese nombre de usuario o NULL si no existe ninguno con ese nombre.
 
-Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_jugadores)
+Jugadores *busca_usuario(const char *usuario, Jugadores* jugador, int numero_jugadores)
 {
     int encontrado = 0;
     int k;
@@ -124,9 +126,9 @@ Jugadores *busca_usuario(const char *usuario, Jugadores jugador[], int numero_ju
 //
 // Parámetros:
 //
-// mensaje (E)      Mensaje a mostrar
-// cadena  (S)      Cadena leída
-// n       (E)      Número máximo de caracteres, incluyendo el terminador
+// - mensaje (E)      Mensaje a mostrar
+// - cadena  (S)      Cadena leída
+// - n       (E)      Número máximo de caracteres, incluyendo el terminador
 //
 // Precondición:
 //
@@ -144,7 +146,6 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
     // Booleano que indica si la longitud raal de la línea no supera a n.
     int longitud_correcta = 0;
 
-
     // Si n supera la máxima longitud de línea, la igualamos.
     if (n > MAX_LONGITUD_LINEA) {
         n = MAX_LONGITUD_LINEA;
@@ -152,7 +153,6 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
     // Repetimos mientras no tengamos una línea de la longitud correcta.
     while (!longitud_correcta) {
         char *p;
-
 
         // Muestra el mensaje.
         fputs(mensaje,stdout);
@@ -175,6 +175,10 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
 }
 
 // Solicita la contraseña de un jugador.
+//
+// Parámetros:
+//
+// - jugador          (E)      Vector de jugadores (puntero a su primer elemento)
 //
 // Precondición:
 //
@@ -209,6 +213,11 @@ int solicita_contrasena(Jugadores* jugador)
 }
 
 // Solicita si se quiere registrar a un jugador como nuevo usuario.
+//
+// Parámetros:
+//
+//  - jugadores           (E/S)   Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
+//  - numero_jugadores    (E)     Puntero al número de jugadores.
 
 void registra_usuario(Jugadores **jugadores, int *numero_jugadores)
 {
@@ -238,6 +247,12 @@ void registra_usuario(Jugadores **jugadores, int *numero_jugadores)
 
 // Registra a un jugador como nuevo usuario si no existe.
 //
+// Parámetros:
+//
+//  - jugadores           (E/S)   Puntero al vector de jugadores en memoria dinámica (puntero a puntero a Jugador).
+//  - numero_jugadores    (E)     Puntero al número de jugadores.
+//
+//
 // Valor devuelto:
 //
 // - 0  Indica que el usuario ya existe y no se ha podido registrar.
@@ -260,9 +275,10 @@ int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores)
         // Añadimos el nuevo jugador.
         ++*numero_jugadores;
         Jugadores *tmp = realloc(*jugadores, sizeof(Jugadores) * *numero_jugadores);  // Reservamos espacio para una estructura extra.
+        // Comprobamos si se ha posido reservar memoria.
         if (!tmp) {
-            --*numero_jugadores;  // revertir el incremento
-            puts("Error: No se pudo reservar memoria.\n");
+            --*numero_jugadores;  // Revertir el incremento.
+            puts("Error al asignar memoria para el nuevo jugador.\n");
             return 0;
         }
         *jugadores = tmp;
