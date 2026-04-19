@@ -3,6 +3,6 @@
 //Name: 15 digits max
 //Desc: 50 digits max
 //Place: 2 digits
-OB01-LlaveSecretaria-Llave con acceso a secretaria-02
-OB02-Ganzua-Herramienta que permite abrir la cerradura del taller-05
-OB03-Martillo-Permite romper la puerta que da al vestibulo-07
+OB01-LlaveSecretaria-Llave con acceso a secretaria-03
+OB02-Ganzua-Herramienta que permite abrir la cerradura del taller-06
+OB03-Martillo-Permite romper la puerta que da al vestibulo-08
