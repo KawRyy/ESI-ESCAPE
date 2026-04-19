@@ -14,8 +14,6 @@ typedef struct {
     char nombre_jugador[21];    // Nombre del jugador.
     char jugador[11];           // Nombre de usuario (nickname).
     char contrasena[9];         // Contraseña.
-    Objetos *objetos;           // Puntero a vector dinámico de objetos (o NULL si no hay ninguno).
-    int num_objetos;            // Número de objetos.
 } Jugadores;
 
 

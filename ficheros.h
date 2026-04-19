@@ -7,6 +7,7 @@
 #include "condiciones.h"
 #include "usuarios.h"
 #include "mapa.h"
+#include "temp.h"
 
 
 /*
