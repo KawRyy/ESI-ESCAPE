@@ -269,7 +269,7 @@ int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores)
         (*jugadores)[*numero_jugadores - 1] = nuevo_jugador;    // Copiamos la estructura a la última posición.
 
         // Guardamos el jugador en el fichero para que sea persistente.
-        FILE *f = fopen("ficheros/jugadores.txt", "a");
+        FILE *f = fopen("jugadores.txt", "a");
         if (f) {
             fprintf(f, "%02d-%s-%s-%s\n", nuevo_jugador.id_jugador, nuevo_jugador.nombre_jugador, nuevo_jugador.jugador, nuevo_jugador.contrasena);
             fclose(f);
