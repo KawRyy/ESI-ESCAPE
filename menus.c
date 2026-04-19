@@ -166,31 +166,31 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
             case 5:
                 system("cls");
                 printf("===== COGER OBJETO ===== \n");
-                CogerObjeto(*jug, *obj, num_objetos, *id_sala_actual); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
+                CogerObjeto(*inv, *obj, num_objetos, *id_sala_actual); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 6:
                 system("cls");
                 printf("===== SOLTAR OBJETO ===== \n");
-                SoltarObjeto(*jug, *obj, num_objetos, *id_sala_actual); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
+                SoltarObjeto(*inv, *obj, num_objetos, *id_sala_actual); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 7:
                 system("cls");
                 printf("===== INVENTARIO ===== \n");
-                Inventario(*obj, *jug, num_objetos); // Llama a la función para mostrar el inventario del jugador
+                Inventario(*obj, *inv, num_objetos); // Llama a la función para mostrar el inventario del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 8:
                 system("cls");
                 printf("===== USAR OBJETO ===== \n");
-                UsarObjeto(*obj, *jug, num_conexiones, *con, *id_sala_actual); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
+                UsarObjeto(*obj, *inv, num_conexiones, *con, *id_sala_actual); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 9:
                 system("cls");
                 printf("===== RESOLVER PUZLE ===== \n");
-                ResolverPuzle(*jug, num_conexiones, *puz, num_puzles, *con, *id_sala_actual); // Llama a la función para resolver un puzle presente en la sala actual del jugador
+                ResolverPuzle(num_conexiones, *puz, num_puzles, *con, *id_sala_actual); // Llama a la función para resolver un puzle presente en la sala actual del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 10:
