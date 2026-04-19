@@ -296,33 +296,52 @@ void UsarObjeto(Objetos *obj, Inventario *inv, int num_conexiones, Conexiones *c
 //Si el jugador decide usar un objeto, se comprueba si este puede ser usado en la situación actual (por ejemplo, 
 //si puede abrir una conexión o resolver un puzle) y se aplica el efecto correspondiente.
     
-    int i = 0; // Variable para recorrer la lista de objetos
-    int j = 0; // Indica si se ha encontrado algún objeto en el inventario
+  int i = 0; // Variable para recorrer la lista de objetos del inventario
+    int j = 0; // Indica si se ha encontrado algún objeto en el inventario que pueda ser usado para abrir alguna conexión, para evitar mostrar el mensaje de "No hay conexiones que puedan ser abiertas con los objetos en el inventario" varias veces si hay varios objetos
     int k = 0; // Variable para recorrer la lista de conexiones
-    int abierto = 0; // Indica si se ha abierto alguna conexión usando el objeto
-       
-            for(i = 0; i < inv->num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en el inventario
-                printf("%s   ->    ¿Deseas usar este objeto? (1: Si, 0: No)\n", inv->Inventario[i].nombre_objeto); // Muestra los objetos del inventario para preguntar si se desea usar alguno
+
+    // Comprobación previa: ¿hay algún objeto en el inventario que pueda abrir alguna conexión?
+    int comprobar = 0; // Indica si hay algún objeto en el inventario que pueda ser usado para abrir alguna conexión, para evitar preguntar por objetos que no pueden abrir nada
+    for(i = 0; i < inv->num_objetos && comprobar == 0; i++){ // Recorre la lista de objetos para encontrar los que están en el inventario
+         for(k = 0; k < num_conexiones && comprobar == 0; k++){ // Recorre la lista de conexiones para comprobar si el objeto puede ser usado en alguna de ellas
+            if(ComprobarConexion(con, k, id_sala_actual, inv->Inventario[i].id_objeto) == 1){ // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id del condicionante de la conexión
+                comprobar = 1; // Se ha encontrado al menos un objeto en el inventario que puede abrir alguna conexión
+            }
+        }
+    }
+
+    if(comprobar == 1){ // Solo entrar si hay algún objeto útil
+        for(i = 0; i < inv->num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en el inventario
+
+            // Comprobar si este objeto concreto puede abrir algo
+            int util = 0; // Indica si el objeto que se está evaluando puede abrir alguna conexión, para evitar preguntar por objetos que no pueden abrir nada
+             for(k = 0; k < num_conexiones && util == 0; k++){ // Recorre la lista de conexiones para comprobar si el objeto puede ser usado en alguna de ellas
+                if(ComprobarConexion(con, k, id_sala_actual, inv->Inventario[i].id_objeto) == 1){ // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id del condicionante de la conexión
+                    util = 1; // El objeto que se está evaluando puede abrir al menos una conexión
+                }
+            }
+    
+
+            if(util == 1){ // Solo preguntar si el objeto puede abrir algo
+                printf("%s   ->    ¿Deseas usar este objeto? (1: Si, 0: No)\n", inv->Inventario[i].nombre_objeto);
                 int respuesta;
                 scanf("%d", &respuesta);
 
-                if(respuesta == 1){
-                    for(k = 0; k < num_conexiones  && j == 0; k++){ // Recorre la lista de conexiones para comprobar si el objeto puede ser usado en alguna de ellas
-                        if(ComprobarConexion(con, k, id_sala_actual, inv->Inventario[i].id_objeto) == 1){ 
-                            // Si la conexión es desde la sala actual, tiene una condición de tipo objeto y el id del objeto coincide con el id del condicionante de la conexión
-                            printf("Has usado el objeto %s \n", inv->Inventario[i].nombre_objeto);
-                            AbrirConexion(con, k); // Cambia el estado de la conexión a abierta
-                            abierto = 1; // Indica que se ha abierto una conexión
-                            j = 1; // Indica que se ha usado un objeto y se sale del bucle de objetos para evitar mostrar el mensaje de "El objeto no se puede usar en esta situación" varias veces si hay varios objetos en el inventario
-                } 
-            }
-             if (abierto == 0){
-                printf("El objeto %s no se puede usar en esta situacion\n", inv->Inventario[i].nombre_objeto);
+                if(respuesta == 1){ // Si el jugador decide usar el objeto, se comprueba si puede abrir alguna conexión
+                    for(k = 0; k < num_conexiones && j == 0; k++){
+                            printf("Has usado el objeto %s\n", inv->Inventario[i].nombre_objeto);
+                            AbrirConexion(con, k);
+                            j = 1;
+                        
+                    }
+                } else{
+                    printf("Has elegido no usar el objeto \n");
+                }
             }
         }
-    }if (j == 0){
+    } else {
         printf("No hay conexiones que puedan ser abiertas con los objetos en el inventario\n");
-        }
+    }
 }
 
 void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual){
