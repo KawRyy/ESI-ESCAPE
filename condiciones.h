@@ -19,6 +19,11 @@ typedef struct {
     int resuelto; // 0: PENDIENTE ; 1: RESUELTO
 } Puzles;
 
+typedef struct {
+    Objetos *Inventario; // Puntero a vector dinámico de objetos (o NULL si no hay ninguno).
+    int num_objetos; // Número de objetos.
+}Inventario;
+
 void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual);  
 void Inventario(Objetos *obj, Jugadores *jug, int num_objetos, int n);
 void CogerObjeto(Jugadores *jug, Objetos *obj, int num_objetos, int id_sala_actual, int n);
