@@ -15,7 +15,7 @@ static void reemplazar(const char *orig, const char *tmp) {
 //Precondicion: recibe un puntero a un array de Salas (inicialmente NULL)
 //Postcondicion: lee el fichero de salas, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de salas leidas o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-TIPO-DESCRIPCION (ej: 01-Sala Inicial-INICIAL-Descripcion de la sala)
 static int leer_salas(Salas **salas) {
-  FILE *f = fopen("ficheros/salas.txt", "r"); //Abre el fichero de salas
+  FILE *f = fopen("salas.txt", "r"); //Abre el fichero de salas
   if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
   *salas = NULL;
@@ -53,7 +53,7 @@ static int leer_salas(Salas **salas) {
 //Precondicion: recibe un puntero a un array de Puzles (inicialmente NULL)
 //Postcondicion: lee el fichero de puzles, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de puzles leidos o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-SALA-TIPO-DESCRIPCION-SOLUCION (ej: P01-01-CODIGO-Descripcion del puzle-1234)
 static int leer_puzles(Puzles **puzles) {
-  FILE *f = fopen("ficheros/puzles.txt", "r"); //Abre el fichero de puzles
+  FILE *f = fopen("puzles.txt", "r"); //Abre el fichero de puzles
   if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
   *puzles = NULL;
@@ -99,7 +99,7 @@ static int leer_puzles(Puzles **puzles) {
 //Precondicion: recibe un puntero a un array de Conexiones (inicialmente NULL)
 //Postcondicion: lee el fichero de conexiones, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de conexiones leidas o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-SALA_ORIGEN-SALA_DESTINO-ESTADO-CONDICIONANTE (ej: C01-01-02-Activa-0)
 static int leer_conexiones(Conexiones **conexiones) {
-  FILE *f = fopen("ficheros/conexiones.txt", "r"); //Abre el fichero de conexiones
+  FILE *f = fopen("conexiones.txt", "r"); //Abre el fichero de conexiones
   if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
   *conexiones = NULL;
@@ -137,7 +137,7 @@ static int leer_conexiones(Conexiones **conexiones) {
 //Precondicion: recibe un puntero a un array de Objetos (inicialmente NULL)
 //Postcondicion: lee el fichero de objetos, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de objetos leidos o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-DESCRIPCION-UBICACION (ej: OB01-Objeto Uno-Descripcion del objeto-01)
 static int leer_objetos(Objetos **objetos) {
-  FILE *f = fopen("ficheros/objetos.txt", "r"); //Abre el fichero de objetos
+  FILE *f = fopen("objetos.txt", "r"); //Abre el fichero de objetos
   if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
   *objetos = NULL; // Inicializa el puntero a NULL para luego asignar memoria dinámicamente
@@ -175,7 +175,7 @@ static int leer_objetos(Objetos **objetos) {
 //Precondicion: recibe un puntero a un array de Jugadores (inicialmente NULL)
 //Postcondicion: lee el fichero de jugadores, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de jugadores leidos o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-NICKNAME-CONTRASENA-OBJETOS (ej: J01-Jugador Uno-jug1-pass123-OB01,OB02)
 static int leer_jugadores(Jugadores **jugadores) {
-  FILE *f = fopen("ficheros/jugadores.txt", "r"); //Abre el fichero de jugadores
+  FILE *f = fopen("jugadores.txt", "r"); //Abre el fichero de jugadores
   if (!f) return -1; // Si no se pudo abrir, devuelve -1
 
   *jugadores = NULL; // Inicializa el puntero a NULL para luego asignar memoria dinámicamente
@@ -239,7 +239,7 @@ int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual
   }
   inv->num_objetos = 0; // Inicializa el contador de objetos
 
-  FILE *archivo_jugadores = fopen("ficheros/jugadores.txt", "r"); // Abre el fichero de jugadores
+  FILE *archivo_jugadores = fopen("jugadores.txt", "r"); // Abre el fichero de jugadores
   if (archivo_jugadores) {
     char linea_jugador[512]; // Lee cada linea del fichero
     while (fgets(linea_jugador, sizeof(linea_jugador), archivo_jugadores)) {
@@ -286,7 +286,7 @@ int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual
   }
 
   // 2. Sobreescribir el resto del mundo con el progreso guardado en partida.txt:
-  if ((f = fopen("ficheros/partida.txt", "r")) == NULL)
+  if ((f = fopen("partida.txt", "r")) == NULL)
     return 1; // Si no hay archivo, devolvemos 1 (comienza limpio)
 
   int bloque_encontrado = 0;
@@ -385,9 +385,9 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
    *    En lugar de modificar en linea, se copia todo el contenido original
    * excepto las entradas del jugador en cuestion, que se reescriben al final
    * del nuevo fichero tmp. */
-  if ((fout = fopen("ficheros/partida_tmp.txt", "w")) != NULL) {
+  if ((fout = fopen("partida_tmp.txt", "w")) != NULL) {
     int skip = 0;
-    if ((fin = fopen("ficheros/partida.txt", "r")) != NULL) {
+    if ((fin = fopen("partida.txt", "r")) != NULL) {
       while (fgets(line, sizeof(line), fin)) {
         char t[512];
         strncpy(t, line, sizeof(t)); // Copia la línea a un buffer temporal para analizarla
@@ -441,7 +441,7 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
     }
 
     fclose(fout);
-    reemplazar("ficheros/partida.txt", "ficheros/partida_tmp.txt");
+    reemplazar("partida.txt", "partida_tmp.txt");
   }
 
   // Liberamos la memoria temporal puramente dinamica
@@ -477,8 +477,8 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
   /* 2. Actualizacion de jugadores.txt:
    *    Solo se modifica el campo inventario del jugador actual;
    *    el resto de campos y los demas jugadores permanecen intactos. */
-  fin = fopen("ficheros/jugadores.txt", "r");
-  fout = fopen("ficheros/jugadores_tmp.txt", "w");
+  fin = fopen("jugadores.txt", "r");
+  fout = fopen("jugadores_tmp.txt", "w");
   if (fin && fout) {
     while (fgets(line, sizeof(line), fin)) {
       if (line[0] == '/' && line[1] == '/') {
@@ -512,9 +512,9 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
   if (fout)
     fclose(fout);
   if (fin && fout)
-    reemplazar("ficheros/jugadores.txt", "ficheros/jugadores_tmp.txt");
+    reemplazar("jugadores.txt", "jugadores_tmp.txt");
   else
-    remove("ficheros/jugadores_tmp.txt");
+    remove("jugadores_tmp.txt");
 }
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los punteros a las estructuras y sus contadores.
