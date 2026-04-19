@@ -557,7 +557,7 @@ int existePartida(int id_jugador) {
     FILE *f = fopen("partida.txt", "r");
     if (!f) return 0;
 
-    char linea[512]; // Linea que se lee del fichero
+    char line[512]; // Linea que se lee del fichero
     char busqueda1[64]; // Busqueda para el ID del jugador
     sprintf(busqueda1, "JUGADOR: %d", id_jugador);
     char busqueda2[64]; // Busqueda para el ID del jugador con ceros a la izquierda
