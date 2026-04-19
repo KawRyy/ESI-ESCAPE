@@ -192,7 +192,7 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
             case 7:
                 system("cls");
                 printf("===== INVENTARIO ===== \n");
-                Inventario(*obj, *jug, num_objetos); // Llama a la función para mostrar el inventario del jugador
+                MostrarInventario(*obj, *inv, num_objetos); // Llama a la función para mostrar el inventario del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 8:

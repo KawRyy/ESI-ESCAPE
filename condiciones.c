@@ -19,7 +19,7 @@ void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual){
     }
 }
 
-void Inventario(Objetos *obj, Inventario *inv, int num_objetos){ 
+void MostrarInventario(Objetos *obj, Inventario *inv, int num_objetos){ 
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de ver el inventario en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador
     if(inv->num_objetos == 0){ // Si el jugador no tiene objetos en el inventario
@@ -116,11 +116,11 @@ void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_act
                         inv->Inventario[k] = inv->Inventario[inv->num_objetos - 1];
                     }
                     inv->num_objetos--;
-                    if(jug[n].num_objetos > 0){ // Redimensionar solo si quedan objetos, para evitar realloc a 0
-                        jug[n].objetos = realloc(jug[n].objetos, jug[n].num_objetos * sizeof(Objetos));
+                    if(inv->num_objetos > 0){ // Redimensionar solo si quedan objetos, para evitar realloc a 0
+                        inv->Inventario = realloc(inv->Inventario, inv->num_objetos * sizeof(Objetos));
                     } else {
-                        free(jug[n].objetos);
-                        jug[n].objetos = NULL;
+                        free(inv->Inventario);
+                        inv->Inventario = NULL;
                     }
                     encontrado = 1;
                 }

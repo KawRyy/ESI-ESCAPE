@@ -25,7 +25,7 @@ typedef struct {
 }Inventario;
 
 void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual);  
-void Inventario(Objetos *obj, Inventario *inv, int num_objetos);
+void MostrarInventario(Objetos *obj, Inventario *inv, int num_objetos);
 void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_actual);
 void SoltarObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_actual);
 void UsarObjeto(Objetos *obj, Inventario *inv, int num_conexiones, Conexiones *con, int id_sala_actual);
