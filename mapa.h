@@ -21,7 +21,7 @@ typedef struct {
 } Conexiones;
 
 
-void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual);
+void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual, Salas *sal);
 void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas *sal);
 void DescribirSala(Salas *sal, int id_sala_actual);
 
