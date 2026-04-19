@@ -75,8 +75,8 @@ static int leer_puzles(Puzles **puzles) {
     memset(&(*puzles)[n], 0, sizeof(Puzles)); // Limpia la nueva entrada de puzle
 
     char *id_puzle_str = strtok(line, "-"); // Separa campos por '-'
-    char *id_sala_puzle_str = strtok(NULL, "-");
-    strtok(NULL, "-"); // Salta el tipo del fichero
+    strtok(NULL, "-"); // SALTAR el nombre del puzle (campo 2)
+    char *id_sala_puzle_str = strtok(NULL, "-"); // El ID de sala es el campo 3
     char *descripcion_puzle_str = strtok(NULL, "-");
     char *solucion_puzle_str = strtok(NULL, "-");
 
@@ -260,16 +260,21 @@ int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual
             Objetos *nuevo_array = realloc(inv->Inventario, (inv->num_objetos + 1) * sizeof(Objetos)); // Reasigna memoria para el inventario
             if (nuevo_array) {
               inv->Inventario = nuevo_array; // Asigna el nuevo puntero al array de objetos
-              memset(&inv->Inventario[inv->num_objetos], 0, sizeof(Objetos)); // Inicializa el nuevo objeto
-              CPY(inv->Inventario[inv->num_objetos].id_objeto, id_obj_inv); // Copia el ID del objeto
-              // Marcar el objeto en lista_objetos como localizado en el inventario (loc = 0)
-              for (int i = 0; i < num_objetos; i++) {
+              memset(&inv->Inventario[inv->num_objetos], 0, sizeof(Objetos));
+              // Buscamos el objeto en la lista global para copiar sus datos (Nombre, Desc)
+              int encontrado = 0;
+              for (int i = 0; i < num_objetos && !encontrado; i++) {
                 if (strcmp((*lista_objetos)[i].id_objeto, id_obj_inv) == 0) {
-                  (*lista_objetos)[i].localizacion_objeto = 0; // Marca el objeto como localizado en el inventario
-                  break;
+                  inv->Inventario[inv->num_objetos] = (*lista_objetos)[i]; // Copiamos el struct completo
+                  inv->Inventario[inv->num_objetos].localizacion_objeto = 0; // Por si acaso
+                  (*lista_objetos)[i].localizacion_objeto = 0; // Marcar como en inventario en la lista global
+                  encontrado = 1;
                 }
               }
-              inv->num_objetos++; // Incrementa el numero de objetos en el inventario
+              if (!encontrado) {
+                  CPY(inv->Inventario[inv->num_objetos].id_objeto, id_obj_inv); // Fallback si no está en la base (no debería pasar)
+              }
+              inv->num_objetos++;
             }
             id_obj_inv = strtok(NULL, ",");
           }
@@ -512,9 +517,9 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
     remove("ficheros/jugadores_tmp.txt");
 }
 
-//Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
+//Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los punteros a las estructuras y sus contadores.
 //Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros.
-void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
+void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, int *num_objetos, Conexiones **lista_conexiones, int *num_conexiones, Puzles **lista_puzles, int *num_puzles) {
   // 1. Reiniciar sala actual
   *id_sala_actual = 1;
 
@@ -530,17 +535,17 @@ void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, In
     free(*lista_objetos);
     *lista_objetos = NULL;
   }
-  leer_objetos(lista_objetos);
+  *num_objetos = leer_objetos(lista_objetos);
 
   if (*lista_conexiones) {
     free(*lista_conexiones);
     *lista_conexiones = NULL;
   }
-  leer_conexiones(lista_conexiones);
+  *num_conexiones = leer_conexiones(lista_conexiones);
 
   if (*lista_puzles) {
     free(*lista_puzles);
     *lista_puzles = NULL;
   }
-  leer_puzles(lista_puzles);
+  *num_puzles = leer_puzles(lista_puzles);
 }

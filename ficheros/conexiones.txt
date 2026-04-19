@@ -4,12 +4,12 @@
 //IDdest: 2 digits
 //State: Activa, Bloqueada
 //Cond: 0, IDobj, IDpuzzle
-C01-00-03-Bloqueada-P01
-C02-00-01-Bloqueada-P02
-C03-01-02-Bloqueada-P03
-C04-03-04-Activa-0
-C05-04-05-Bloqueada-P04
-C06-04-06-Bloqueada-OB01
-C07-06-07-Bloqueada-OB02
-C08-04-08-Bloqueada-OB03
-C09-08-09-Bloqueada-P05
+C01-01-04-Bloqueada-P01
+C02-01-02-Bloqueada-P02
+C03-02-03-Bloqueada-P03
+C04-04-05-Activa-0
+C05-05-06-Bloqueada-P04
+C06-05-07-Bloqueada-OB01
+C07-07-08-Bloqueada-OB02
+C08-05-09-Bloqueada-OB03
+C09-09-10-Bloqueada-P05

@@ -20,14 +20,14 @@ int main(){
     // DECLARACION DE LA ESTRUCTURA SALAS, NO SE MODIFICA
     Salas *sal = NULL;
     int num_salas = 0; // IDEM
-    int id_sala_actual = 0; // Variable para almacenar el ID de la sala actual del jugador, la sala inicial es 0
+    int id_sala_actual = 1; // Variable para almacenar el ID de la sala actual del jugador, la sala inicial es 1
 
     // (1) FLUJO DE DATOS: Se vuelcan los datos de los ficheros a las estructuras dinámicas que se modificaran en partida
     volcado(&sal, &num_salas, &con, &num_conexiones, &puz, &num_puzles, &obj, &num_objetos, &jug, &num_jugadores);
 
     // (2) FLUJO DE DATOS: Se pasan las direcciones de las estructuras de datos inicializadas al modulo de flujo de datos
-    menu_inicial(&sal, num_salas, &id_sala_actual, &con, num_conexiones, &puz, num_puzles, &obj, num_objetos, &jug, &num_jugadores, &inv);
-    // Pasamos por valor el numero de estructuras pues no se volverán a modificar durante la partida
+    menu_inicial(&sal, &num_salas, &id_sala_actual, &con, &num_conexiones, &puz, &num_puzles, &obj, &num_objetos, &jug, &num_jugadores, &inv);
+    
     
     return 0;
 }

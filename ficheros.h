@@ -17,6 +17,6 @@ int volcado(Salas **s, int *num_s, Conexiones **c, int *num_c, Puzles **p, int *
     
 void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos *lista_objetos, Conexiones *lista_conexiones, Puzles *lista_puzles);
 int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, int num_objetos, Conexiones **lista_conexiones, int num_conexiones, Puzles **lista_puzles, int num_puzles);
-void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles);
+void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, int *num_objetos, Conexiones **lista_conexiones, int *num_conexiones, Puzles **lista_puzles, int *num_puzles);
 
 #endif /* FICHEROS_H */
