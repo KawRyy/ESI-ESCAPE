@@ -19,7 +19,7 @@ void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual){
     }
 }
 
-void Inventario(Objetos *obj, Inventario *inv, int num_objetos){ 
+void MostrarInventario(Objetos *obj, Inventario *inv, int num_objetos){ 
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de ver el inventario en el menú de acciones del jugador
 //Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador
     if(inv->num_objetos == 0){ // Si el jugador no tiene objetos en el inventario
