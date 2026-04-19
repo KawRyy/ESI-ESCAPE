@@ -21,7 +21,7 @@ void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual, Sa
 
             // Determinamos cuál es la sala objetivo a la que mira esta conexión
             int sala_conectada;
-            if(con[i].id_sala_orig == id_sala_actual) {
+            if(con[i].id_sala_orig == id_sala_actual) {   /* Si la sala origen es la sala actual la conexon es a la sala destino, en otro caso es a la sala origen*/
                 sala_conectada = con[i].id_sala_dest; 
             } else {
                 sala_conectada = con[i].id_sala_orig; 
@@ -67,8 +67,8 @@ void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas
                 destino = con[i].id_sala_orig;
             }
 
-            printf("\n>>> ¿Quieres entrar a: %s? (S/N)\n", sal[destino - 1].nombre_sala);
-            printf("---- DESCRIPCION ----\n%s\n", sal[destino - 1].descripcion_sala);
+            printf("\n>>> ¿Quieres entrar a: %s? (S/N)\n", sal[destino].nombre_sala);
+            printf("---- DESCRIPCION ----\n%s\n", sal[destino].descripcion_sala);
 
             if (scanf(" %c", &respuesta) != 1) {
                 while (getchar() != '\n'); 
@@ -76,7 +76,7 @@ void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas
 
             if (respuesta == 'S' || respuesta == 's') {
                 *id_sala_actual = destino; 
-                printf("Te has movido a la sala: %s\n", sal[destino - 1].nombre_sala);
+                printf("Te has movido a la sala: %s\n", sal[destino].nombre_sala);
                 return; // IMPORTANTE: Salir de la función al moverte para no procesar más conexiones en el mismo turno
             } else if (respuesta == 'N' || respuesta == 'n') {
                 printf("Decides no entrar.\n");
@@ -92,7 +92,6 @@ void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas
     }
 }
 
-
 void DescribirSala(Salas *sal, int id_sala_actual) {
     // Precondición: Datos cargados e id_sala_actual válido.
     // Postcondición: Muestra información y espera a que el usuario decida salir.
@@ -102,9 +101,9 @@ void DescribirSala(Salas *sal, int id_sala_actual) {
 
         system("cls"); // Limpiamos pantalla para que solo se vea la descripción
         printf("==========================================\n");
-        printf("ESTAS EN: %s\n", sal[id_sala_actual - 1].nombre_sala);
+        printf("ESTAS EN: %s\n", sal[id_sala_actual].nombre_sala);
         printf("==========================================\n");
-        printf("%s\n\n", sal[id_sala_actual - 1].descripcion_sala);
+        printf("%s\n\n", sal[id_sala_actual].descripcion_sala);
 
         printf("Pulse (1) para volver al menu de acciones: ");
     
