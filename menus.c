@@ -171,7 +171,7 @@ static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexio
             case 3:
                 system("cls");
                 printf("===== SALIDAS ===== \n");
-                ExaminarSalidas(*con, *num_conexiones, *id_sala_actual); // Llama a la función para examinar las salidas disponibles desde la sala actual
+                ExaminarSalidas(*con, *num_conexiones, *id_sala_actual, *sal); // Llama a la función para examinar las salidas disponibles desde la sala actual
                 Sleep(1500); // Espera 1.5 segundos
                 system("cls");
                 break;
