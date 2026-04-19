@@ -269,13 +269,19 @@ int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores)
        return 0;
     } else {
         lee_cadena("Contraseña: ", nuevo_jugador.contrasena, sizeof nuevo_jugador.contrasena);
-        // Inicialmente, el nuevo jugador no posee objetos.
-        nuevo_jugador.objetos = NULL;
-        nuevo_jugador.num_objetos = 0;
         // Añadimos el nuevo jugador.
         ++*numero_jugadores;
         *jugadores = realloc(*jugadores, sizeof(Jugadores) * *numero_jugadores);  // Reservamos espacio para una estructura extra.
         (*jugadores)[*numero_jugadores - 1] = nuevo_jugador;                    // Copiamos la estructura a la última posición.
+
+        // Guardamos el jugador en el fichero para que sea persistente.
+        FILE *f = fopen("ficheros/jugadores.txt", "a");
+        if (f) {
+            fprintf(f, "%02d-%s-%s-%s\n", nuevo_jugador.id_jugador, nuevo_jugador.nombre_jugador, nuevo_jugador.jugador, nuevo_jugador.contrasena);
+            fclose(f);
+        } else {
+            puts("Error: No se pudo abrir el archivo de jugadores para guardar.\n");
+        }
 
         // PARA DEPURACIÓN. ELIMINAR ANTES DE ENTREGAR.
         muestra_usuarios(*jugadores, *numero_jugadores);

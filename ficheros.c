@@ -5,27 +5,13 @@
 
 #define CPY(d, s) (strncpy((d), (s), sizeof(d) - 1), (d)[sizeof(d) - 1] = '\0')
 
+//Precondicion: Recibe dos cadenas de caracteres, una que representa el nombre de un fichero original y otra que representa el nombre de un fichero temporal
+//Postcondicion: Elimina el fichero original y renombra el fichero temporal con el nombre del fichero original
 static void reemplazar(const char *orig, const char *tmp) {
   remove(orig);
   rename(tmp, orig);
 }
-//Precondicion: recibe la ruta de un fichero de texto
-//Postcondicion: devuelve el numero de lineas validas (no vacias ni comentarios) o -1 si no se pudo abrir el fichero 
-int contar_lineas(const char *ruta) {
-  FILE *f = fopen(ruta, "r"); //Abrir fichero modo lectura
-  if (!f)
-    return -1; // Si no se pudo abrir, devuelve -1
-  char line[512]; // Buffer para leer lineas
-  int count = 0;
-  while (fgets(line, sizeof(line), f)) {
-    line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
-    if (line[0] == '/' || line[0] == '\0') // Ignora lineas vacias o comentarios
-      continue;
-    count++; // Cuenta lineas validas
-  }
-  fclose(f);
-  return count;
-}
+
 //Precondicion: recibe un puntero a un array de Salas (inicialmente NULL)
 //Postcondicion: lee el fichero de salas, asigna dinamicamente el array y lo llena con los datos. Devuelve el numero de salas leidas o -1 si hubo error al abrir el fichero. El formato del fichero debe ser: ID-NOMBRE-TIPO-DESCRIPCION (ej: 01-Sala Inicial-INICIAL-Descripcion de la sala)
 static int leer_salas(Salas **salas) {
@@ -89,8 +75,8 @@ static int leer_puzles(Puzles **puzles) {
     memset(&(*puzles)[n], 0, sizeof(Puzles)); // Limpia la nueva entrada de puzle
 
     char *id_puzle_str = strtok(line, "-"); // Separa campos por '-'
-    strtok(NULL, "-"); // Salta el tipo del fichero
     char *id_sala_puzle_str = strtok(NULL, "-");
+    strtok(NULL, "-"); // Salta el tipo del fichero
     char *descripcion_puzle_str = strtok(NULL, "-");
     char *solucion_puzle_str = strtok(NULL, "-");
 
@@ -170,6 +156,7 @@ static int leer_objetos(Objetos **objetos) {
       return -1;
     }
     *objetos = tmp; // Asigna el nuevo puntero al array de objetos
+    memset(&(*objetos)[n], 0, sizeof(Objetos));
 
     char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *desc = strtok(NULL, "-"), *loc = strtok(NULL, "-"); // Separa campos por '-'
 
@@ -529,7 +516,7 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
 //Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros.
 void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
   // 1. Reiniciar sala actual
-  *id_sala_actual = 0;
+  *id_sala_actual = 1;
 
   // 2. Limpiar inventario
   if (inv->Inventario) {

@@ -9,13 +9,6 @@
 #include "mapa.h"
 #include "temp.h"
 
-
-/*
- * contar_lineas: lee un fichero, ignorando líneas vacías y comentarios,
- * y devuelve el número de entidades reales, ideal para usar calloc/malloc.
- */
-int contar_lineas(const char *ruta);
-
 /*
  * volcado: carga todos los ficheros de datos del mundo del juego.
  * Retorna 1 si todos los ficheros se cargaron correctamente, 0 si alguno falló.

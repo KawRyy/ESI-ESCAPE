@@ -82,7 +82,7 @@ void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_act
     int j = 0; // Indica si se ha encontrado algún objeto en el inventario para soltar, para evitar mostrar el mensaje de "No tienes objetos en el inventario" varias veces si hay varios objetos
    if(inv->num_objetos == 0){
         printf("No tienes objetos en el inventario para soltar\n");
-        int j = 1; // Indica que no hay objetos en el inventario para soltar
+        j = 1; // Indica que no hay objetos en el inventario para soltar
     }
 
     for(i = 0; i < inv->num_objetos && j == 0; i++){  // Recorre la lista de objetos para encontrar los que están en el inventario
@@ -160,8 +160,9 @@ void UsarObjeto(Objetos *obj, Inventario *inv, int num_conexiones, Conexiones *c
                             j = 1; // Indica que se ha usado un objeto y se sale del bucle de objetos para evitar mostrar el mensaje de "El objeto no se puede usar en esta situación" varias veces si hay varios objetos en el inventario
                 } 
             }
-            } if (abierto == 0){
+             if (abierto == 0){
                 printf("El objeto %s no se puede usar en esta situacion\n", inv->Inventario[i].nombre_objeto);
+            }
         }
     }if (j == 0){
         printf("No hay conexiones que puedan ser abiertas con los objetos en el inventario\n");

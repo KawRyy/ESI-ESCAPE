@@ -163,63 +163,74 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
                 system("cls");
                 printf("===== OBJETOS EN LA SALA ===== \n");
                 ExaminarObjeto(*obj, num_objetos, *id_sala_actual); // Llama a la función para examinar los objetos presentes en la sala actual
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 3:
                 system("cls");
                 printf("===== SALIDAS ===== \n");
                 ExaminarSalidas(*con, num_conexiones, *id_sala_actual); // Llama a la función para examinar las salidas disponibles desde la sala actual
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 4:
                 system("cls");
                 printf("===== ENTRAR A OTRA SALA ===== \n");
                 AccionMover(*con, num_conexiones, id_sala_actual, *sal); // Llama a la función para moverse a otra sala si la salida está abierta
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 5:
                 system("cls");
                 printf("===== COGER OBJETO ===== \n");
                 CogerObjeto(inv, *obj, num_objetos, *id_sala_actual); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 6:
                 system("cls");
                 printf("===== SOLTAR OBJETO ===== \n");
                 SoltarObjeto(inv, *obj, num_objetos, *id_sala_actual); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 7:
                 system("cls");
                 printf("===== INVENTARIO ===== \n");
                 MostrarInventario(*obj, inv, num_objetos); // Llama a la función para mostrar el inventario del jugador
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 8:
                 system("cls");
                 printf("===== USAR OBJETO ===== \n");
                 UsarObjeto(*obj, inv, num_conexiones, *con, *id_sala_actual); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 9:
                 system("cls");
                 printf("===== RESOLVER PUZLE ===== \n");
                 ResolverPuzle(num_conexiones, *puz, num_puzles, *con, *id_sala_actual); // Llama a la función para resolver un puzle presente en la sala actual del jugador
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                system("cls");
                 break;
             case 10:
                 printf("Guardando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
                 guardarPartida(jug, indice_jugador, id_sala_actual, inv, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
+                system("cls");
                 break;
             case 11:
                 printf("Saliendo al menu principal...\n");
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
+                reinicio(jug, indice_jugador, id_sala_actual, inv, obj, con, puz); // Llama a la función para reiniciar el estado de la partida actual y limpiar los datos cargados (Por si el jugador quiere volver a iniciar sesión o iniciar una nueva partida sin salir del programa)
                 salir = 1; // Establece la variable salir a 1 para salir del menú de juego
+                system("cls");
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion del menu.\n");
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1500); // Espera 1.5 segundos
         }
     }while(salir == 0);
 }
