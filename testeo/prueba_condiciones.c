@@ -201,9 +201,10 @@ void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_act
 
     int i = 0; // Variable para recorrer la lista de objetos
     int j = 0; // Indica si se ha encontrado algún objeto en la sala actual para coger, para evitar mostrar el mensaje de "No hay objetos en esta sala" varias veces si hay varios objetos
-
+    int encontrado = 0; // Indica si se ha encontrado un objeto en la sala actual para coger, para evitar mostrar el mensaje de "No hay objetos en esta sala" varias veces si hay varios objetos
     for(i = 0; i < num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en la sala actual
         if(obj[i].localizacion_objeto == id_sala_actual){ // Si el objeto está en la sala actual
+            encontrado = 1; // Se ha encontrado un objeto en la sala actual
             printf("%s   ->    ¿Deseas coger este objeto? (1: Si, 0: No)\n", obj[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
@@ -221,13 +222,14 @@ void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_act
 
                 printf("Has cogido el objeto %s\n", obj[i].nombre_objeto);
                 j = 1;
-            }
-        }
-    } if (j == 0){
-        printf("No hay objetos para coger en esta sala\n");
+            } else{ // Si el jugador decide no coger el objeto, se muestra un mensaje de que ha elegido no cogerlo (solo si se ha encontrado al menos un objeto en la sala para evitar mostrar el mensaje varias veces si hay varios objetos)
+        printf("Has elegido no coger el objeto %s\n", obj[i].nombre_objeto);
+        } 
+        } 
+    }if (encontrado == 0){
+        printf("No hay objetos en esta sala para coger\n");
     }
 }
-
 
  void SoltarObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_actual){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de soltar objetos en el menú de acciones del jugador
