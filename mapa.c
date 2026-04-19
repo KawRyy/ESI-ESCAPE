@@ -6,90 +6,113 @@
 
 //Modulo que se encarga de gestionar las acciones relacionadas con el mapa, como examinar las salidas de la sala actual o moverse a otra sala, gestionando las salas y las conexiones
 
-void ExaminarSalidas(Conexiones *con, int num_conexiones, int id_sala_actual, Salas *sal) { 
+static void AccionMover(int *id_sala_actual, Salas *sal, int *salas_abiertas, int num_salas_abiertas); // Declaración de la función para moverse a otra sala si la salida está abierta, se declara aquí porque solo se utiliza dentro de este módulo
+
+void ExaminarSalidas(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas *sal) { 
     // Función para examinar las salidas disponibles desde la sala actual del jugador
     // Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de examinar salidas en el menú de acciones del jugador
     // Postcondición: Se muestra la descripción de las conexiones que parten de la sala actual, indicando si están abiertas o bloqueadas.
 
-    int salidas_encontradas = 0; 
+    int sala_conectada; // Variable para almacenar la sala conectada a la sala actual a través de una conexión
+    char respuesta; // Variable para almacenar la respuesta del jugador sobre si desea moverse a alguna de las salas conectadas a través de una conexión abierta
+    
+    int *salas_abiertas = NULL; // Array dinámico para almacenar las salas a las que se puede acceder desde la sala actual (conexiones abiertas)
+    int num_salas_abiertas = 0; // Variable para contar el número de salas abiertas encontradas
 
+    // MUESTRA LAS CONEXIONES QUE PARTEN DE LA SALA ACTUAL, INDICANDO SI ESTAN ABIERTAS O BLOQUEADAS
     for(int i = 0; i < num_conexiones; i++) {
-        // Comprobamos si la sala actual está en cualquiera de los extremos de la conexión
-        if(con[i].id_sala_orig == id_sala_actual || con[i].id_sala_dest == id_sala_actual) { 
-            
-            salidas_encontradas = 1;
+        if(con[i].id_sala_orig == *id_sala_actual || con[i].id_sala_dest == *id_sala_actual) { 
 
-            // Determinamos cuál es la sala objetivo a la que mira esta conexión
-            int sala_conectada;
-            if(con[i].id_sala_orig == id_sala_actual) {   /* Si la sala origen es la sala actual la conexon es a la sala destino, en otro caso es a la sala origen*/
-                sala_conectada = con[i].id_sala_dest; 
-            } else {
+            // Lógica de intercambio: Si mi sala es el origen, la sala conectada es el destino. Si mi sala es el destino, la sala conectada es el origen.
+            if(con[i].id_sala_orig == *id_sala_actual) {  
+                sala_conectada = con[i].id_sala_dest;
+            } 
+            else {
                 sala_conectada = con[i].id_sala_orig; 
             }
 
-            // Imprimimos el estado hacia la sala conectada, incluyendo su nombre
-            // Usamos %s para imprimir sal[sala_conectada].nombre_sala
+            //COMPROBAMOS EL ESTADO DE LA CONEXION PARA MOSTRAR SI LA SALIDA ESTA ABIERTA O BLOQUEADA, Y SI ESTA ABIERTA SE GUARDA LA SALA CONECTADA EN UN ARRAY DINAMICO PARA LUEGO MOSTRARLE AL JUGADOR LAS OPCIONES DE MOVIMIENTO
             if(con[i].estado_conexion == 1) { 
-                printf("Hacia sala %d - %s (abierta)\n", sala_conectada, sal[sala_conectada].nombre_sala);
-            } else { 
-                printf("Hacia sala %d - %s (bloqueada)\n", sala_conectada, sal[sala_conectada].nombre_sala);
+                printf("Hacia sala %d - %s (abierta)\n", sala_conectada, sal[sala_conectada-1].nombre_sala);
+                num_salas_abiertas++; // Aumentamos el contador de salas encontradas
+                // Redimensionamos el array multiplicando el número de salas por el tamaño de un int
+                salas_abiertas = realloc(salas_abiertas, num_salas_abiertas * sizeof(int));
+                
+                if(salas_abiertas == NULL) { // Comprobamos que la reasignación de memoria se ha realizado correctamente
+                    printf("Error al asignar memoria para las salas abiertas.\n");
+                    free(salas_abiertas); // Liberamos la memoria asignada antes de salir para evitar fugas de memoria
+                    return; // Salimos de la función en caso de error
+                }
+                // Guardamos el ID de la sala en la última posición disponible
+
+                salas_abiertas[num_salas_abiertas - 1] = sala_conectada; // Restamos 1 al ID de la sala para obtener el índice correcto en el array de salas
+            } 
+            else { 
+                printf("Hacia sala %d - %s (bloqueada)\n", sala_conectada, sal[sala_conectada-1].nombre_sala);
             }
         }
     }  
 
-    // Si el bucle termina y no encontró ninguna conexión asociada a la sala actual
-    if (salidas_encontradas == 0) {
+    // SI SE HAN ENCONTRADO SALIDAS DESDE LA SALA ACTUAL, SE PREGUNTA AL JUGADOR SI DESEA MOVERSE A ALGUNA DE LAS SALAS CONECTADAS A TRAVÉS DE UNA CONEXION ABIERTA
+    if (num_salas_abiertas == 0) {
         printf("No parece haber ninguna salida desde esta sala.\n");
-    }
-}
-
-void AccionMover(Conexiones *con, int num_conexiones, int *id_sala_actual, Salas *sal) {
-    // Función para moverse a otra sala desde la sala actual del jugador
-    // Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de entrar a otra sala en el menú de acciones del jugador
-    // Postcondición: Se pregunta al jugador por cada conexión que parte de la sala actual si desea entrar a la sala conectada. Si el jugador decide entrar a una sala conectada, se cambia la sala actual a esa sala y se muestra un mensaje indicando el cambio de sala. Si el jugador decide no entrar a ninguna de las salas conectadas no se modifica su posicion.
-   
-    char respuesta;
-    int encontrado = 0;
-
-    for (int i = 0; i < num_conexiones; i++) {
-        // 1. Comprobamos si la sala actual es parte de esta conexión (ya sea origen o destino)
-        if (con[i].estado_conexion == 1 && 
-           (con[i].id_sala_orig == *id_sala_actual || con[i].id_sala_dest == *id_sala_actual)) {
+    } 
+    else { // Si es 1 (es decir, encontró salidas)
+        do {
+            printf("\n>>> Deseas moverte a alguna de estas salas? (S/N): ");
             
-            encontrado = 1;
-
-            // 2. Lógica de intercambio: Si mi sala es el origen, voy al destino. 
-            // Si mi sala es el destino, voy al origen.
-            int destino;
-            if (*id_sala_actual == con[i].id_sala_orig) {
-                destino = con[i].id_sala_dest;
-            } else {
-                destino = con[i].id_sala_orig;
-            }
-
-            printf("\n>>> ¿Quieres entrar a: %s? (S/N)\n", sal[destino-1].nombre_sala);
-            printf("---- DESCRIPCION ----\n%s\n", sal[destino-1].descripcion_sala);
-
-            if (scanf(" %c", &respuesta) != 1) {
-                while (getchar() != '\n'); 
-            }
+            scanf(" %c", &respuesta);
+            while (getchar() != '\n'); // Limpiamos el buffer
 
             if (respuesta == 'S' || respuesta == 's') {
-                *id_sala_actual = destino; 
-                printf("Te has movido a la sala: %s\n", sal[destino-1].nombre_sala);
-                return; // IMPORTANTE: Salir de la función al moverte para no procesar más conexiones en el mismo turno
+                AccionMover(id_sala_actual, sal, salas_abiertas, num_salas_abiertas); // Llama a la función para moverse a otra sala si la salida está abierta, pasando el array de salas abiertas y su tamaño
             } else if (respuesta == 'N' || respuesta == 'n') {
-                printf("Decides no entrar.\n");
+                printf("Decides no moverte por ahora.\n");
             } else {
-                printf("Respuesta no valida.\n");
-                i--; 
+                printf("Respuesta no valida. Introduce S o N.\n");
+            }
+        } while (respuesta != 'S' && respuesta != 's' && respuesta != 'N' && respuesta != 'n');
+    }
+    free(salas_abiertas); // Liberamos la memoria asignada al array de salas abiertas para evitar fugas de memoria
+}
+
+
+static void AccionMover(int *id_sala_actual, Salas *sal, int *salas_abiertas, int num_salas_abiertas) {
+    // Función para moverse a otra sala si la salida está abierta
+    // Precondición: Deben haber sido cargados los datos de la partida, haber sido seleccionada la opción de entrar a otra sala en el menú de acciones del jugador, y se ha comprobado que existen conexiones abiertas desde la sala actual.
+    // Postcondición: Se cambia la sala actual del jugador a la sala seleccionada por el jugador entre las opciones de salas conectadas a través de conexiones abiertas.
+
+    int nueva_sala; // Variable para almacenar la nueva sala a la que se desea mover el jugador
+    int opcion_valida = 0; // Variable para controlar si se ha seleccionado una opción válida
+    int aux = 0; // Variabe para salir del bucle cuando la sala seleccionada sea la correcta
+
+    do {
+        printf(">>> Ingresa el numero de la sala a la que deseas moverte: (0 para cancelar): ");
+        if (scanf("%d", &nueva_sala) != 1) {
+            printf("Entrada no valida. Por favor, ingresa un numero.\n");
+            while (getchar() != '\n'); // Limpiamos el buffer
+        } 
+        else if (nueva_sala == 0) {
+            while (getchar() != '\n'); // Limpiamos el buffer de entrada para evitar problemas con entradas posteriores
+            printf("Movimiento cancelado...\n");
+            opcion_valida = 1; // Establecemos que se ha seleccionado una opción válida para salir del bucle
+        }
+        else {
+            while (getchar() != '\n'); // Limpiamos el buffer de entrada para evitar problemas con entradas posteriores
+            // Comprobamos si la nueva sala ingresada por el jugador está entre las salas abiertas disponibles
+            for (int i = 0; i < num_salas_abiertas && aux == 0; i++) {
+                if (nueva_sala == salas_abiertas[i]) {
+                    *id_sala_actual = nueva_sala; // Actualizamos la sala actual del jugador
+                    printf("Te has movido a la sala %d - %s\n", nueva_sala, sal[nueva_sala-1].nombre_sala);
+                    opcion_valida = 1; // Establecemos que se ha seleccionado una opción válida
+                    aux = 1; // Establecemos que se ha encontrado la sala seleccionada para salir del bucle
+                }
+            }
+            if (opcion_valida == 0) {
+                printf("Opcion no valida. Por favor, selecciona una de las salas abiertas listadas anteriormente.\n");
             }
         }
-    }
-
-    if (encontrado != 1) {
-        printf("No hay conexiones abiertas desde esta sala.\n");
-    }
+    } while (opcion_valida == 0);
 }
 
 void DescribirSala(Salas *sal, int id_sala_actual) {
