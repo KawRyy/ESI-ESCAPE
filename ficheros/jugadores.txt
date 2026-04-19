@@ -6,3 +6,4 @@
 //Inventory: Undefined
 01-asdasd-erchope-12345678
 123-123-123-123456
+03-jose-jose-1234
