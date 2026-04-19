@@ -35,18 +35,6 @@ static void lee_cadena(const char *mensaje, char *cadena, int n);
 static int solicita_contrasena(Jugadores* jugador);
 static void registra_usuario(Jugadores **jugadores, int *numero_jugadores);
 static int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores);
-// static void nueva_partida(Jugadores *jugador, Partida *partida);
-
-// Para depuración...
-
-static void muestra_usuarios(Jugadores *jugador, int numero_jugadores)
-{
-    putchar('\n');
-    puts(">>> DEPURACIÓN");
-    for (int k = 0; k < numero_jugadores; ++k)
-        printf("%02d-%s-%s-%s\n", jugador[k].id_jugador, jugador[k].nombre_jugador, jugador[k].jugador, jugador[k].contrasena);
-    puts("<<< DEPURACIÓN\n");
-}
 
 /*
     ENUNCIADO
@@ -167,7 +155,7 @@ void lee_cadena(const char *mensaje, char *cadena, int n)
 
 
         // Muestra el mensaje.
-        printf(mensaje);
+        fputs(mensaje,stdout);
         // Lee una línea completa de la entrada estándar.
         fgets(linea, MAX_LONGITUD_LINEA, stdin);
         // Aseguramos que exista un '\0'. Ver el manual: puede no haberlo si fgets falla...
@@ -203,10 +191,10 @@ int solicita_contrasena(Jugadores* jugador)
     int intentos = 0;
 
     while (intentos < MAX_INTENTOS && !contrasena_correcta) {
-        lee_cadena("Contraseña: ", contrasena, sizeof contrasena);
+        lee_cadena("Contrasena: ", contrasena, sizeof contrasena);
         if (strcmp(contrasena, jugador->contrasena)) {
             // Es incorrecta, informamos y seguimos intentándolo.
-            puts("Contraseña incorrecta\n");
+            puts("Contrasena incorrecta\n");
             ++intentos;
         } else {
             // Es correcta, terminamos.
@@ -268,11 +256,17 @@ int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores)
     if (busca_usuario(nuevo_jugador.jugador, *jugadores, *numero_jugadores)) {
        return 0;
     } else {
-        lee_cadena("Contraseña: ", nuevo_jugador.contrasena, sizeof nuevo_jugador.contrasena);
+        lee_cadena("Contrasena: ", nuevo_jugador.contrasena, sizeof nuevo_jugador.contrasena);
         // Añadimos el nuevo jugador.
         ++*numero_jugadores;
-        *jugadores = realloc(*jugadores, sizeof(Jugadores) * *numero_jugadores);  // Reservamos espacio para una estructura extra.
-        (*jugadores)[*numero_jugadores - 1] = nuevo_jugador;                    // Copiamos la estructura a la última posición.
+        Jugadores *tmp = realloc(*jugadores, sizeof(Jugadores) * *numero_jugadores);  // Reservamos espacio para una estructura extra.
+        if (!tmp) {
+            --*numero_jugadores;  // revertir el incremento
+            puts("Error: No se pudo reservar memoria.\n");
+            return 0;
+        }
+        *jugadores = tmp;
+        (*jugadores)[*numero_jugadores - 1] = nuevo_jugador;    // Copiamos la estructura a la última posición.
 
         // Guardamos el jugador en el fichero para que sea persistente.
         FILE *f = fopen("ficheros/jugadores.txt", "a");
@@ -283,53 +277,6 @@ int nuevo_usuario(Jugadores **jugadores, int *numero_jugadores)
             puts("Error: No se pudo abrir el archivo de jugadores para guardar.\n");
         }
 
-        // PARA DEPURACIÓN. ELIMINAR ANTES DE ENTREGAR.
-        muestra_usuarios(*jugadores, *numero_jugadores);
-
         return 1;
     }
 }
-
-/*
-partida->num_objetos = 0;
-partida->num_conexiones = 0;
-partida->num_puzles = 0;
-*/
-
-// Crea una nueva partida.
-//
-// Inicializa la estructura partida para el jugador indicado.
-//
-// jugador (E)  Jugador que ha inciado sesión
-// partida (S)  Partida nueva sin inicializar.
-
-/*
-void nueva_partida(Jugadores *jugador, Partida *partida)
-{
-    partida->id_jugador = jugador->id_jugador;
-    partida->id_sala_actual = 0;
-    partida->lista_objetos = NULL;
-    partida->num_objetos = 0;
-    partida->lista_conexiones = NULL;
-    partida->num_conexiones = 0;
-    partida->lista_puzles = NULL;
-    partida->num_puzles = 0;
-}
-
-void guardarJugador(Jugadores *jugador) {
-  FILE *f = fopen("ficheros/jugadores.txt", "a");
-  if (!f) {
-    printf("Error: No se pudo abrir el archivo jugadores.txt para guardar\n");
-    return;
-  }
-  
-  // Escribe el jugador en el formato: ID-Nombre-nickname-Contraseña 
-  fprintf(f, "%s-%s-%s-%s\n", 
-          jugador->id_jugador, 
-          jugador->nombre_jugador, 
-          jugador->nickname,
-          jugador->contrasena);
-  
-  fclose(f);
-}
-*/
