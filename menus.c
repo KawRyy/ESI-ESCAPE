@@ -7,10 +7,10 @@
 #include "condiciones.h" 
 #include "ficheros.h"
 
-static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador); // Declaración de la función para mostrar el menú principal, se define después del menú inicial para evitar problemas de orden de funciones
-static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador); // Declaración de la función para mostrar el menú de juego, se define después del menú principal para evitar problemas de orden de funciones
+static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv); // Declaración de la función para mostrar el menú principal, se define después del menú inicial para evitar problemas de orden de funciones
+static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv); // Declaración de la función para mostrar el menú de juego, se define después del menú principal para evitar problemas de orden de funciones
 
-void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int *num_jugadores){
+void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int *num_jugadores, Inventario *inv){
     int control = 0;  // Variable para controlar la opción seleccionada en el menú inicial
     int salir = 0;  // Variable para controlar cuándo salir del menú inicial
 
@@ -45,7 +45,7 @@ void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **
                 if (indice_jugador >= 0) {
                     printf("Inicio de sesion exitoso... \n");
                     Sleep(1500); // Espera 1.5 segundos
-                    menu_principal(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador);
+                    menu_principal(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador, &inv);
                 } else {
                     printf("Error interno: jugador no encontrado.\n");
                     Sleep(1000);
@@ -70,7 +70,7 @@ void menu_inicial(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **
 }
 
 
-static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador){
+static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv){
     int control = 0; // Variable para controlar la opción seleccionada en el menú principal
     int salir = 0; // Variable para controlar cuándo salir del menú principal
 
@@ -97,26 +97,26 @@ static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Cone
                 Sleep(1500); // Espera 1.5 segundos
                 system("cls");
                 // (3.1) FLUJO DE DATOS: Como las estructuras base ya están inicializadas con los datos de los ficheros, se llama directamente al menú de juego pasando las estructuras base
-                menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador); // Pasamos directamente las estructuras base al menu de juego
+                menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador, inv); // Pasamos directamente las estructuras base al menu de juego
                 break;
             case 2:
                 printf("Cargando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
                 system("cls");
                 // (3.2) FLUJO DE DATOS: Se llama a la función para cargar una partida guardada, se comparan las estructuras base con la partida guardada y se actualizan las estructuras base con los datos de la partida guardada, incluyendo la sala actual del jugador
-                if(cargarPartida(jug, indice_jugador, id_sala_actual, obj, num_objetos, con, num_conexiones, puz, num_puzles) == 0) { // Llama a la función para cargar una partida guardada y actualizar el estado del juego
+                if(cargarPartida(jug, indice_jugador, id_sala_actual, inv, obj, num_objetos, con, num_conexiones, puz, num_puzles) == 0) { // Llama a la función para cargar una partida guardada y actualizar el estado del juego
                     printf("Error al cargar la partida.\n");
                     Sleep(1000); // Espera 1 segundo
                     system("cls");
                 } else {
-                    menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador); // Llama al menú de juego pasando las estructuras actualizadas con los datos de la partida cargada
+                    menu_juego(sal, num_salas, id_sala_actual, con, num_conexiones, puz, num_puzles, obj, num_objetos, jug, indice_jugador, inv); // Llama al menú de juego pasando las estructuras actualizadas con los datos de la partida cargada
                 }
                 break;
             case 3:
                 printf("Gracias por jugar. Hasta luego!\n");
                 Sleep(1000); // Espera 1 segundo
                 // (3.3) FLUJO DE DATOS: Se llama a la función para reiniciar el estado de la partida actual, se liberan las estructuras dinámicas y se vuelven a inicializar con los datos de los ficheros para que el jugador pueda iniciar sesión con otro usuario o iniciar una nueva partida sin salir del programa
-                reinicio(jug, indice_jugador, id_sala_actual, obj, con, puz); // Llama a la función para reiniciar el estado de la partida actual y limpiar los datos cargados (Por si el jugador quiere volver a iniciar sesión o iniciar una nueva partida sin salir del programa)
+                reinicio(jug, indice_jugador, id_sala_actual, inv, obj, con, puz); // Llama a la función para reiniciar el estado de la partida actual y limpiar los datos cargados (Por si el jugador quiere volver a iniciar sesión o iniciar una nueva partida sin salir del programa)
                 salir = 1; // Establece la variable salir a 1 para salir del menú principal
                 break;
             default:
@@ -127,7 +127,7 @@ static void menu_principal(Salas **sal, int num_salas, int *id_sala_actual, Cone
 }
 
 
-static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador){
+static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexiones **con, int num_conexiones, Puzles **puz, int num_puzles, Objetos **obj, int num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv){
     int control = 0; // Variable para controlar la opción seleccionada en el menú de juego
     int salir = 0; // Variable para controlar cuándo salir del menú de juego
     do{
@@ -180,37 +180,37 @@ static void menu_juego(Salas **sal, int num_salas, int *id_sala_actual, Conexion
             case 5:
                 system("cls");
                 printf("===== COGER OBJETO ===== \n");
-                CogerObjeto(*jug, *obj, num_objetos, *id_sala_actual); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
+                CogerObjeto(inv, *obj, num_objetos, *id_sala_actual); // Llama a la función para coger un objeto de la sala actual y añadirlo al inventario del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 6:
                 system("cls");
                 printf("===== SOLTAR OBJETO ===== \n");
-                SoltarObjeto(*jug, *obj, num_objetos, *id_sala_actual); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
+                SoltarObjeto(inv, *obj, num_objetos, *id_sala_actual); // Llama a la función para soltar un objeto del inventario del jugador y dejarlo en la sala actual
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 7:
                 system("cls");
                 printf("===== INVENTARIO ===== \n");
-                MostrarInventario(*obj, *inv, num_objetos); // Llama a la función para mostrar el inventario del jugador
+                MostrarInventario(*obj, inv, num_objetos); // Llama a la función para mostrar el inventario del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 8:
                 system("cls");
                 printf("===== USAR OBJETO ===== \n");
-                UsarObjeto(*obj, *jug, num_conexiones, *con, *id_sala_actual); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
+                UsarObjeto(*obj, inv, num_conexiones, *con, *id_sala_actual); // Llama a la función para usar un objeto del inventario del jugador y aplicar su efecto en la situación actual
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 9:
                 system("cls");
                 printf("===== RESOLVER PUZLE ===== \n");
-                ResolverPuzle(*jug, num_conexiones, *puz, num_puzles, *con, *id_sala_actual); // Llama a la función para resolver un puzle presente en la sala actual del jugador
+                ResolverPuzle(num_conexiones, *puz, num_puzles, *con, *id_sala_actual); // Llama a la función para resolver un puzle presente en la sala actual del jugador
                 Sleep(1000); // Espera 1 segundo
                 break;
             case 10:
                 printf("Guardando partida...\n");
                 Sleep(1500); // Espera 1.5 segundos
-                guardarPartida(jug, indice_jugador, id_sala_actual, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
+                guardarPartida(jug, indice_jugador, id_sala_actual, inv, *obj, *con, *puz); // Llama a la función para guardar el estado actual de la partida
                 break;
             case 11:
                 printf("Saliendo al menu principal...\n");

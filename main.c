@@ -11,6 +11,7 @@ int main(){
     int num_puzles = 0; // IDEM
     Conexiones *con = NULL;
     int num_conexiones = 0; // IDEM
+    Inventario *inv = NULL;
 
     // DECLARACION DE LA ESTRUCTURA DE USUARIOS, SE INICIALIZA EN EL VOLCADO CON LOS JUGADORES EXISTENTES, SE MODIFICA EN EL LOGIN AÑADIENDO UN NUEVO USUARIO (SI PROCEDE)
     Jugadores *jug = NULL;

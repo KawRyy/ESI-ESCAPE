@@ -209,27 +209,14 @@ static int leer_jugadores(Jugadores **jugadores) {
     *jugadores = tmp_jug; // Asigna el nuevo puntero al array de jugadores
     memset(&(*jugadores)[n], 0, sizeof(Jugadores)); // Inicializa punteros a NULL y contadores a 0
 
-    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"), *inv = strtok(NULL, "-"); // Separa campos por '-'. El último campo (inventario) es opcional, por lo que puede ser NULL
+    char *id = strtok(line, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"); // Separa campos por '-'. El inventario se carga en cargarPartida, no aqui
 
     if (id && nom && nick && pw) {
       (*jugadores)[n].id_jugador = atoi(id); // Convierte el ID del jugador a entero
       CPY((*jugadores)[n].nombre_jugador, nom); // Copia el nombre del jugador
       CPY((*jugadores)[n].jugador, nick); // Copia el nickname del jugador
       CPY((*jugadores)[n].contrasena, pw); // Copia la contraseña del jugador
-
-      if (inv) {
-        char *obj_token = strtok(inv, ","); // Separa los objetos del inventario por comas. Cada token es un ID de objeto
-        while (obj_token) { 
-          Objetos *tmp_obj = realloc((*jugadores)[n].objetos, ((*jugadores)[n].num_objetos + 1) * sizeof(Objetos));// Redimensiona el array de objetos del jugador para agregar un nuevo objeto al inventario
-          if (tmp_obj) { 
-            (*jugadores)[n].objetos = tmp_obj; // Asigna el nuevo puntero al array de objetos del jugador
-            memset(&(*jugadores)[n].objetos[(*jugadores)[n].num_objetos], 0, sizeof(Objetos)); // Limpia la nueva entrada de objeto
-            CPY((*jugadores)[n].objetos[(*jugadores)[n].num_objetos].id_objeto, obj_token); // Copia el ID del objeto al inventario del jugador
-            (*jugadores)[n].num_objetos++;
-          }
-          obj_token = strtok(NULL, ","); // Corregido: antes usabas '-' aquí
-        }
-      }
+      // El inventario se carga en cargarPartida, no aqui
       n++;
     }
   }
@@ -252,59 +239,98 @@ int volcado(Salas **s, int *num_s, Conexiones **c, int *num_c, Puzles **p, int *
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
 //Postcondicion: carga el progreso del jugador desde partida.txt, actualizando la sala actual, la ubicacion de los objetos, el estado de las conexiones y el estado de los puzles. Devuelve 1 si se cargo correctamente o 0 si hubo error al abrir partida.txt (en cuyo caso se mantiene el estado base limpio)
-int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos **lista_objetos, int num_objetos, Conexiones **lista_conexiones, int num_conexiones, Puzles **lista_puzles, int num_puzles){
+int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, int num_objetos, Conexiones **lista_conexiones, int num_conexiones, Puzles **lista_puzles, int num_puzles){
   Jugadores *jug = &((*jugadores)[indice_jugador]);
   FILE *f;
   char line[512];
 
-  // 1. Aplicamos el inventario del jugador como estado inicial en las estructuras globales (localizacion = 0)
-  for (int i = 0; i < jug->num_objetos; i++) {
-    for (int j = 0; j < num_objetos; j++) {
-      if (strcmp((*lista_objetos)[j].id_objeto, jug->objetos[i].id_objeto) == 0) {
-        (*lista_objetos)[j].localizacion_objeto = 0; // Coloca el objeto en el inventario del jugador (localizacion 0)
-        break;
+  // 1. Cargar el inventario del jugador desde jugadores.txt y aplicarlo a lista_objetos
+  // Liberamos el inventario previo si lo hubiera
+  if (inv->Inventario) {
+    free(inv->Inventario); // Libera la memoria del inventario previo
+    inv->Inventario = NULL; // Inicializa el puntero a NULL
+  }
+  inv->num_objetos = 0; // Inicializa el contador de objetos
+
+  FILE *archivo_jugadores = fopen("ficheros/jugadores.txt", "r"); // Abre el fichero de jugadores
+  if (archivo_jugadores) {
+    char linea_jugador[512]; // Lee cada linea del fichero
+    while (fgets(linea_jugador, sizeof(linea_jugador), archivo_jugadores)) {
+      linea_jugador[strcspn(linea_jugador, "\r\n")] = '\0'; // Elimina saltos de linea
+      if (linea_jugador[0] == '/' || linea_jugador[0] == '\0') continue; // Salta comentarios y lineas vacias
+      char copia_linea[512];
+      strncpy(copia_linea, linea_jugador, sizeof(copia_linea) - 1); // Copia la linea a un buffer temporal
+      copia_linea[sizeof(copia_linea) - 1] = '\0'; // Asegura que el buffer este terminado en nulo
+      char *id_leido  = strtok(copia_linea, "-"); // Separa el ID del jugador
+      strtok(NULL, "-"); // nombre
+      strtok(NULL, "-"); // nick
+      strtok(NULL, "-"); // password
+      char *inv_leido = strtok(NULL, ""); // inventario (puede ser NULL si no tiene objetos)
+      if (id_leido && atoi(id_leido) == jug->id_jugador) {
+        if (inv_leido) {
+          char *id_obj_inv = strtok(inv_leido, ","); // Divide el inventario en objetos
+          while (id_obj_inv) {
+            Objetos *nuevo_array = realloc(inv->Inventario, (inv->num_objetos + 1) * sizeof(Objetos)); // Reasigna memoria para el inventario
+            if (nuevo_array) {
+              inv->Inventario = nuevo_array; // Asigna el nuevo puntero al array de objetos
+              memset(&inv->Inventario[inv->num_objetos], 0, sizeof(Objetos)); // Inicializa el nuevo objeto
+              CPY(inv->Inventario[inv->num_objetos].id_objeto, id_obj_inv); // Copia el ID del objeto
+              // Marcar el objeto en lista_objetos como localizado en el inventario (loc = 0)
+              for (int i = 0; i < num_objetos; i++) {
+                if (strcmp((*lista_objetos)[i].id_objeto, id_obj_inv) == 0) {
+                  (*lista_objetos)[i].localizacion_objeto = 0; // Marca el objeto como localizado en el inventario
+                  break;
+                }
+              }
+              inv->num_objetos++; // Incrementa el numero de objetos en el inventario
+            }
+            id_obj_inv = strtok(NULL, ",");
+          }
+        }
+        break; // jugador encontrado, no seguir leyendo
       }
     }
+    fclose(archivo_jugadores);
   }
 
   // 2. Sobreescribir el resto del mundo con el progreso guardado en partida.txt:
   if ((f = fopen("ficheros/partida.txt", "r")) == NULL)
     return 1; // Si no hay archivo, devolvemos 1 (comienza limpio)
 
-  int en_bloque = 0;
+  int bloque_encontrado = 0;
   while (fgets(line, sizeof(line), f)) {
     line[strcspn(line, "\r\n")] = '\0'; // Elimina saltos de linea
     if (line[0] == '/' || line[0] == '\0')
       continue;
 
     // Creamos una copia de la linea para tokenizarla y obtener la clave y el valor
-    char line_copy[512];
-    strncpy(line_copy, line, sizeof(line_copy) - 1); // Copia la línea a un buffer temporal para tokenizar
-    line_copy[sizeof(line_copy) - 1] = '\0'; // Asegura la terminación nula del string
+    char linea_partida[512];
+    strncpy(linea_partida, line, sizeof(linea_partida) - 1); // Copia la línea a un buffer temporal para tokenizar
+    linea_partida[sizeof(linea_partida) - 1] = '\0'; // Asegura la terminación nula del string
 
-    char *clave = strtok(line_copy, ":");
-    char *valor = strtok(NULL, "");
-    if (!clave || !valor)
+    char *tipo_dato = strtok(linea_partida, ":");
+    char *valor_dato = strtok(NULL, "");
+    if (!tipo_dato || !valor_dato)
       continue;
 
     // Eliminamos espacio inicial en el valor si lo hay
-    if (valor[0] == ' ')
-      valor++;
+    if (valor_dato[0] == ' ')
+      valor_dato++;
 
-    if (strcmp(clave, "JUGADOR") == 0) {
-      en_bloque = (atoi(valor) == jug->id_jugador); // Activa la lectura solo si es el bloque del jugador
+    if (strcmp(tipo_dato, "JUGADOR") == 0) {
+      bloque_encontrado = (atoi(valor_dato) == jug->id_jugador); // Activa la lectura solo si es el bloque del jugador
       continue;
     }
-    if (!en_bloque) // Si no estamos en el bloque del jugador, ignoramos el resto de lineas
+    if (!bloque_encontrado) // Si no estamos en el bloque del jugador, ignoramos el resto de lineas
       continue;
 
-    if (strcmp(clave, "SALA") == 0) {
-      *id_sala_actual = atoi(valor); // Actualiza la sala actual del jugador
+    if (strcmp(tipo_dato, "SALA") == 0) {
+      *id_sala_actual = atoi(valor_dato); // Actualiza la sala actual del jugador
       continue;
     }
-    if (strcmp(clave, "OBJETO") == 0) {
+    if (strcmp(tipo_dato, "OBJETO") == 0) {
       // Sobreescribe la ubicacion del objeto en las estructuras globales
-      char *id_objeto_str = strtok(valor, "-"), *loc_str = strtok(NULL, "-");
+      char *id_objeto_str = strtok(valor_dato, "-"), *loc_str = strtok(NULL, "-");
       if (id_objeto_str && loc_str) {
         int loc = atoi(loc_str); // Convierte la ubicación a entero
         for (int i = 0; i < num_objetos; i++) {
@@ -316,9 +342,9 @@ int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual
       }
       continue;
     }
-    if (strcmp(clave, "CONEXION") == 0) {
+    if (strcmp(tipo_dato, "CONEXION") == 0) {
       // Sobreescribe el estado de la conexion en las estructuras globales
-      char *id_conexion_str = strtok(valor, "-"), *estado_str = strtok(NULL, "-");
+      char *id_conexion_str = strtok(valor_dato, "-"), *estado_str = strtok(NULL, "-");
       if (id_conexion_str && estado_str) {
         for (int i = 0; i < num_conexiones; i++) {
           if (strcmp((*lista_conexiones)[i].id_conexion, id_conexion_str) == 0) {
@@ -329,9 +355,9 @@ int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual
       }
       continue;
     }
-    if (strcmp(clave, "PUZZLE") == 0) {
+    if (strcmp(tipo_dato, "PUZZLE") == 0) {
       //Sobreescribe el estado del puzle en las estructuras globales
-      char *id_puzle_str = strtok(valor, "-"), *estado_str = strtok(NULL, "-");
+      char *id_puzle_str = strtok(valor_dato, "-"), *estado_str = strtok(NULL, "-");
       if (id_puzle_str && estado_str) {
         for (int i = 0; i < num_puzles; i++) {
           if (strcmp((*lista_puzles)[i].id_puzle, id_puzle_str) == 0) {
@@ -349,19 +375,19 @@ int cargarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
 //Postcondicion: guarda el progreso del jugador en partida.txt, actualizando solo las entradas correspondientes al jugador para mantener intacto el progreso de los demas jugadores. Devuelve 1 si se guardo correctamente o 0 si hubo error al abrir partida.txt (en cuyo caso no se modifica el archivo)
-void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos *lista_objetos, Conexiones *lista_conexiones, Puzles *lista_puzles) {
+void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos *lista_objetos, Conexiones *lista_conexiones, Puzles *lista_puzles) {
   Jugadores *jug = &((*jugadores)[indice_jugador]);
   FILE *fin, *fout;
   char line[512];
 
   // Cargamos en memoria los listados limpios base directamente para extraer cuentas puras
-  Objetos *base_obj = NULL;
-  Conexiones *base_con = NULL;
-  Puzles *base_puz = NULL;
+  Objetos *objetos_archivo = NULL;
+  Conexiones *conexiones_archivo = NULL;
+  Puzles *puzles_archivo = NULL;
 
-  int num_objetos = leer_objetos(&base_obj); // Carga el listado base de objetos para comparar cambios de ubicación
-  int num_conexiones = leer_conexiones(&base_con); // Carga el listado base de conexiones para comparar cambios de estado
-  int num_puzles = leer_puzles(&base_puz); // Carga el listado base de puzles para comparar cambios de estado
+  int num_objetos = leer_objetos(&objetos_archivo); // Carga el listado base de objetos para comparar cambios de ubicación
+  int num_conexiones = leer_conexiones(&conexiones_archivo); // Carga el listado base de conexiones para comparar cambios de estado
+  int num_puzles = leer_puzles(&puzles_archivo); // Carga el listado base de puzles para comparar cambios de estado
 
   /* 1. Actualizacion de partida.txt:
    *    En lugar de modificar en linea, se copia todo el contenido original
@@ -389,8 +415,8 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
     // Guarda solo los objetos que han cambiado de ubicacion
     for (int i = 0; i < num_objetos; i++) {
       for (int j = 0; j < num_objetos; j++) {
-        if (strcmp(lista_objetos[i].id_objeto, base_obj[j].id_objeto) == 0) {
-          if (lista_objetos[i].localizacion_objeto != base_obj[j].localizacion_objeto) {
+        if (strcmp(lista_objetos[i].id_objeto, objetos_archivo[j].id_objeto) == 0) {
+          if (lista_objetos[i].localizacion_objeto != objetos_archivo[j].localizacion_objeto) {
             fprintf(fout, "OBJETO: %s-%02d\n", lista_objetos[i].id_objeto, lista_objetos[i].localizacion_objeto); // Guarda el ID del objeto y su nueva ubicación (0 = inventario, >0 = sala)
           }
           break;
@@ -401,8 +427,8 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
     // Guarda solo las conexiones cuyo estado ha cambiado
     for (int i = 0; i < num_conexiones; i++) {
       for (int j = 0; j < num_conexiones; j++) {
-        if (strcmp(lista_conexiones[i].id_conexion, base_con[j].id_conexion) == 0) {
-          if (lista_conexiones[i].estado_conexion != base_con[j].estado_conexion) {
+        if (strcmp(lista_conexiones[i].id_conexion, conexiones_archivo[j].id_conexion) == 0) {
+          if (lista_conexiones[i].estado_conexion != conexiones_archivo[j].estado_conexion) {
             fprintf(fout, "CONEXION: %s-%s\n", lista_conexiones[i].id_conexion, lista_conexiones[i].estado_conexion ? "Activa" : "Bloqueada"); // Guarda el ID de la conexión y su nuevo estado (Activa o Bloqueada)
           }
           break;
@@ -413,8 +439,8 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
     // Guarda solo los puzles cuyo estado ha cambiado
     for (int i = 0; i < num_puzles; i++) {
       for (int j = 0; j < num_puzles; j++) {
-        if (strcmp(lista_puzles[i].id_puzle, base_puz[j].id_puzle) == 0) {
-          if (lista_puzles[i].resuelto != base_puz[j].resuelto) {
+        if (strcmp(lista_puzles[i].id_puzle, puzles_archivo[j].id_puzle) == 0) {
+          if (lista_puzles[i].resuelto != puzles_archivo[j].resuelto) {
             fprintf(fout, "PUZZLE: %s-%s\n", lista_puzles[i].id_puzle, lista_puzles[i].resuelto ? "Resuelto" : "Pendiente"); // Guarda el ID del puzle y su nuevo estado (Resuelto o Pendiente)
           }
           break;
@@ -427,33 +453,32 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
   }
 
   // Liberamos la memoria temporal puramente dinamica
-  if (base_obj)
-    free(base_obj);
-  if (base_con)
-    free(base_con);
-  if (base_puz)
-    free(base_puz);
+  if (objetos_archivo)
+    free(objetos_archivo);
+  if (conexiones_archivo)
+    free(conexiones_archivo);
+  if (puzles_archivo)
+    free(puzles_archivo);
 
-  /* Sincronizar memoria en caliente de Jugadores (inventario)
-   * Asegura que el estado coincida si el usuario hace recargas en caliente */
-  if (jug->objetos) {
-    free(jug->objetos);
-    jug->objetos = NULL;
+  /* Sincronizar inv (inventario externo) con el estado actual: objetos en localizacion 0 */
+  if (inv->Inventario) {
+    free(inv->Inventario);
+    inv->Inventario = NULL;
   }
-  jug->num_objetos = 0;
+  inv->num_objetos = 0;
   for (int i = 0; i < num_objetos; i++) {
     if (lista_objetos[i].localizacion_objeto == 0) {
-      Objetos *tmp = realloc(jug->objetos, (jug->num_objetos + 1) * sizeof(Objetos)); // Redimensiona el array de objetos del jugador para agregar un nuevo objeto
-      if (!tmp) {
-        free(jug->objetos); // Si no se pudo asignar memoria, libera el array actual y deja el inventario vacío
-        jug->objetos = NULL;
-        jug->num_objetos = 0;
+      Objetos *nuevo_array_inventario = realloc(inv->Inventario, (inv->num_objetos + 1) * sizeof(Objetos)); // Reasigna memoria para el inventario
+      if (!nuevo_array_inventario) {
+        free(inv->Inventario); // Libera la memoria del inventario previo
+        inv->Inventario = NULL; // Inicializa el puntero a NULL
+        inv->num_objetos = 0; // Inicializa el contador de objetos
         break;
       }
-      jug->objetos = tmp;
-      memset(&jug->objetos[jug->num_objetos], 0, sizeof(Objetos)); // Limpia la nueva entrada de objeto
-      CPY(jug->objetos[jug->num_objetos].id_objeto, lista_objetos[i].id_objeto); // Copia el ID del objeto al inventario del jugador
-      jug->num_objetos++;
+      inv->Inventario = nuevo_array_inventario; // Asigna el nuevo puntero al array de objetos
+      memset(&inv->Inventario[inv->num_objetos], 0, sizeof(Objetos)); // Inicializa el nuevo objeto
+      CPY(inv->Inventario[inv->num_objetos].id_objeto, lista_objetos[i].id_objeto); // Copia el ID del objeto
+      inv->num_objetos++; // Incrementa el numero de objetos en el inventario
     }
   }
 
@@ -468,24 +493,23 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
         fputs(line, fout); // Copia comentarios sin modificar
         continue;
       }
-      char t[512];
-      strncpy(t, line, sizeof(t) - 1); // Copia la línea a un buffer temporal para analizarla
-      t[sizeof(t) - 1] = '\0'; // Asegura la terminación nula del string
-      t[strcspn(t, "\r\n")] = '\0'; // Elimina saltos de linea
-      char t_copy[512];
-      strncpy(t_copy, t, sizeof(t_copy) - 1); // Copia la línea a otro buffer para tokenizar sin modificar el original
-      t_copy[sizeof(t_copy) - 1] = '\0';
-      char *id = strtok(t_copy, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"); // Tokeniza la línea para extraer los campos del jugador
+      char linea_auxiliar[512];
+      strncpy(linea_auxiliar, line, sizeof(linea_auxiliar) - 1); // Copia la línea a un buffer temporal para analizarla
+      linea_auxiliar[sizeof(linea_auxiliar) - 1] = '\0'; // Asegura la terminación nula del string
+      linea_auxiliar[strcspn(linea_auxiliar, "\r\n")] = '\0'; // Elimina saltos de linea
+      char copia_linea_aux[512];
+      strncpy(copia_linea_aux, linea_auxiliar, sizeof(copia_linea_aux) - 1); // Copia la línea a otro buffer para tokenizar sin modificar el original
+      copia_linea_aux[sizeof(copia_linea_aux) - 1] = '\0';
+      char *id = strtok(copia_linea_aux, "-"), *nom = strtok(NULL, "-"), *nick = strtok(NULL, "-"), *pw = strtok(NULL, "-"); // Tokeniza la línea para extraer los campos del jugador
       if (!id || !nom || !nick || !pw || atoi(id) != jug->id_jugador) {
         fputs(line, fout); //Mantiene intacto el resto de jugadores
         continue;
       }
       // Reescribe la linea del jugador actual con el inventario actualizado
       fprintf(fout, "%s-%s-%s-%s", id, nom, nick, pw);
-      int cnt = 0;
-      for (int i = 0; i < num_objetos; i++)
-        if (lista_objetos[i].localizacion_objeto == 0)
-          fprintf(fout, "%s%s", cnt++ ? "," : "-", lista_objetos[i].id_objeto); // Agrega al inventario del jugador los objetos que están en localización 0, separados por comas
+      int items_escritos = 0;
+      for (int i = 0; i < inv->num_objetos; i++)
+        fprintf(fout, "%s%s", items_escritos++ ? "," : "-", inv->Inventario[i].id_objeto); // Guarda los objetos del inventario separados por comas
       fprintf(fout, "\n");
     }
   }
@@ -503,17 +527,16 @@ void guardarPartida(Jugadores **jugadores, int indice_jugador, int *id_sala_actu
 
 //Precondicion: recibe un puntero a un jugador, el ID de la sala actual y los arrays de objetos, conexiones y puzles con su respectivo numero de elementos
 //Postcondicion: reinicia el progreso del jugador, limpiando su inventario y recargando el estado puro del mundo desde los ficheros.
-void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
-  Jugadores *jugador = &((*jugadores)[indice_jugador]);
+void reinicio(Jugadores **jugadores, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **lista_objetos, Conexiones **lista_conexiones, Puzles **lista_puzles) {
   // 1. Reiniciar sala actual
   *id_sala_actual = 0;
 
-  // 2. Limpiar inventario del jugador
-  if (jugador->objetos) {
-    free(jugador->objetos);
-    jugador->objetos = NULL;
+  // 2. Limpiar inventario
+  if (inv->Inventario) {
+    free(inv->Inventario);
+    inv->Inventario = NULL;
   }
-  jugador->num_objetos = 0;
+  inv->num_objetos = 0;
 
   // 3. Recargar el estado puro del mundo desde los ficheros
   if (*lista_objetos) {
