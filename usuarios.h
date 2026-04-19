@@ -4,7 +4,7 @@
 // (MÓDULO DE PROCESAMIENTO)
 
 #include "condiciones.h"
-#include "temp.h"
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,6 +43,12 @@
       Modifica *jugadores y *numero_jugadores si se registran nuevos usuarios
       Devuelve el id del jugador que inicia sesión    
 */
+typedef struct {
+    int id_jugador;             // Identificador del jugador.
+    char nombre_jugador[21];    // Nombre del jugador.
+    char jugador[11];           // Nombre de usuario (nickname).
+    char contrasena[9];         // Contraseña.
+} Jugadores;
 
 int login(Jugadores **jugadores, int *numero_jugadores);
 
