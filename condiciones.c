@@ -49,7 +49,7 @@ void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_act
     for(i = 0; i < num_objetos && j == 0; i++){ // Recorre la lista de objetos para encontrar los que están en la sala actual
         if(obj[i].localizacion_objeto == id_sala_actual){ // Si el objeto está en la sala actual
             encontrado = 1; // Se ha encontrado un objeto en la sala actual
-            printf("%s   ->    ¿Deseas coger este objeto? (1: Si, 0: No)\n", obj[i].nombre_objeto);
+            printf("%s   ->    Deseas coger este objeto? (1: Si, 0: No)\n", obj[i].nombre_objeto);
             int respuesta;
             scanf("%d", &respuesta);
 
@@ -89,7 +89,7 @@ void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_act
     }
 
     for(i = 0; i < inv->num_objetos && j == 0; i++){  // Recorre la lista de objetos para encontrar los que están en el inventario
-        printf("%s   ->    ¿Deseas soltar este objeto? (1: Si, 0: No)\n", inv->Inventario[i].nombre_objeto);
+        printf("%s   ->    Deseas soltar este objeto? (1: Si, 0: No)\n", inv->Inventario[i].nombre_objeto);
         int respuesta;
         scanf("%d", &respuesta);
 
@@ -170,7 +170,7 @@ void UsarObjeto(Objetos *obj, Inventario *inv, int num_conexiones, Conexiones *c
     
 
             if(util == 1){ // Solo preguntar si el objeto puede abrir algo
-                printf("%s   ->    ¿Deseas usar este objeto? (1: Si, 0: No)\n", inv->Inventario[i].nombre_objeto);
+                printf("%s   ->    Deseas usar este objeto? (1: Si, 0: No)\n", inv->Inventario[i].nombre_objeto);
                 int respuesta;
                 scanf("%d", &respuesta);
 
@@ -204,7 +204,7 @@ void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *
         for(i = 0; i < num_puzles && j == 0; i++){ //Recorre la lista de puzles para encontrar los que están en la sala actual
             if(ComprobarConexion(con, k,id_sala_actual, puz[i].id_puzle) == 1){ // Si la conexión es desde la sala actual, tiene una condición de tipo puzle y el id del puzle coincide con el id del condicionante de la conexión
                 encontrado = 1; // Se ha encontrado un puzle en la sala actual para resolver
-                printf("%s   ->    ¿Deseas intentar resolver este puzle? (1: Si, 0: No)\n", puz[i].descripcion_puzle);
+                printf("%s   ->    Deseas intentar resolver este puzle? (1: Si, 0: No)\n", puz[i].descripcion_puzle);
                 int respuesta;
                 scanf("%d", &respuesta);
 
