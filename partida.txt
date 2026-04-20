@@ -11,3 +11,7 @@
 //OBJETO: OB02-Place
 //CONEXION: 01-Activa
 //PUZZLE: P01-Resuelto
+JUGADOR: 1
+SALA: 01
+CONEXION: C01-Activa
+PUZZLE: P01-Resuelto

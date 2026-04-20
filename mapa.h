@@ -30,7 +30,7 @@ void DescribirSala(Salas *sal, int id_sala_actual);
 
 // Precondición: Datos cargados e id_sala_actual válido.
 // Postcondición: Muestra información y espera a que el usuario decida salir.
-void AbrirConexion(Conexiones *con, int k);
+void AbrirConexion(Conexiones *con, int k, int id_sala_actual);
 
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos o resolver puzles en el menú de acciones del jugador
 //Postcondición: Se comprueba si la conexión con índice k en la lista de conexiones tiene como sala de origen la sala actual, tiene el estado de conexión a 0 (bloqueada) y tiene como condicionante el id del objeto o puzle que se está evaluando.

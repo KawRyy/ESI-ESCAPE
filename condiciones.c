@@ -176,10 +176,11 @@ void UsarObjeto(Objetos *obj, Inventario *inv, int num_conexiones, Conexiones *c
 
                 if(respuesta == 1){ // Si el jugador decide usar el objeto, se comprueba si puede abrir alguna conexión
                     for(k = 0; k < num_conexiones && j == 0; k++){
-                            printf("Has usado el objeto %s\n", inv->Inventario[i].nombre_objeto);
-                            AbrirConexion(con, k);
-                            j = 1;
-                        
+                        if(ComprobarConexion(con, k, id_sala_actual, inv->Inventario[i].id_objeto) == 1){
+                             printf("Has usado el objeto %s\n", inv->Inventario[i].nombre_objeto);
+                             AbrirConexion(con, k, id_sala_actual);
+                             j = 1;
+                        }
                     }
                 } else{
                     printf("Has elegido no usar el objeto \n");
@@ -219,7 +220,7 @@ void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *
                         if(strcmp(solucion, puz[i].solucion_puzle) == 0){ // Si la solución introducida coincide con la solución del puzle
                             puz[i].resuelto = 1; // Marca el puzle como resuelto
                             printf("Has resuelto el puzle %s\n", puz[i].descripcion_puzle);
-                    AbrirConexion(con, k); // Cambia el estado de la conexión a abierta
+                    AbrirConexion(con, k, id_sala_actual); // Cambia el estado de la conexión a abierta
                     
                 
                     j = 1; // Indica que se ha resuelto un puzle y se sale del bucle

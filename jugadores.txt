@@ -4,3 +4,4 @@
 //Player: 7 digits
 //Password: 8 digits
 //Inventory: Undefined
+01-jose-jose-1234

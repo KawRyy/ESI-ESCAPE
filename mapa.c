@@ -149,17 +149,18 @@ void DescribirSala(Salas *sal, int id_sala_actual) {
 
 int ComprobarConexion(Conexiones *con, int k,int id_sala_actual, char *n){
 //Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos o resolver puzles en el menú de acciones del jugador
-//Postcondición: Se comprueba si la conexión con índice k en la lista de conexiones tiene como sala de origen la sala actual, tiene el estado de conexión a 0 (bloqueada) y tiene como condicionante el id del objeto o puzle que se está evaluando.
-    if(con[k].id_sala_orig == id_sala_actual && con[k].estado_conexion == 0 && strcmp(con[k].id_condicionante, n) == 0){
-        return 1; // La conexión está bloqueada por un objeto que se encuentra en el inventario del jugador
+//Postcondición: Se comprueba si la conexión con índice k en la lista de conexiones tiene como sala de origen o destino la sala actual, tiene el estado de conexión a 0 (bloqueada) y tiene como condicionante el id del objeto o puzle que se está evaluando.
+    if((con[k].id_sala_orig == id_sala_actual || con[k].id_sala_dest == id_sala_actual) && con[k].estado_conexion == 0 && strcmp(con[k].id_condicionante, n) == 0){
+        return 1; // La conexión está bloqueada por un objeto que se encuentra en el inventario del jugador o un puzle
     }else{
-        return 0; // La conexión no está bloqueada por un objeto que se encuentra en el inventario del jugador
+        return 0; // La conexión no está bloqueada
     }
 }
 
-void AbrirConexion(Conexiones *con, int k){
-//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos o resolver puzles en el menú de acciones del jugador, y se ha comprobado que la conexión con índice k en la lista de conexiones tiene como sala de origen la sala actual, tiene el estado de conexión a 0 (bloqueada) y tiene como condicionante el id del objeto o puzle que se está evaluando.
+void AbrirConexion(Conexiones *con, int k, int id_sala_actual){
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos o resolver puzles en el menú de acciones del jugador, y se ha comprobado que la conexión con índice k en la lista de conexiones tiene vinculación con la sala actual y tiene como condicionante el id del objeto o puzle que se está evaluando.
 //Postcondición: Se cambia el estado de la conexión con índice k en la lista de conexiones a 1 (abierta) y se muestra un mensaje indicando que se ha abierto la conexión hacia la sala de destino de dicha conexión.
      con[k].estado_conexion = 1; // Cambia el estado de la conexión a abierta
-     printf("Has abierto la conexion hacia la sala %d\n", con[k].id_sala_dest);
+     int id_sala_destino = (con[k].id_sala_orig == id_sala_actual) ? con[k].id_sala_dest : con[k].id_sala_orig;
+     printf("Has abierto la conexion hacia la sala %d\n", id_sala_destino);
 }
