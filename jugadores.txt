@@ -4,7 +4,3 @@
 //Player: 7 digits
 //Password: 8 digits
 //Inventory: Undefined
-01-asdasd-erchope-12345678
-123-123-123-123456
-03-jose-jose-1234-OB01
-04-23-23-23
