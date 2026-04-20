@@ -354,10 +354,11 @@ void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *
     int i = 0; // Variable para recorrer la lista de puzles
     int j = 0; // Indica si se ha encontrado algún puzle en la sala actual
     int k = 0; // Variable para recorrer la lista de conexiones
-     
+    int encontrado = 0; // Indica si se ha encontrado algún puzle en la sala actual para resolver, para evitar mostrar el mensaje de "No hay puzles en esta sala para resolver" varias veces si hay varios puzles 
         for(k = 0; k < num_conexiones && j == 0; k++){ //Recorre la lista de conexiones para encontrar las que parten de la sala actual y tienen como condicionante el puzle que se está evaluando
         for(i = 0; i < num_puzles && j == 0; i++){ //Recorre la lista de puzles para encontrar los que están en la sala actual
             if(ComprobarConexion(con, k,id_sala_actual, puz[i].id_puzle) == 1){ // Si la conexión es desde la sala actual, tiene una condición de tipo puzle y el id del puzle coincide con el id del condicionante de la conexión
+                encontrado = 1; // Se ha encontrado un puzle en la sala actual para resolver
                 printf("%s   ->    ¿Deseas intentar resolver este puzle? (1: Si, 0: No)\n", puz[i].descripcion_puzle);
                 int respuesta;
                 scanf("%d", &respuesta);
@@ -385,7 +386,7 @@ void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *
         }
     }
 
-} if (j == 0){
+} if (encontrado == 0){
         printf("No hay puzles en esta sala para resolver\n");
     }
 }
