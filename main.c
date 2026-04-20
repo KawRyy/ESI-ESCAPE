@@ -28,6 +28,11 @@ int main(){
     // (2) FLUJO DE DATOS: Se pasan las direcciones de las estructuras de datos inicializadas al modulo de flujo de datos
     menu_inicial(&sal, &num_salas, &id_sala_actual, &con, &num_conexiones, &puz, &num_puzles, &obj, &num_objetos, &jug, &num_jugadores, &inv);
     
-    
+    free(sal);
+    free(con);
+    free(puz);
+    free(obj);
+    free(jug);
+    free(inv.Inventario);
     return 0;
 }

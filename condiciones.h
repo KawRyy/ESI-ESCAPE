@@ -2,7 +2,7 @@
 #define CONDICIONES_H
 // (MÓDULO DE PROCESAMIENTO)
 
-// AUTOR:
+// AUTOR: Carlos Junquera Lobato
 
 #include "mapa.h" // Se incluyen las estructuras de mapa para el .c, se refleja aqui por legibilidad
 
@@ -30,11 +30,28 @@ typedef struct {
     int num_objetos; // Número de objetos.
 }Inventario;
 
-void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual);  
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de examinar objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual
+void ExaminarObjeto(Objetos *obj, int num_objetos, int id_sala_actual);
+
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de ver el inventario en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador
 void MostrarInventario(Objetos *obj, Inventario *inv, int num_objetos);
+
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de coger objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en la sala actual y se pregunta al jugador si desea coger alguno de ellos. 
 void CogerObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_actual);
+
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de soltar objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea soltar alguno de ellos. 
 void SoltarObjeto(Inventario *inv, Objetos *obj, int num_objetos, int id_sala_actual);
+
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de usar objetos en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los objetos que se encuentran en el inventario del jugador y se pregunta si desea usar alguno de ellos. 
 void UsarObjeto(Objetos *obj, Inventario *inv, int num_conexiones, Conexiones *con, int id_sala_actual);
+
+//Precondición: Deben haber sido cargados los datos de la partida y haber sido seleccionada la opción de resolver puzles en el menú de acciones del jugador
+//Postcondición: Se muestra la descripción de los puzles que se encuentran en la sala actual y se pregunta al jugador si desea intentar resolver alguno de ellos.
 void ResolverPuzle(int num_conexiones, Puzles *puz, int num_puzles, Conexiones *con, int id_sala_actual);
 
 #endif /* CONDICIONES_H */

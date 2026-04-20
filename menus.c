@@ -11,6 +11,8 @@ static void menu_principal(Salas **sal, int *num_salas, int *id_sala_actual, Con
 static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexiones **con, int *num_conexiones, Puzles **puz, int *num_puzles, Objetos **obj, int *num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv);
 static void MostrarVictoria(int *salir, Jugadores **jug, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **obj, int *num_objetos, Conexiones **con, int *num_conexiones, Puzles **puz, int *num_puzles);
 
+//Precondición: Recibe punteros a las estructuras base del juego (salas, conexiones, puzles, objetos, jugadores e inventario) que ya han sido inicializadas con los datos de los ficheros. Estas estructuras se pasan por referencia para que cualquier modificación realizada en ellas dentro de los menús se refleje en el estado global del juego. El menú inicial es el punto de entrada al juego y desde aquí se accede al menú principal y al menú de juego. El flujo de datos se mantiene a través de la llamada a funciones y la manipulación directa de las estructuras base, asegurando que el estado del juego se actualice correctamente en función de las acciones del jugador.
+//Postcondición: El menú inicial permite al jugador iniciar sesión, acceder al menú principal para comenzar una nueva partida o cargar una partida guardada, y desde el menú principal se accede al menú de juego donde se desarrolla la experiencia interactiva del escape room. A lo largo de estos menús, las estructuras base del juego se actualizan en función de las acciones del jugador, como moverse entre salas, interactuar con objetos, resolver puzles y guardar el progreso. El flujo de datos se mantiene coherente y actualizado en todo momento, permitiendo una experiencia de juego fluida y consistente.
 void menu_inicial(Salas **sal, int *num_salas, int *id_sala_actual, Conexiones **con, int *num_conexiones, Puzles **puz, int *num_puzles, Objetos **obj, int *num_objetos, Jugadores **jug, int *num_jugadores, Inventario *inv){
     int control = 0;  // Variable para controlar la opción seleccionada en el menú inicial
     int salir = 0;  // Variable para controlar cuándo salir del menú inicial
@@ -70,7 +72,8 @@ void menu_inicial(Salas **sal, int *num_salas, int *id_sala_actual, Conexiones *
     }while(salir == 0);
 }
 
-
+//Precondición: Recibe las estructuras base del juego actualizadas con el estado del jugador logueado. El menú principal permite al jugador iniciar una nueva partida, cargar una partida guardada o salir al inicio de sesión. Si el jugador elige iniciar una nueva partida, se llama al menú de juego con las estructuras base para comenzar la experiencia interactiva. Si elige cargar una partida, se verifica si existe una partida guardada para ese jugador y se carga el estado del juego antes de llamar al menú de juego. El flujo de datos se mantiene a través de la manipulación directa de las estructuras base, asegurando que cualquier cambio realizado en ellas dentro del menú principal se refleje en el estado global del juego.
+//Postcondición: El menú principal permite al jugador acceder al menú de juego para desarrollar la experiencia del escape room, ya sea comenzando una nueva partida o cargando una partida guardada. A lo largo del menú principal, las estructuras base del juego se actualizan en función de las acciones del jugador, como iniciar una nueva partida o cargar una partida guardada, asegurando que el estado del juego se mantenga coherente y actualizado para la experiencia de juego. Desde el menú principal, el jugador puede acceder al menú de juego donde se desarrolla la experiencia interactiva del escape room.
 static void menu_principal(Salas **sal, int *num_salas, int *id_sala_actual, Conexiones **con, int *num_conexiones, Puzles **puz, int *num_puzles, Objetos **obj, int *num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv){
     int control = 0; // Variable para controlar la opción seleccionada en el menú principal
     int salir = 0; // Variable para controlar cuándo salir del menú principal
@@ -142,7 +145,8 @@ static void menu_principal(Salas **sal, int *num_salas, int *id_sala_actual, Con
     }while(salir == 0);
 }
 
-
+//Precondición: Recibe las estructuras base del juego actualizadas con el estado del jugador logueado y la sala actual. El menú de juego es donde se desarrolla la experiencia interactiva del escape room, permitiendo al jugador realizar acciones como describir la sala, examinar objetos, coger y soltar objetos, usar objetos, resolver puzles, guardar la partida o salir al menú principal. A lo largo del menú de juego, las estructuras base del juego se actualizan en función de las acciones del jugador, asegurando que el estado del juego se mantenga coherente y actualizado para la experiencia de juego. Si el jugador alcanza la sala de salida (id_sala_actual == 10), se muestra un mensaje de victoria y se ofrecen opciones para guardar la partida o salir sin guardar.
+//Postcondición: El menú de juego permite al jugador interactuar con el mundo del escape room, realizar acciones que afectan el estado del juego y avanzar hacia la condición de victoria. A lo largo del menú de juego, las estructuras base del juego se actualizan en función de las acciones del jugador, asegurando que el estado del juego se mantenga coherente y actualizado para la experiencia de juego. Si el jugador alcanza la sala de salida, se muestra un mensaje de victoria y se ofrecen opciones para guardar la partida o salir sin guardar, permitiendo al jugador finalizar su experiencia de juego de manera satisfactoria. Desde el menú de juego, el jugador puede regresar al menú principal para iniciar una nueva partida o cargar otra partida guardada.
 static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexiones **con, int *num_conexiones, Puzles **puz, int *num_puzles, Objetos **obj, int *num_objetos, Jugadores **jug, int indice_jugador, Inventario *inv) {
     int control = 0;
     int salir = 0;
@@ -276,7 +280,8 @@ static void menu_juego(Salas **sal, int *num_salas, int *id_sala_actual, Conexio
     } while (salir == 0);
 }
 
-
+//Precondición: Recibe punteros a las estructuras base del juego actualizadas con el estado del jugador logueado y la sala actual. Esta función se llama cuando el jugador alcanza la sala de salida (id_sala_actual == 10) y muestra un mensaje de victoria, ofreciendo opciones para guardar la partida o salir sin guardar. El flujo de datos se mantiene a través de la manipulación directa de las estructuras base, asegurando que cualquier cambio realizado en ellas dentro de esta función se refleje en el estado global del juego.
+//Postcondición: Si el jugador elige guardar la partida, se llama a la función para guardar el estado del juego, se actualizan las estructuras base con los datos de la partida guardada y se regresa al menú principal. Si el jugador elige salir sin guardar, se regresa al menú principal sin guardar el progreso. En ambos casos, se muestra un mensaje de salida y se reinician las estructuras base para preparar una nueva partida o cargar otra partida guardada desde el menú principal.
 static void MostrarVictoria(int *salir, Jugadores **jug, int indice_jugador, int *id_sala_actual, Inventario *inv, Objetos **obj, int *num_objetos, Conexiones **con, int *num_conexiones, Puzles **puz, int *num_puzles) {
     int control = 0;
 
