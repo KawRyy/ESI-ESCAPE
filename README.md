@@ -2,7 +2,7 @@
 
 main.c - Francisco Javier Funes Marín \
 menus.c - Francisco Javier Funes Marín \
-mapa.c - Francisco Javier Funes Marín y Carlos Junquera Lobato \
+mapa.c - Francisco Javier Funes Marín \
 condiciones.c - Carlos Junquera Lobato \
 ficheros.c - Álvaro Rodríguez García \
 usuarios.c - Alejandro Palomo Medina 
